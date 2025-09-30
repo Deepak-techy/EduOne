@@ -184,6 +184,7 @@ git checkout -- filename
 ```
 git stash
 git stash apply    # bring it back
+git stash clear    # clear the stash after bringing it back
 ```
 
 ---

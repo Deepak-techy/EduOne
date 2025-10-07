@@ -20,7 +20,7 @@ src/
 │   │   ├── Sidebar.jsx              # Sidebar for navigation and filtering options
 │   │   ├── Footer.jsx               # Footer UI component with copyright
 │   │   └── LayoutWrapper.jsx       # Wrapper component to include Navbar + Sidebar around pages
-│   │
+Features/
 │   ├── PDFQA/                       # Components for PDF Q&A feature
 │   │   ├── DocumentUploader.jsx    # Upload PDF document, handle Cloudinary upload logic
 │   │   ├── PDFViewer.jsx            # Display PDF with scroll and text selection support
@@ -77,7 +77,7 @@ src/
 │   │   └── NoteOrganizerPage.jsx   # Wraps NoteEditor and NotesList side by side
 │   │
 │   ├── PlannerPage/               # Academic planner full page
-│   │   └── PlannerPage.jsx         # Wraps Dashboard, TaskCalendar, CreateTaskForm components
+│   │   └── ResumeAnalyzerPage.jsx         # Wraps Dashboard, TaskCalendar, CreateTaskForm components
 │   │
 │   ├── ResumeAnalyzerPage/        # Resume analysis feature page
 │   │   └── ResumeAnalyzerPage.jsx  # Wraps ResumeUploader and AnalysisReport

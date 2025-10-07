@@ -77,6 +77,15 @@ git fetch --prune
 ```
 
 ---
+## Renaming the current branch:
+```
+git branch -m <new-branch-name>
+```
+## Renaming a different branch (not the current branch):
+```
+git branch -m <old-branch-name> <new-branch-name>
+```
+---
 
 ## 4. Local Workflow
 

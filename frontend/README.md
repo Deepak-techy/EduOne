@@ -1,132 +1,137 @@
 src/
 │
-├── assets/
-│   ├── images/
-│   │   └── logo.png                   # App logo image
-│   ├── fonts/                        # Custom fonts (if any)
-│   └── icons/
-│       └── menu.svg                  # Icon files (SVG format)
+├── assets/                     # All static files: images, icons, fonts
+│   ├── images/                 # PNG, JPG, JPEG images
+│   │   └── logo.png            # App logo
+│   ├── icons/                  # SVG or icon files
+│   │   └── menu.svg            # Menu icon example
+│   └── fonts/                  # Custom fonts (optional)
 │
-├── components/
-│   ├── common/                       # Reusable basic UI elements (used everywhere)
-│   │   ├── Button.jsx                # Custom button component with props for styling/types
-│   │   ├── Input.jsx                 # Text input component with validation handlers
-│   │   ├── Modal.jsx                 # Modal dialog UI component with open/close state
-│   │   ├── Loader.jsx                # Loading spinner component
-│   │   └── Alert.jsx                 # Alert/Notification component for success/error messages
+├── components/                 # Reusable components used across multiple features
+│   ├── common/                 # Truly generic UI components
+│   │   ├── Button.jsx          # Button with props for type, color, onClick
+│   │   ├── Input.jsx           # Text input with validation
+│   │   ├── Modal.jsx           # Modal wrapper component
+│   │   ├── Loader.jsx          # Loading spinner component
+│   │   └── Alert.jsx           # Alerts / Notifications (success/error)
 │   │
-│   ├── layout/                      # Layout components for app structure
-│   │   ├── Navbar.jsx               # Top navigation bar with links and user menu
-│   │   ├── Sidebar.jsx              # Sidebar for navigation and filtering options
-│   │   ├── Footer.jsx               # Footer UI component with copyright
-│   │   └── LayoutWrapper.jsx       # Wrapper component to include Navbar + Sidebar around pages
-Features/
-│   ├── PDFQA/                       # Components for PDF Q&A feature
-│   │   ├── DocumentUploader.jsx    # Upload PDF document, handle Cloudinary upload logic
-│   │   ├── PDFViewer.jsx            # Display PDF with scroll and text selection support
-│   │   ├── QuestionInput.jsx        # Input box for user question related to PDF content
-│   │   └── AnswerDisplay.jsx        # Show AI-generated answers with citation info
+│   ├── layout/                 # Layout components for app structure
+│   │   ├── Navbar.jsx          # Top navigation bar
+│   │   ├── Sidebar.jsx         # Sidebar menu / filters
+│   │   ├── Footer.jsx          # Footer for all pages
+│   │   └── LayoutWrapper.jsx   # Wraps Navbar + Sidebar around pages
 │   │
-│   ├── NoteOrganizer/               # Components for note creation & editing
-│   │   ├── NoteEditor.jsx           # Main note editor UI: subject/tag inputs and content textbox
-│   │   ├── TagInput.jsx             # AI tag generator and manual tag input component
-│   │   ├── VoiceToTextButton.jsx    # Optional voice-to-text button to dictate notes
-│   │   └── NotesList.jsx            # Displays list of user notes with basic info and search bar
-│   │
-│   ├── AcademicPlanner/             # Planner feature components
-│   │   ├── Dashboard.jsx            # Overview dashboard with tasks progress & summaries
-│   │   ├── TaskCalendar.jsx         # Monthly calendar view of tasks with clickable dates
-│   │   ├── TaskCard.jsx             # Single task card showing task info and priority
-│   │   └── CreateTaskForm.jsx       # Form to create/edit new tasks with validation
-│   │
-│   ├── ResumeAnalyzer/              # Resume upload and analysis UI
-│   │   ├── ResumeUploader.jsx       # File input and upload handling
-│   │   └── AnalysisReport.jsx       # Displays AI feedback and improvement suggestions
-│   │
-│   ├── CommunityPost/               # Collaborative feed components
-│   │   ├── PostCard.jsx             # Individual post display with votes, comments
-│   │   ├── PostFilterTabs.jsx       # Filter tabs to toggle between All, Students, Teachers
-│   │   ├── CreatePostButton.jsx     # Button to open modal/form to create post or announcement
-│   │   └── BookmarkedPostsSidebar.jsx # Sidebar with bookmarked posts quick access
-│   │
-│   ├── InterviewWithAI/             # Interview creation and feedback components
-│   │   ├── InterviewForm.jsx        # Form to create new interviews (job role, description, type)
-│   │   ├── InterviewList.jsx        # List view of created interviews with status
-│   │   └── FeedbackReport.jsx       # AI-generated interview feedback display
-│   │
-│   └── AdminTools/                  # Admin panel feature components
-│       ├── UserManagement.jsx       # Manage users, roles, suspension
-│       ├── ContentModeration.jsx    # Review flagged posts, approve/remove content
-│       ├── AnalyticsDashboard.jsx   # Usage statistics and active user charts
-│       └── SystemAnnouncements.jsx  # Create and broadcast admin announcements
+│   └── feature-specific/       # Optional reusable components inside a specific feature
+│       └── PDFQA/
+│           ├── QuestionInput.jsx
+│           └── AnswerDisplay.jsx
 │
-├── pages/                          # Route-level page components - used in routing configuration
-│   ├── Home/                      # Landing/home page
-│   │   └── Home.jsx                # Uses common layout, welcome UI, feature highlights
+├── features/                   # Feature-specific components (core logic/UI)
+│   ├── PDFQA/
+│   │   ├── DocumentUploader.jsx    # Upload PDFs
+│   │   ├── PDFViewer.jsx           # View PDF content
+│   │   └── index.js                # Export all PDFQA components
 │   │
-│   ├── Login/                     # Authentication page
-│   │   └── Login.jsx               # Login form and social login buttons
+│   ├── NoteOrganizer/
+│   │   ├── NoteEditor.jsx          # Create/edit notes
+│   │   ├── TagInput.jsx            # Generate/select tags
+│   │   ├── VoiceToTextButton.jsx   # Optional dictation button
+│   │   └── NotesList.jsx           # Display all notes
 │   │
-│   ├── Dashboard/                 # After-login user dashboard page
-│   │   └── Dashboard.jsx           # Displays user's overview with links to features
+│   ├── AcademicPlanner/
+│   │   ├── Dashboard.jsx           # Task summary / overview
+│   │   ├── TaskCalendar.jsx        # Monthly calendar view
+│   │   ├── TaskCard.jsx            # Single task card
+│   │   └── CreateTaskForm.jsx      # Form to create/edit tasks
 │   │
-│   ├── PDFQAPage/                 # PDF Q&A system page
-│   │   └── PDFQAPage.jsx           # Combines DocumentUploader, PDFViewer, Q&A input/display
+│   ├── ResumeAnalyzer/
+│   │   ├── ResumeUploader.jsx      # Upload resume file
+│   │   └── AnalysisReport.jsx      # Show AI feedback
 │   │
-│   ├── NoteOrganizerPage/         # Page for note organizer feature
-│   │   └── NoteOrganizerPage.jsx   # Wraps NoteEditor and NotesList side by side
+│   ├── CommunityPost/
+│   │   ├── PostCard.jsx            # Single post UI
+│   │   ├── PostFilterTabs.jsx      # Filter tabs (All/Students/Teachers)
+│   │   ├── CreatePostButton.jsx    # Create post modal/button
+│   │   └── BookmarkedPostsSidebar.jsx
 │   │
-│   ├── PlannerPage/               # Academic planner full page
-│   │   └── ResumeAnalyzerPage.jsx         # Wraps Dashboard, TaskCalendar, CreateTaskForm components
+│   ├── InterviewWithAI/
+│   │   ├── InterviewForm.jsx       # Create new interviews
+│   │   ├── InterviewList.jsx       # List of interviews
+│   │   └── FeedbackReport.jsx      # AI-generated feedback
 │   │
-│   ├── ResumeAnalyzerPage/        # Resume analysis feature page
-│   │   └── ResumeAnalyzerPage.jsx  # Wraps ResumeUploader and AnalysisReport
-│   │
-│   ├── CommunityPage/             # Community posts and announcements page
-│   │   └── CommunityPage.jsx       # Integrates PostFilterTabs, PostCard feed, bookmarks
-│   │
-│   ├── InterviewPage/             # Interview with AI feature page
-│   │   └── InterviewPage.jsx       # Wraps InterviewForm, InterviewList, and FeedbackReport
-│   │
-│   ├── AdminPanel/                # Admin dashboard and tools page
-│   │   └── AdminPanel.jsx          # Wraps UserManagement, ContentModeration, AnalyticsDashboard
-│   │
-│   └── NotFound/                 # 404 error page for unmatched routes
-│       └── NotFound.jsx
+│   └── AdminTools/
+│       ├── UserManagement.jsx      # Manage users
+│       ├── ContentModeration.jsx   # Review flagged content
+│       ├── AnalyticsDashboard.jsx  # Usage stats charts
+│       └── SystemAnnouncements.jsx # Broadcast announcements
 │
-├── hooks/                        # Custom React hooks encapsulating specific logic
-│   ├── useAuth.js                 # Authentication state and handlers
-│   ├── useFetch.js                # Generic data fetching hook with loading/error states
-│   ├── useNotes.js                # Note creation and update logic hook
-│   ├── useTasks.js                # Task management hook (create, update, delete)
-│   └── useCommunity.js            # Handles community post interactions, voting, bookmarking
+├── pages/                      # Route-level components (directly used in routing)
+│   ├── home/
+│   │   └── Home.jsx              # Landing page
+│   │
+│   ├── login/
+│   │   └── Login.jsx             # Login/authentication page
+│   │
+│   ├── dashboard/
+│   │   └── Dashboard.jsx         # User dashboard overview
+│   │
+│   ├── pdfqa/
+│   │   └── PDFQAPage.jsx         # Wraps PDFQA components
+│   │
+│   ├── notes/
+│   │   └── NoteOrganizerPage.jsx # Wraps NoteOrganizer feature
+│   │
+│   ├── planner/
+│   │   └── PlannerPage.jsx       # Wraps AcademicPlanner feature
+│   │
+│   ├── resume-analyzer/
+│   │   └── ResumeAnalyzerPage.jsx # Wraps ResumeAnalyzer feature
+│   │
+│   ├── community/
+│   │   └── CommunityPage.jsx     # Wraps CommunityPost feature
+│   │
+│   ├── interview/
+│   │   └── InterviewPage.jsx     # Wraps InterviewWithAI feature
+│   │
+│   ├── admin/
+│   │   └── AdminPanel.jsx        # Wraps AdminTools feature
+│   │
+│   └── not-found/
+│       └── NotFound.jsx          # 404 page
 │
-├── contexts/                     # React contexts providing global state
-│   ├── AuthContext.jsx            # Auth provider for user login status and info
-│   ├── NotesContext.jsx           # Provides note data and actions app-wide
-│   ├── TasksContext.jsx           # Task state/context for planner feature
-│   ├── CommunityContext.jsx       # Community posts and bookmark state context
-│   └── AdminContext.jsx           # Admin user and content moderation context
+├── hooks/                      # Custom React hooks
+│   ├── useAuth.js               # Auth state & handlers
+│   ├── useFetch.js              # Generic data fetching hook
+│   ├── useNotes.js              # Note-related logic
+│   ├── useTasks.js              # Task management logic
+│   └── useCommunity.js          # Community interactions
 │
-├── services/                    # Backend API interaction logic
-│   ├── apiClient.js               # Axios or fetch instance with base URL and interceptors
-│   ├── authService.js             # Auth-related backend API calls (login, signup)
-│   ├── notesService.js            # CRUD API calls for notes
-│   ├── tasksService.js            # API calls for task management
-│   ├── communityService.js        # Posts creation, voting, commenting APIs
-│   ├── resumeService.js           # Resume upload and AI feedback API
-│   └── interviewService.js        # Interview creation, status, and feedback APIs
+├── contexts/                   # Global state providers
+│   ├── AuthContext.jsx
+│   ├── NotesContext.jsx
+│   ├── TasksContext.jsx
+│   ├── CommunityContext.jsx
+│   └── AdminContext.jsx
+│
+├── services/                   # Backend API interaction
+│   ├── apiClient.js             # Axios/fetch instance
+│   ├── authService.js           # Auth API calls
+│   ├── notesService.js          # Notes API calls
+│   ├── tasksService.js          # Tasks API calls
+│   ├── communityService.js      # Community API calls
+│   ├── resumeService.js         # Resume analysis API calls
+│   └── interviewService.js      # Interview API calls
 │
 ├── utils/                      # Helper functions and constants
-│   ├── formatDate.js              # Format dates consistently across UI
-│   ├── generateTags.js            # AI tag generation helper logic
-│   ├── validateInput.js           # Input validation utilities and regex patterns
-│   └── constants.js               # Static values like API endpoints, roles, priorities
+│   ├── formatDate.js            # Date formatting
+│   ├── generateTags.js          # AI tag generation helper
+│   ├── validateInput.js         # Input validation
+│   └── constants.js             # Static constants like roles, priorities
 │
-├── styles/                    # Global CSS and Tailwind configuration
-│   ├── index.css                  # Global styles including Tailwind imports
-│   └── tailwind.config.js         # Tailwind CSS theme and customizations
+├── styles/                     # Global CSS / Tailwind
+│   ├── index.css                # Global styles + Tailwind import
+│   └── tailwind.config.js       # Tailwind config
 │
-├── App.jsx                    # Main React app component, holds Router setup with routes & layouts
-├── main.jsx                   # Entry point, renders App into DOM with ReactDOM
-└── vite-env.d.ts              # Vite environment type declarations (if using TypeScript)
+├── App.jsx                     # Main app component with routing
+├── main.jsx                    # Entry point for React
+└── vite-env.d.ts               # Vite environment types (if using TS)

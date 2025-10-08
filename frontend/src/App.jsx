@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <div className='bg-red-400'>
-        <h1>This is main branch</h1>
+        hiii this is homepage
       </div>
     </>
   )

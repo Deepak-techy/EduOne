@@ -1,4 +1,5 @@
 import crypto from "crypto"
+import jwt from "jsonwebtoken"
 
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -64,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // return response
     return res
         .status(200)
-        .json(new ApiResponse(200, "User registered successfully"))
+        .json(new ApiResponse(200, createdUser, "User registered successfully"))
 
 })
 
@@ -86,7 +87,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     // check the password
-    const isPasswordValid = await User.isPasswordCorrect(password)
+    const isPasswordValid = await user.isPasswordCorrect(password)
 
     if (!isPasswordValid) {
         throw new ApiError(401, "Invalid password")
@@ -139,9 +140,9 @@ const logoutUser = asyncHandler(async (req, res) => {
     // return response
     return res
         .status(200)
-        .clearcookie("accessToken", options)
-        .clearcookie("refreshToken", options)
-        .json(new ApiResponse(200, "User logges out successfully"))
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, "User logged out successfully"))
 })
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -221,7 +222,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
     const resetTokenExpires = Date.now() + Number(process.env.RESET_TOKEN_EXP_MINUTES) * 60 * 1000; // 15 mins
 
     user.resetPasswordToken = resetToken;
-    user.resetPasswordExpire = resetTokenExpire;
+    user.resetPasswordExpires = resetTokenExpires;
 
     await user.save({
         validateBeforeSave: false
@@ -244,7 +245,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
     // return response
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Password reset link sent to your email"))
+        .json(new ApiResponse(200, "Password reset link sent to your email"))
 })
 
 const resetPassword = asyncHandler(async (req, res) => {
@@ -263,7 +264,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     // find the user
     const user = await User.findOne({
         resetPasswordToken: token,
-        resetPasswordExpire: { $gt: Date.now() }
+        resetPasswordExpires: { $gt: Date.now() }
     })
 
     if (!user) {
@@ -273,7 +274,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     // update the password
     user.password = newPassword
     user.resetPasswordToken = undefined
-    user.resetPasswordExpire = undefined
+    user.resetPasswordExpires = undefined
     await user.save({
         validateBeforeSave: false
     })
@@ -281,7 +282,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     // return response
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Password reset successfully"))
+        .json(new ApiResponse(200, "Password reset successfully"))
 })
 
 const getUserProfile = asyncHandler(async (req, res) => {

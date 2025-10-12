@@ -4,7 +4,7 @@ const Hero = () => {
   return (
     <section 
       id="home" 
-      className="flex items-center bg-[#E8F4F8] dark:bg-[#1a1b1e] py-16 md:py-20 lg:py-24 px-6 md:px-10 lg:px-12 transition-colors duration-300"
+      className="flex items-center bg-[#E8F4F8] dark:bg-[rgb(26,27,30)] py-16 md:py-20 lg:py-24 px-6 md:px-10 lg:px-12 transition-colors duration-300"
     >
       <div className="max-w-7xl mx-auto w-full">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 xl:gap-16 items-center">

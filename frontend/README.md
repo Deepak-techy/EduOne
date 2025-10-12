@@ -1,4 +1,5 @@
-all coreect but folder structure wrong so detelete that from memory and save this one src/
+```
+src/
 │
 ├── assets/                                  # 📁 All static files (images, fonts, icons)
 │   ├── images/                              # App banners, logos, and illustrations
@@ -146,3 +147,4 @@ all coreect but folder structure wrong so detelete that from memory and save thi
 ├── App.jsx                                  # App entry component (contains Router + Theme)
 ├── main.jsx                                 # ReactDOM render root
 └── vite-env.d.ts                            # Type definitions for Vite
+```

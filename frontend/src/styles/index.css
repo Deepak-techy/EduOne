@@ -1,0 +1,241 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+* {
+  margin: 1;
+  padding: 1;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+/* ===== LIGHT MODE ===== */
+body {
+  background-color: #E8F4F8;
+  color: #000000;
+}
+
+/* ========================================
+   DARK MODE - COMPLETE FIX
+======================================== */
+
+/* Navbar Dark Mode */
+html.dark nav {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+  border-color: #374151;
+}
+
+/* Hero Section Dark Mode */
+html.dark section#home {
+  background-color: #1a1b1e !important;
+}
+
+/* ========== SERVICES SECTION ========== */
+html.dark section#services {
+  background-color: #1a1b1e !important;
+}
+
+/* Service Cards - Dark */
+html.dark section#services > div > div:last-child > div {
+  background: linear-gradient(135deg, #2d2e33 0%, #1a1b1e 100%) !important;
+  border-color: #3d3e43 !important;
+}
+
+/* Service Card Icon Box - Dark */
+html.dark section#services > div > div:last-child > div > div:first-child > div {
+  background-color: #25262b !important;
+  border-color: #3d3e43 !important;
+}
+
+/* Service Card Title */
+html.dark section#services h4 {
+  color: #ffffff !important;
+}
+
+/* Service Card Description */
+html.dark section#services p {
+  color: #9ca3af !important;
+}
+
+/* Service Icons - Brighter Blue */
+html.dark section#services svg {
+  color: #4a9eff !important;
+}
+
+/* ========== ABOUT SECTION ========== */
+html.dark section#about {
+  background: linear-gradient(135deg, #1a1b1e 0%, #25262b 100%) !important;
+}
+
+/* About Stats Cards - Dark */
+html.dark section#about > div > div:nth-child(2) > div {
+  background-color: #25262b !important;
+  border-color: #3d3e43 !important;
+}
+
+/* About Feature Cards - Dark */
+html.dark section#about > div > div:nth-child(3) > div {
+  background-color: #25262b !important;
+  border-color: #4a9eff !important;
+}
+
+/* About Text Colors */
+html.dark section#about h2,
+html.dark section#about h3 {
+  color: #ffffff !important;
+}
+
+html.dark section#about p,
+html.dark section#about > div > div:nth-child(2) > div > div:last-child {
+  color: #9ca3af !important;
+}
+
+/* About Numbers - Brighter Blue */
+html.dark section#about > div > div:nth-child(2) > div > div:first-child {
+  color: #4a9eff !important;
+}
+
+/* ========== CONTACT SECTION ========== */
+html.dark section#contact {
+  background: linear-gradient(135deg, #1a1b1e 0%, #25262b 50%, #1a1b1e 100%) !important;
+}
+
+/* Contact Form Container - Dark */
+html.dark section#contact > div > div > div:last-child {
+  background-color: #25262b !important;
+  border-color: #3d3e43 !important;
+}
+
+/* Contact Input Fields - Dark */
+html.dark section#contact input,
+html.dark section#contact textarea {
+  background-color: #1a1b1e !important;
+  border-color: #3d3e43 !important;
+  color: #ffffff !important;
+}
+
+html.dark section#contact input::placeholder,
+html.dark section#contact textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Contact Input Focus */
+html.dark section#contact input:focus,
+html.dark section#contact textarea:focus {
+  border-color: #4a9eff !important;
+  ring-color: #4a9eff !important;
+}
+
+/* Contact Labels */
+html.dark section#contact label {
+  color: #d1d5db !important;
+}
+
+/* Submit Button - Dark */
+html.dark section#contact button[type="submit"] {
+  background-color: #303658 !important;
+  color: #ffffff !important;
+}
+
+html.dark section#contact button[type="submit"]:hover {
+  background-color: #3d3e43 !important;
+}
+
+/* "Let's connect" Box - Dark */
+html.dark section#contact > div > div > div:first-child > div:last-child {
+  background: linear-gradient(135deg, #25262b 0%, #2d2e33 100%) !important;
+}
+
+/* Contact Headings */
+html.dark section#contact h2,
+html.dark section#contact h3 {
+  color: #ffffff !important;
+}
+
+/* Contact Description */
+html.dark section#contact p {
+  color: #9ca3af !important;
+}
+
+/* "Get in touch" - Blue Text */
+html.dark section#contact h2 > span:last-child {
+  color: #4a9eff !important;
+}
+/* ========================================
+   FORCE "LET'S CONNECT" BOX DARK MODE
+======================================== */
+
+/* Target the specific box */
+html.dark section#contact > div > div > div:first-child > div:nth-child(2) > div {
+  background: linear-gradient(135deg, #2d2e33 0%, #1a1b1e 100%) !important;
+  border: 1px solid #3d3e43 !important;
+}
+
+/* All text inside the box - white */
+html.dark section#contact > div > div > div:first-child > div:nth-child(2) h3 {
+  color: #ffffff !important;
+}
+
+/* All paragraphs inside the box - gray */
+html.dark section#contact > div > div > div:first-child > div:nth-child(2) p {
+  color: #9ca3af !important;
+}
+
+/* ========== FOOTER ========== */
+html.dark footer {
+  background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
+}
+
+
+
+/* Text Colors Dark Mode */
+html.dark h1,
+html.dark h2,
+html.dark h3 {
+  color: #ffffff !important;
+}
+
+html.dark p {
+  color: #9ca3af !important;
+}
+
+html.dark button {
+  color: inherit;
+}
+
+/* Nav Links Dark Mode */
+html.dark nav button,
+html.dark nav a {
+  color: #e5e7eb !important;
+}
+
+/* Border Dark Mode */
+html.dark .border-black {
+  border-color: #ffffff !important;
+}
+
+html.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+/* Background Circles Dark Mode */
+html.dark .bg-gradient-to-br.from-gray-200 {
+  background: linear-gradient(to bottom right, #374151, #1f2937) !important;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.8s ease-out forwards;
+}

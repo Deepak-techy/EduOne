@@ -1,4 +1,4 @@
-src/
+all coreect but folder structure wrong so detelete that from memory and save this one src/
 │
 ├── assets/                                  # 📁 All static files (images, fonts, icons)
 │   ├── images/                              # App banners, logos, and illustrations

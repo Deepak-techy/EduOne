@@ -58,7 +58,7 @@ export const authService = {
     try {
       const response = await api.post(`/reset-password/${token}`, {  // ← FIXED: Removed /users/
         newPassword: passwords.newPassword,
-        confirmPassword: passwords.confirmNewPassword,
+        confirmNewPassword: passwords.confirmNewPassword,
       });
       return response.data;
     } catch (error) {

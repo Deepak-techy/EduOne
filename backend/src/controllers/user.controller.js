@@ -229,7 +229,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
     })
 
     // send email
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+    const resetUrl = `${process.env.FRONTEND_URL}/api/users/reset-password/${resetToken}`
 
     // 5️⃣ Compose email content
     const message = `

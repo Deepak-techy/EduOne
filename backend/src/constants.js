@@ -13,6 +13,9 @@ export const SUBJECT_COLLECTIONS = {
 // Temporary upload collection
 export const TEMP_COLLECTION = 'temp_uploads';
 
+// Session timeout for temporary uploads
+export const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
 // Create prompt template for RAG:- PDF-QA feature
 export const QA_PROMPT = {
     system: 'You are a helpful assistant answering questions based on provided context. If the answer is not in the context, say so.',

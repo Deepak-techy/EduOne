@@ -184,6 +184,11 @@ git log --oneline
 git reset --soft HEAD~1
 ```
 
+### Undo last commit (Discard changes):
+```
+git reset --hard HEAD~1
+```
+
 ### Discard local changes to a file:
 ```
 git checkout -- filename

@@ -226,7 +226,7 @@ const ResetPassword = () => {
                       </svg>
                       Resetting...
                     </span>
-                  ) : 'Done'}
+                  ) : 'Reset'}
                 </button>
               </form>
             </>

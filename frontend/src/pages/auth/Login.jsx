@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { validateEmail, validatePassword } from '../../utils/validation';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -45,8 +46,20 @@ const Login = () => {
       const response = await authService.login(formData);
       localStorage.setItem('user', JSON.stringify(response.data));
       navigate('/dashboard');
+
+      // Show success message
+    toast.success('Login successful! Welcome back! 🎉', {
+      position: 'top-right',
+      autoClose: 2000,
+    });
+    
     } catch (error) {
       setApiError(error.message || 'Login failed. Please try again.');
+      // Show error toast
+    toast.error(errorMessage, {
+      position: 'top-right',
+      autoClose: 3000,
+    });
     } finally {
       setLoading(false);
     }

@@ -6,7 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
-import { uploadOnCloudinary } from "../services/cloudinaryUpload.js";
+import { uploadOnCloudinary } from "../services/cloudinaryUpload.service.js";
 
 
 const generateAccessAndRefreshToken = async (userId) => {

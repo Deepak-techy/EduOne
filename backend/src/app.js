@@ -23,12 +23,14 @@ app.use(cookieParser())
 
 // routes import
 import userRouter from "./routes/user.routes.js"
-
+import subjectRouter from "./routes/subject.routes.js"
+import uploadRouter from "./routes/upload.routes.js"
 
 
 // route declarations
 app.use("/api/users", userRouter)   // users route
-
+app.use("/api/subjects", subjectRouter)   // subjects route
+app.use("/api/uploads", uploadRouter)   // uploads route
 
 
 export { app }

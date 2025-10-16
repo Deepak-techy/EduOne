@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
     registerUser,
     loginUser,
@@ -16,16 +17,16 @@ import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 
-router.route("/register").post(registerUser)
-router.route("/login").post(loginUser)
-router.route("/forget-password").post(verifyJWT, forgetPassword)
-router.route("/reset-password/:token").post(resetPassword)
+router.route("/register").post(registerUser)    // POST /api/users/register
+router.route("/login").post(loginUser)    // POST /api/users/login
+router.route("/forget-password").post(verifyJWT, forgetPassword)    // POST /api/users/forget-password
+router.route("/reset-password/:token").post(resetPassword)    // POST /api/users/reset-password/:token
 
 // secured routes
-router.route("/logout").post(verifyJWT, logoutUser)
-router.route("/refresh-token").post(verifyJWT, refreshAccessToken)
-router.route("/view-profile").get(verifyJWT, getUserProfile)
-router.route("/update-profile").patch(verifyJWT, updateAccountDetails)
-router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
+router.route("/logout").post(verifyJWT, logoutUser)   // POST /api/users/logout
+router.route("/refresh-token").post(verifyJWT, refreshAccessToken)   // POST /api/users/refresh-token
+router.route("/view-profile").get(verifyJWT, getUserProfile)    // GET /api/users/view-profile
+router.route("/update-profile").patch(verifyJWT, updateAccountDetails)    // PATCH /api/users/update-profile
+router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)    // PATCH /api/users/update-avatar
 
 export default router;

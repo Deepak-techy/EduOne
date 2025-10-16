@@ -10,6 +10,15 @@ export const SUBJECT_COLLECTIONS = {
     // Add more subjects as needed
 };
 
+// Pre-built subject list
+export const SUBJECT_LIST = [
+    { code: 'DSA', name: 'Data Structures & Algorithms' },
+    { code: 'OS', name: 'Operating Systems' },
+    { code: 'DBMS', name: 'Database Management Systems' },
+    { code: 'CN', name: 'Computer Networks' },
+    // Add more subjects as needed
+];
+
 // Temporary upload collection
 export const TEMP_COLLECTION = 'temp_uploads';
 

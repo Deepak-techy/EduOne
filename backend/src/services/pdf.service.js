@@ -1,12 +1,18 @@
-import pdf from 'pdf-parse';
+import { createRequire } from 'module';
 import fs from 'fs/promises';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
+const require = createRequire(import.meta.url);
+const pdf = require('pdf-parse');
+
 // Extract text from PDF file
 export const extractTextFromPDF = async (filePath) => {
-    const dataBuffer = await fs.readFile(filePath);
-    const data = await pdf(dataBuffer);
-    return data.text;
+    const loader = new PDFLoader(filePath);
+    const docs = await loader.load();
+
+    // Combine all pages into single text
+    const text = docs.map(doc => doc.pageContent).join('\n\n');
+    return text;
 };
 
 // Split text into chunks for better retrieval

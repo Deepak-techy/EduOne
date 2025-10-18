@@ -7,7 +7,7 @@ import { generateAnswer } from '../services/qa.service.js';
 import { createSession, extendSession } from '../utils/sessionManager.js';
 import { SUBJECT_LIST } from "../constants.js";
 
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import fs from 'fs/promises';
 
 const uploadPermanentPDF = asyncHandler(async (req, res) => {

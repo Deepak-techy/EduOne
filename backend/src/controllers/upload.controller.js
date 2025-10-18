@@ -1,11 +1,14 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { extractTextFromPDF, chunkText } from "../services/pdf.service.js";
-import { storeTempDocument, searchInTempUpload, storeDocumentsInSubject } from '../services/vector.service.js';
-import { generateAnswer } from '../services/qa.service.js';
+import { extractTextFromPDF, chunkText } from "../services/pdfProcessor.service.js";
+import {
+    storeTempDocumentInTempCollection,
+    searchInTempUploadCollection,
+    storeDocumentsInSubjectCollection
+} from '../services/vector.service.js';
+import { generateAnswer } from '../services/generateAnswer.service.js';
 import { createSession, extendSession } from '../utils/sessionManager.js';
-import { SUBJECT_LIST } from "../constants.js";
 
 import { v4 as uuidv4 } from "uuid";
 import fs from 'fs/promises';
@@ -20,9 +23,8 @@ const uploadPermanentPDF = asyncHandler(async (req, res) => {
     const { subject } = req.body;
 
     // Validate subject
-    if (!subject || !SUBJECT_LIST.find(s => s.name === subject)) {
-        await fs.unlink(req.file.path);
-        throw new ApiError(400, 'Invalid subject');
+    if (!subject) {
+        throw new ApiError(400, 'Subject is required');
     }
 
     // Extract text from PDF file
@@ -49,15 +51,13 @@ const uploadPermanentPDF = asyncHandler(async (req, res) => {
     };
 
     // Store in subject-specific Qdrant collection
-    const { vectorStore, pointIds } = await storeDocumentsInSubject(
+    const { vectorStore, pointIds } = await storeDocumentsInSubjectCollection(
         subject,
         chunks,
         metadata
     );
 
-    if (!vectorStore) {
-        throw new ApiError(500, "Failed to store document in Qdrant");
-    }
+    console.log("Vector store: ", vectorStore);
 
     // Delete uploaded file from disk
     await fs.unlink(req.file.path);
@@ -69,7 +69,7 @@ const uploadPermanentPDF = asyncHandler(async (req, res) => {
             documentId,
             subject,
             chunkCount: chunks.length,
-            pointIds: pointIds.length,
+            // pointIds: pointIds.length,
             uploadDate: metadata.uploadDate
         }, "Document uploaded and stored permanently"));
 });
@@ -86,11 +86,11 @@ const uploadTempPDF = asyncHandler(async (req, res) => {
     // split text into chunks for better retrieval
     const chunks = await chunkText(text)
 
-    // gebenere Session ID
+    // generate Session ID
     const sessionId = uuidv4();
 
     // store in Qdrant with session metadata
-    const { vectorStore } = await storeTempDocument(chunks, sessionId);
+    const { vectorStore } = await storeTempDocumentInTempCollection(chunks, sessionId);
 
     if (!vectorStore) {
         throw new ApiError(500, "Failed to store in Qdrant");
@@ -111,7 +111,7 @@ const uploadTempPDF = asyncHandler(async (req, res) => {
         }, "File uploaded and stored successfully"));
 })
 
-const queryTempUpload = asyncHandler(async (req, res) => {
+const queryForTempUpload = asyncHandler(async (req, res) => {
     // get session ID and query from frontend
     const { sessionId, query } = req.body;
 
@@ -123,11 +123,10 @@ const queryTempUpload = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Query is required");
     }
 
-    // extend session timeout on activity
     extendSession(sessionId);
 
     // search in temporary collection filtered by session
-    const context = await searchInTempUpload(query, sessionId);
+    const context = await searchInTempUploadCollection(query, sessionId);
 
     if (!context) {
         throw new ApiError(400, "No context found");
@@ -149,6 +148,6 @@ const queryTempUpload = asyncHandler(async (req, res) => {
 
 export {
     uploadTempPDF,
-    queryTempUpload,
+    queryForTempUpload,
     uploadPermanentPDF
 }

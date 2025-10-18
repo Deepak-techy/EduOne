@@ -2,10 +2,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { SUBJECT_COLLECTIONS, SUBJECT_LIST } from "../constants.js";
-import { searchInSubject } from "../services/vector.service.js";
-import { generateAnswer } from "../services/qa.service.js";
+import { searchInSubjectCollection } from "../services/vector.service.js";
+import { generateAnswer } from "../services/generateAnswer.service.js";
 
-const getSubjectDocuments = asyncHandler(async (req, res) => {
+const getSubjectQueryAnswer = asyncHandler(async (req, res) => {
     // get subject and query from frontend
     const { subject, query } = req.body;
 
@@ -22,7 +22,7 @@ const getSubjectDocuments = asyncHandler(async (req, res) => {
     }
 
     // semantic search in subject collection
-    const context = await searchInSubject(subject, query)
+    const context = await searchInSubjectCollection(subject, query)
 
     if (!context) {
         throw new ApiError(400, "No context found");
@@ -53,6 +53,6 @@ const getAvailableSubjects = asyncHandler(async (req, res) => {
 
 
 export {
-    getSubjectDocuments,
+    getSubjectQueryAnswer,
     getAvailableSubjects
 }

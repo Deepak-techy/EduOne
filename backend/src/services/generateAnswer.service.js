@@ -8,13 +8,13 @@ import { QA_PROMPT } from '../constants.js';
 export const generateAnswer = async (query, context) => {
     const contextText = context.map(doc => doc.pageContent).join('\n\n');
 
-    const prompt = new ChatPromptTemplate.fromMessages([
+    const prompt = ChatPromptTemplate.fromMessages([
         ['system', QA_PROMPT.system],
-        ['human', QA_PROMPT.human(contextText)],
-    ])
+        ['human', QA_PROMPT.human('{contextText}')],
+    ]);
 
     const chain = prompt.pipe(geminiModel);
-    const response = await chain.invoke({ query });
+    const response = await chain.invoke({ query, contextText });
 
     return response.content;
 };

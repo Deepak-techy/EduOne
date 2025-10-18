@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import connectDB from "./config/mongoDB.config.js";
+import { connectQdrant } from "./config/qdrant.config.js";
 import { app } from "./app.js";
 
 dotenv.config({
@@ -7,7 +8,10 @@ dotenv.config({
 })
 
 connectDB()
-    .then(() => {
+    .then(async () => {
+        // Connect to Qdrant after MongoDB is connected
+        await connectQdrant();
+
         app.listen(process.env.PORT, () => {
 
             app.on("error", (err) => {

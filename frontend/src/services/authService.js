@@ -1,4 +1,4 @@
-// Handles all API calls to backend
+//src/services/authService.js (Handles all API calls to backend)
 
 import axios from 'axios';
 

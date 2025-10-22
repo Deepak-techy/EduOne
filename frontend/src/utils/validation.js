@@ -1,10 +1,22 @@
-//Validates form inputs (email, password, etc.)
+// Validates form inputs (email, password, etc.)
 
-// Email validation
+// Email validation - UPDATED to accept both email and username
 export const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email) return 'Email is required';
-  if (!emailRegex.test(email)) return 'Invalid email format';
+  
+  // Check if empty
+  if (!email) return 'Email or username is required';
+  
+  // If it contains @, validate as email
+  if (email.includes('@') && !emailRegex.test(email)) {
+    return 'Invalid email format';
+  }
+  
+  // If no @, treat as username (min 3 chars)
+  if (!email.includes('@') && email.length < 3) {
+    return 'Username must be at least 3 characters';
+  }
+  
   return '';
 };
 
@@ -26,16 +38,13 @@ export const validateName = (name) => {
 export const validateUsername = (username) => {
   if (!username) return 'Username is required';
   if (username.length < 3) return 'Username must be at least 3 characters';
+  // Check for special characters (username should be alphanumeric)
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+  if (!usernameRegex.test(username)) {
+    return 'Username can only contain letters, numbers, and underscores';
+  }
   return '';
 };
-
-// // Phone validation
-// export const validatePhone = (phone) => {
-//   const phoneRegex = /^[0-9]{10}$/;
-//   if (!phone) return 'Phone number is required';
-//   if (!phoneRegex.test(phone)) return 'Phone must be 10 digits';
-//   return '';
-// };
 
 // Role validation
 export const validateRole = (role) => {

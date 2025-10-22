@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 // Auth Pages
 import Login from "../pages/auth/Login";
@@ -6,11 +6,14 @@ import Signup from "../pages/auth/Signup";
 import ForgetPassword from "../pages/auth/ForgetPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
+// Home Page (Your landing page)
+import Home from "../pages/Home/Home";
+
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Redirect root to login */}
-      <Route path="/" element={<Navigate to="/auth/login" replace />} />
+      {/* Home Route - Shows landing page */}
+      <Route path="/" element={<Home />} />
 
       {/* Auth Routes */}
       <Route path="/auth/login" element={<Login />} />
@@ -18,8 +21,8 @@ const AppRoutes = () => {
       <Route path="/auth/forget-password" element={<ForgetPassword />} />
       <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
 
-      {/* Catch all - redirect to login */}
-      <Route path="*" element={<Navigate to="/auth/login" replace />} />
+      {/* 404 - Redirect to home */}
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 };

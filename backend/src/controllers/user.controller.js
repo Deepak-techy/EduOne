@@ -6,7 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
-import { uploadOnCloudinary } from "../services/cloudinaryUpload.js";
+import { uploadOnCloudinary } from "../services/cloudinaryUpload.service.js";
 
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -59,7 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // check for user creation
     if (!createdUser) {
-        return new ApiError(500, "Something went wrong while registring the user")
+        throw new ApiError(500, "Something went wrong while registring the user")
     }
 
     // return response

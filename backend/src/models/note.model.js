@@ -57,5 +57,7 @@ noteSchema.index({ subject: 'text', tags: 'text', content: 'text' });
 
 // Compound index for subject and tags filtering
 noteSchema.index({ userId: 1, subject: 1, tags: 1 });
+// noteSchema.index({ subject: 1 });
+// noteSchema.index({ tags: 1 });
 
 export const Note = mongoose.model("Note", noteSchema);

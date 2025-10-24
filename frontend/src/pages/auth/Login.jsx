@@ -55,7 +55,7 @@ const Login = () => {
         autoClose: 2000,
       });
 
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       setApiError(error.message || 'Login failed. Please try again.');
       toast.error(error.message || 'Login failed. Please try again.', {

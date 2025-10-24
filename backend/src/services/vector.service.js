@@ -2,8 +2,8 @@ import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
 
 import { qdrantClient } from '../config/qdrant.config.js';
 import { ollamaEmbeddings } from '../config/ollama.config.js';
-import { SUBJECT_COLLECTIONS, TEMP_COLLECTION } from '../constants.js';
-
+import { SUBJECT_COLLECTIONS, TEMP_COLLECTION, getCollectionName } from '../constants.js';
+import { generateDocumentEmbeddings, generateQueryEmbedding } from './textEmbedding.service.js';
 
 // Store documents in a subject-specific collection
 // QdrantVectorStore handles embedding storage automatically
@@ -108,5 +108,84 @@ export const deleteTempSession = async (sessionId) => {
         await qdrantClient.delete(TEMP_COLLECTION, {
             points: pointIds
         });
+    }
+};
+
+
+// Store notes-feature document chunks with embeddings in Qdrant
+export const storeDocumentEmbeddingsInNotesCollection = async (collectionName, textChunks, noteId) => {
+    try {
+        const documentEmbeddings = await generateDocumentEmbeddings(textChunks);
+
+        const points = textChunks.map((chunk, index) => ({
+            id: `${noteId}_chunk_${index}_${Date.now()}`,
+            vector: documentEmbeddings[index],
+            payload: {
+                text: chunk,
+                noteId: noteId,
+                chunkIndex: index,
+                timestamp: new Date().toISOString(),
+            },
+        }));
+
+        await qdrantClient.upsert(collectionName, {
+            wait: true,
+            points: points,
+        });
+
+        return points.map((p) => p.id);
+    } catch (error) {
+        console.error('Error storing document embeddings:', error);
+        throw new Error('Failed to store document embeddings');
+    }
+};
+
+
+// Search for similar content in the vector database
+export const searchSimilarContentInNotesCollection = async (collectionName, query, limit = 5) => {
+    try {
+        // 1️⃣ Generate embedding for query
+        const queryEmbedding = await generateQueryEmbedding(query);
+
+        // 2️⃣ Search in Qdrant
+        const searchResult = await qdrantClient.search(collectionName, {
+            vector: queryEmbedding,
+            limit: limit,
+            with_payload: true,
+        });
+
+        // 3️⃣ Convert each point to a LangChain-style Document
+        const documents = searchResult.map(point => ({
+            pageContent: point.payload.text,   // original text chunk
+            metadata: {
+                noteId: point.payload.noteId,
+                chunkIndex: point.payload.chunkIndex,
+                timestamp: point.payload.timestamp,
+                pointId: point.id,            // include pointId for reference/deletion
+            },
+            score: point.score                  // optional similarity score
+        }));
+
+        return documents;
+    } catch (error) {
+        console.error('Error searching similar content:', error);
+        throw new Error('Failed to search similar content');
+    }
+};
+
+
+// Delete specific document chunks from Qdrant
+export const deleteDocumentChunksFromNotesCollection = async (collectionName, chunkIds) => {
+    try {
+        if (chunkIds && chunkIds.length > 0) {
+            await qdrantClient.delete(collectionName, {
+                wait: true,
+                points: chunkIds,
+            });
+            console.log(`Deleted ${chunkIds.length} chunks from ${collectionName}`);
+        }
+    } catch (error) {
+        console.error('Error deleting document chunks:', error);
+        throw new Error('Failed to delete document chunks');
     }
 };

@@ -45,3 +45,7 @@ export const QA_PROMPT = {
         `
 }
 
+// Collection name for notes-feature
+export const getCollectionName = (username) => `NOTES_${username}`;
+
+

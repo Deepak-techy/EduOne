@@ -144,17 +144,17 @@ export const storeDocumentEmbeddingsInNotesCollection = async (collectionName, t
 // Search for similar content in the vector database
 export const searchSimilarContentInNotesCollection = async (collectionName, query, limit = 5) => {
     try {
-        // 1️⃣ Generate embedding for query
+        // 1️ Generate embedding for query
         const queryEmbedding = await generateQueryEmbedding(query);
 
-        // 2️⃣ Search in Qdrant
+        // 2️ Search in Qdrant
         const searchResult = await qdrantClient.search(collectionName, {
             vector: queryEmbedding,
             limit: limit,
             with_payload: true,
         });
 
-        // 3️⃣ Convert each point to a LangChain-style Document
+        // 3️ Convert each point to a LangChain-style Document
         const documents = searchResult.map(point => ({
             pageContent: point.payload.text,   // original text chunk
             metadata: {

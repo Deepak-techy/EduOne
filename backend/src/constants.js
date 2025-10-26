@@ -35,17 +35,46 @@ export const TEMP_COLLECTION = 'temp_uploads';
 // Session timeout for temporary uploads
 export const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
-// Create prompt template for RAG:- PDF-QA feature
-export const QA_PROMPT = {
-    system: 'You are a helpful assistant answering questions based on provided context. If the answer is not in the context, say so.',
-    human: (contextText) =>
-        `Context: \n{contextText} \n\n
-        Question: {query} \n\n
-        Answer:
-        `
-}
-
 // Collection name for notes-feature
 export const getCollectionName = (username) => `NOTES_${username}`;
+
+// Create prompt template for QA
+export const QA_PROMPT = {
+    system: `You are a helpful assistant that answers questions based on the provided document context.
+If the context does not contain enough information to answer the question, clearly say so.`,
+
+    human: `
+Context from document: \n{contextText}\n\n
+
+Question: {query}\n\n
+
+Please provide a clear and concise answer based only on the context provided. 
+If the context doesn't contain enough information to answer the question, say so.
+
+Answer:
+    `
+};
+
+// Create prompt template for generating tags
+export const GENERATE_TAGS_PROMPT = {
+    system: `You are a helpful assistant that generates relevant and concise tags for study notes. 
+Your job is to read the note content and subject, then produce accurate tags for categorization.`,
+
+    human: `
+Subject: {subject}
+Note Content: {content}
+
+Generate 5–7 relevant tags that help categorize and search for this note.
+Tags should:
+- Be lowercase
+- Use hyphens for multi-word tags (e.g., machine-learning)
+- Be specific and relevant to the content
+- Include both broad and specific topics
+
+Return only the tags as a comma-separated list with no extra explanation.
+
+Tags:
+  `
+};
 
 

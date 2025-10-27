@@ -17,7 +17,6 @@ const noteSchema = new Schema(
         tags: [
             {
                 type: String,
-                required: true,
                 trim: true,
                 lowerCase: true,
                 index: true,
@@ -25,7 +24,6 @@ const noteSchema = new Schema(
         ],
         content: {
             type: String,
-            required: true,
             trim: true,
         },
         documentUrl: {

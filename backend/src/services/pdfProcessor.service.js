@@ -2,6 +2,10 @@ import fs from 'fs';
 import pdf from 'pdf-parse';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
+import { getCollectionName } from '../constants.js';
+import { storeDocumentEmbeddingsInNotesCollection } from './vector.service.js';
+import { uploadOnCloudinary } from './cloudinaryUpload.service.js';
+
 // Extract text from PDF file
 export const extractTextFromPDF = async (filePath) => {
     const dataBuffer = fs.readFileSync(filePath);
@@ -19,4 +23,40 @@ export const chunkText = async (text) => {
 
     const chunks = await splitter.splitText(text);
     return chunks;
+};
+
+// Process uploaded document for notes: extract text, embed, store in Qdrant, then upload to Cloudinary
+export const processNoteDocument = async (file, userName, noteId) => {
+    try {
+        // Extract text from PDF
+        const extractedText = await extractTextFromPDF(file.path);
+
+        // Split text into chunks for embedding
+        const textChunks = chunkText(extractedText);
+
+        // Generate embeddings and store in Qdrant
+        const chunkIds = await storeDocumentEmbeddingsInNotesCollection(
+            getCollectionName(userName),
+            textChunks,
+            noteId
+        );
+
+        // Upload to Cloudinary after successful embedding
+        const cloudinaryResponse = await uploadOnCloudinary(file.path);
+
+        return {
+            documentUrl: cloudinaryResponse.url,
+            collectionName: getCollectionName(userName),
+            chunkIds: chunkIds,
+            metadata: {
+                fileName: file.originalname,    
+                fileSize: file.size,
+                mimeType: file.mimetype,
+                pageCount: Math.ceil(extractedText.length / 3000), // Approximate
+            },
+        };
+    } catch (error) {
+        console.error('Error processing document:', error);
+        throw new Error('Failed to process document');
+    }
 };

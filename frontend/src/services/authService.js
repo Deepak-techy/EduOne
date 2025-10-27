@@ -23,7 +23,6 @@ export const authService = {
         fullName: userData.fullName,
         userName: userData.userName,
         email: userData.email,
-        // phone: userData.phone,
         role: userData.role,
         password: userData.password,
       });

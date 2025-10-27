@@ -1,145 +1,116 @@
-import { Link, useLocation } from "react-router-dom";
+// src/components/layout/Sidebar.jsx - FIXED MENU POSITION
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-  Home,  
-  PhoneCall,   // Contact
-  Info,        // About
-  Briefcase,   // Services
-  FileQuestion,
-  StickyNote,
-  Calendar,
-  FileCheck,
-  Users,
-  ShieldCheck,
-  Menu,
-  Plus,
-  Minus
+  Home, PhoneCall, Info, Briefcase,
+  FileQuestion, StickyNote, Calendar,
+  FileCheck, Users, ShieldCheck,
+  Menu, Plus, Minus
 } from "lucide-react";
 
-
-// Navigation items - using section IDs for smooth scroll
 const navItems = [
-  { icon: Home, label: "Home", id: "home" },
-  { icon: Briefcase, label: "Services", id: "services" },
-  { icon: PhoneCall, label: "Contact", id: "contact" },
-  { icon: Info, label: "About", id: "about" },
+  { icon: Home, label: "Home", id: "home", path: "/" },
+  { icon: Briefcase, label: "Services", id: "services", path: "/" },
+  { icon: PhoneCall, label: "Contact", id: "contact", path: "/" },
+  { icon: Info, label: "About", id: "about", path: "/" },
 ];
 
-
-// Add subfeatures for demo—expand for all features!
 const featuresItems = [
   {
     icon: FileQuestion,
     label: "PDF Q&A",
     path: "/pdf-qa",
     subFeatures: [
-      { label: "Upload PDF", path: "/pdf-qa/upload" },
-      { label: "View Questions", path: "/pdf-qa/questions" }
+      { label: "Subject Q&A", path: "/pdf-qa/subject" },
+      { label: "Upload PDF", path: "/pdf-qa/upload" }
     ]
   },
   {
     icon: StickyNote,
     label: "Notes Organizer",
     path: "/notes-organizer",
-    subFeatures: [
-      { label: "Create Note", path: "/notes-organizer/create" },
-      { label: "View Notes", path: "/notes-organizer/list" }
-    ]
+    subFeatures: []
   },
   {
     icon: Calendar,
     label: "Academic Planner",
     path: "/academic-planner",
-    subFeatures: [
-      { label: "Add Schedule", path: "/academic-planner/add" },
-      { label: "View Calendar", path: "/academic-planner/calendar" }
-    ]
+    subFeatures: []
   },
   {
     icon: FileCheck,
     label: "Resume Analyzer",
     path: "/resume-analyzer",
-    subFeatures: [
-      { label: "Upload Resume", path: "/resume-analyzer/upload" }
-    ]
+    subFeatures: []
   },
   {
     icon: Users,
     label: "Interview AI",
     path: "/interview-ai",
-    subFeatures: [
-      { label: "Practice Interviews", path: "/interview-ai/practice" }
-    ]
+    subFeatures: []
   },
   {
     icon: Users,
     label: "Community",
     path: "/community",
-    subFeatures: [
-      { label: "Join Group", path: "/community/groups" },
-      { label: "Forum", path: "/community/forum" }
-    ]
+    subFeatures: []
   },
   {
     icon: ShieldCheck,
     label: "Admin Panel",
     path: "/admin",
-    subFeatures: [
-      { label: "User Manager", path: "/admin/users" },
-      { label: "Reports", path: "/admin/reports" }
-    ]
+    subFeatures: []
   }
 ];
 
-
-// Minimal sidebar menu for logged out users
-const publicMenuItems = [
-  { icon: Home, label: "Home", id: "home" },
-  { icon: PhoneCall, label: "Contact", id: "contact" }
-];
-
-
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [expanded, setExpanded] = useState({});
-  const [activeSection, setActiveSection] = useState("home");
-
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
     setUser(stored ? JSON.parse(stored) : null);
-
-
-    // Open sidebar by default after login
     if (stored && setOpen) setOpen(true);
   }, []);
 
-
-  // All icons always show, even when collapsed (labels can hide)
   const sidebarWidth = open ? 250 : 70;
+  const isOnFeaturePage = location.pathname !== '/';
 
+  const handleFeatureClick = (feature) => {
+    // Always navigate to main feature path
+    navigate(feature.path);
+    
+    // If has subfeatures and sidebar is open, expand
+    if (feature.subFeatures && feature.subFeatures.length > 0 && open) {
+      toggleExpand(feature.label);
+    }
+  };
 
-  // Expand/collapse features
   const toggleExpand = (label) => {
     setExpanded((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-
-  // Smooth scroll to section
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setActiveSection(id);
+  const handleNavClick = (item) => {
+    if (location.pathname === '/') {
+      const element = document.getElementById(item.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(item.id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
   };
 
-
-  // Menus
-  const menuNavigation = user ? navItems : publicMenuItems;
+  const menuNavigation = user ? navItems : navItems.slice(0, 2);
   const menuFeatures = user ? featuresItems : [];
-
 
   return (
     <div
@@ -151,27 +122,21 @@ const Sidebar = ({ open, setOpen }) => {
         border: "1.5px solid #c2e4fa",
         transition: "width 0.35s cubic-bezier(.72,-0.2,.25,1)",
         overflowY: "auto",
-        scrollbarWidth: "none", // Firefox
-        msOverflowStyle: "none", // IE/Edge
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
       }}
     >
-      {/* Hide scrollbar for Chrome/Safari/Opera */}
-      <style jsx>{`
-        div::-webkit-scrollbar {
-          display: none;
-        }
+      <style>{`
+        div::-webkit-scrollbar { display: none; }
       `}</style>
 
-
       <div className="flex flex-col h-full">
-        {/* Menu Toggle Button - Fixed Position */}
+        
+        {/* Menu Toggle Button - FIXED POSITION */}
         <div 
-          className="flex-shrink-0"
+          className="flex-shrink-0 p-4 flex"
           style={{
-            padding: "16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: open ? "flex-end" : "center"
+            justifyContent: open ? 'flex-end' : 'center'
           }}
         >
           <Menu
@@ -181,82 +146,71 @@ const Sidebar = ({ open, setOpen }) => {
           />
         </div>
 
-
         {/* Navigation */}
         <nav className="px-3 flex-shrink-0">
           {menuNavigation.map((item) => {
             const Icon = item.icon;
-            const isActive = activeSection === item.id;
+            const isActive = location.pathname === '/' && false;
             return (
               <div
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className={`flex items-center ${open ? "" : "justify-center"} mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all cursor-pointer ${
-                  isActive
-                    ? "bg-blue-100 text-blue-800 shadow font-semibold"
-                    : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+                onClick={() => handleNavClick(item)}
+                className={`flex items-center ${
+                  open ? "" : "justify-center"
+                } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all cursor-pointer ${
+                  isOnFeaturePage 
+                    ? "text-slate-900"
+                    : `${isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"}`
                 }`}
-                style={{
-                  height: "44px",
-                  transition: "all 0.25s"
-                }}
+                style={{ height: "44px" }}
                 title={item.label}
               >
-                <Icon className={`w-6 h-6 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
+                <Icon className="w-6 h-6" />
                 {open && <span className="ml-2">{item.label}</span>}
               </div>
             );
           })}
         </nav>
 
-
-        {/* Line separator */}
         {user && <div className="mx-4 my-3 border-b border-slate-400 flex-shrink-0"></div>}
 
-
-        {/* Features Label */}
         {user && open && (
           <div className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0">
             Features
           </div>
         )}
 
-
-        {/* Features - Scrollable Area */}
+        {/* Features */}
         {user && (
           <nav className="px-3 pb-4 flex-grow">
             {menuFeatures.map((feature) => {
               const Icon = feature.icon;
               const isExpanded = expanded[feature.label];
-              const isActive = location.pathname === feature.path;
-
+              const isActive = location.pathname === feature.path || 
+                               location.pathname.startsWith(feature.path + '/');
 
               return (
                 <div key={feature.label} className="mb-1">
                   <div
-                    className={`flex items-center ${open ? "" : "justify-center"} cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] ${
+                    className={`flex items-center ${
+                      open ? "" : "justify-center"
+                    } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] ${
                       isActive
                         ? "bg-blue-100 text-blue-800 shadow font-semibold"
                         : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
                     }`}
                     style={{ height: "44px" }}
-                    onClick={() =>
-                      feature.subFeatures && feature.subFeatures.length > 0
-                        ? toggleExpand(feature.label)
-                        : null
-                    }
+                    onClick={() => handleFeatureClick(feature)}
                     title={feature.label}
                   >
                     <Icon className={`w-6 h-6 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
-                    {open && <span className="ml-2 flex-grow">{feature.label}</span>}
-                    {feature.subFeatures && feature.subFeatures.length > 0 && (
-                      open ? (
-                        isExpanded ? (
-                          <Minus className="w-5 h-5" />
-                        ) : (
-                          <Plus className="w-5 h-5" />
-                        )
-                      ) : null
+                    {open && (
+                      <>
+                        <span className="ml-2 flex-grow">{feature.label}</span>
+                        {feature.subFeatures && feature.subFeatures.length > 0 && (
+                          isExpanded ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />
+                        )}
+                      </>
                     )}
                   </div>
                   {isExpanded && feature.subFeatures && feature.subFeatures.length > 0 && open && (
@@ -288,6 +242,5 @@ const Sidebar = ({ open, setOpen }) => {
     </div>
   );
 };
-
 
 export default Sidebar;

@@ -1,3 +1,4 @@
+// src/routes/AppRoutes.jsx
 import { Routes, Route } from "react-router-dom";
 
 // Auth Pages
@@ -6,13 +7,16 @@ import Signup from "../pages/auth/Signup";
 import ForgetPassword from "../pages/auth/ForgetPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
-// Home Page (Your landing page)
+// Home Page
 import Home from "../pages/Home/Home";
+
+// Feature Routes
+import PdfQARoutes from "./PdfQARoutes";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Home Route - Shows landing page */}
+      {/* Home Route */}
       <Route path="/" element={<Home />} />
 
       {/* Auth Routes */}
@@ -21,7 +25,10 @@ const AppRoutes = () => {
       <Route path="/auth/forget-password" element={<ForgetPassword />} />
       <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
 
-      {/* 404 - Redirect to home */}
+      {/* PDF Q&A Feature Routes */}
+      <Route path="/pdf-qa/*" element={<PdfQARoutes />} />
+
+      {/* 404 */}
       <Route path="*" element={<Home />} />
     </Routes>
   );

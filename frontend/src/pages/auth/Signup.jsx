@@ -124,7 +124,7 @@ const Signup = () => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="Name"
+                  placeholder="Full Name"
                   className={`w-full px-4 py-3 rounded-xl border transition-all ${errors.fullName
                       ? 'border-red-500 focus:ring-red-500'
                       : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-[#2196F3] focus:ring-[#2196F3]'

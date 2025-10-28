@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
-import { validateEmail, validatePassword } from '../../utils/validation';
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // username or email
     password: '',
   });
 
@@ -27,10 +26,8 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const emailError = validateEmail(formData.email);
-    if (emailError) newErrors.email = emailError;
-    const passwordError = validatePassword(formData.password);
-    if (passwordError) newErrors.password = passwordError;
+    if (!formData.identifier) newErrors.identifier = "Username or email is required";
+    if (!formData.password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -43,23 +40,28 @@ const Login = () => {
     setApiError('');
 
     try {
-      const response = await authService.login(formData);
-      localStorage.setItem('user', JSON.stringify(response.data));
-      navigate('/dashboard');
+      // Detect if input is email or username and prepare payload for backend
+      const isEmail = formData.identifier.includes('@');
+      const payload = isEmail
+        ? { email: formData.identifier, password: formData.password }
+        : { userName: formData.identifier, password: formData.password };
 
-      // Show success message
-    toast.success('Login successful! Welcome back! 🎉', {
-      position: 'top-right',
-      autoClose: 2000,
-    });
-    
+      const response = await authService.login(payload);
+
+      localStorage.setItem('user', JSON.stringify(response.data.user || response.data));
+
+      toast.success('Login successful! Welcome back! 🎉', {
+        position: 'top-right',
+        autoClose: 2000,
+      });
+
+      navigate('/');
     } catch (error) {
       setApiError(error.message || 'Login failed. Please try again.');
-      // Show error toast
-    toast.error(errorMessage, {
-      position: 'top-right',
-      autoClose: 3000,
-    });
+      toast.error(error.message || 'Login failed. Please try again.', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
     } finally {
       setLoading(false);
     }
@@ -71,8 +73,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden bg-gradient-to-br from-blue-100 via-cyan-100 to-blue-200">
-      
-      {/* Animated Bubbles */}
+      {/* Bubbles */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-10 left-10 w-32 h-32 rounded-full opacity-30 animate-float bg-blue-300"></div>
         <div className="absolute top-40 right-20 w-24 h-24 rounded-full opacity-40 animate-float-delay-1 bg-cyan-300"></div>
@@ -81,50 +82,39 @@ const Login = () => {
       </div>
 
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center relative z-10">
-        
-        {/* Left - Branding */}
+        {/* Branding */}
         <div className="hidden lg:flex flex-col items-start space-y-4 animate-fade-in">
-          <h2 className="text-xl font-medium tracking-wide text-gray-600">
-            WELCOME TO
-          </h2>
-          <h1 className="text-7xl font-bold text-[#2196F3] drop-shadow-lg">
-            EDUONE
-          </h1>
+          <h2 className="text-xl font-medium tracking-wide text-gray-600">WELCOME TO</h2>
+          <h1 className="text-7xl font-bold text-[#2196F3] drop-shadow-lg">EDUONE</h1>
         </div>
 
-        {/* Right - Login Card */}
+        {/* Login Card */}
         <div className="backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md mx-auto animate-slide-up bg-white/90 border border-white/50">
-          <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-            LOG IN
-          </h2>
-
-          {/* Error Alert */}
+          <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">LOG IN</h2>
           {apiError && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm animate-shake">
               {apiError}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
+            {/* Username/Email */}
             <div>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                name="identifier"
+                value={formData.identifier}
                 onChange={handleChange}
-                placeholder="Username or email"
+                placeholder="Username or Email"
                 className={`w-full px-4 py-3 rounded-xl border transition-all ${
-                  errors.email 
+                  errors.identifier 
                     ? 'border-red-500 focus:ring-red-500' 
                     : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-[#2196F3] focus:ring-[#2196F3]'
                 } focus:outline-none focus:ring-2`}
               />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.email}</p>
+              {errors.identifier && (
+                <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.identifier}</p>
               )}
             </div>
-
             {/* Password */}
             <div>
               <input
@@ -143,25 +133,19 @@ const Login = () => {
                 <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.password}</p>
               )}
             </div>
-
             {/* Forgot Password */}
             <div className="text-right">
-              <Link
-                to="/auth/forget-password"
-                className="text-sm text-[#2196F3] hover:text-[#1976D2] transition-colors"
-              >
+              <Link to="/auth/forget-password" className="text-sm text-[#2196F3] hover:text-[#1976D2] transition-colors">
                 Forgot Password?
               </Link>
             </div>
-
             {/* Divider */}
             <div className="flex items-center gap-3 my-6">
               <div className="flex-1 h-px bg-gray-300"></div>
               <span className="text-sm text-gray-500">OR</span>
               <div className="flex-1 h-px bg-gray-300"></div>
             </div>
-
-            {/* Google Button */}
+            {/* Google Login */}
             <button
               type="button"
               onClick={handleGoogleLogin}
@@ -175,7 +159,6 @@ const Login = () => {
               </svg>
               Continue with Google
             </button>
-
             {/* Submit */}
             <button
               type="submit"
@@ -193,7 +176,6 @@ const Login = () => {
               ) : 'LOG IN'}
             </button>
           </form>
-
           {/* Sign Up Link */}
           <p className="text-center text-sm mt-6 text-gray-600">
             Don't have an account?{' '}
@@ -206,19 +188,9 @@ const Login = () => {
 
       {/* Animations */}
       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-20px) scale(1.05); }
-        }
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-10px); }
-          75% { transform: translateX(10px); }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .animate-float { animation: float 6s ease-in-out infinite; }
         .animate-float-delay-1 { animation: float 8s ease-in-out infinite 2s; }
         .animate-float-delay-2 { animation: float 7s ease-in-out infinite 4s; }

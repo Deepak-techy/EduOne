@@ -1,4 +1,4 @@
-// Handles all API calls to backend
+//src/services/authService.js (Handles all API calls to backend)
 
 import axios from 'axios';
 
@@ -23,7 +23,6 @@ export const authService = {
         fullName: userData.fullName,
         userName: userData.userName,
         email: userData.email,
-        // phone: userData.phone,
         role: userData.role,
         password: userData.password,
       });

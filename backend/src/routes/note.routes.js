@@ -20,9 +20,11 @@ const router = Router();
 
 // secured routes
 router.route("/create").post(verifyJWT, createNote)    // POST /api/notes/create
-router.route("/:noteId/upload").post(verifyJWT, upload.single("pdf"), uploadAndProcessDocument)    // POST /api/notes/:noteId/upload
 router.route("/all").get(verifyJWT, getNotesWithOptionalFilters)    // GET /api/notes/all
 router.route("/last-updated").get(verifyJWT, getLastUpdatedNotes)    // GET /api/notes/last-updated
+
+// dynamic routes
+router.route("/:noteId/upload").post(verifyJWT, upload.single("pdf"), uploadAndProcessDocument)    // POST /api/notes/:noteId/upload
 router.route("/:noteId").get(verifyJWT, getNoteById)    // GET /api/notes/:noteId
 router.route("/:noteId/update").patch(verifyJWT, updateNote)    // PATCH /api/notes/:noteId/update
 router.route("/:noteId/delete").delete(verifyJWT, deleteNote)    // DELETE /api/notes/:noteId/delete

@@ -137,7 +137,8 @@ const getLastUpdatedNotes = asyncHandler(async (req, res) => {
     // Fetch last 5 updated notes (sorted by updatedAt descending)
     const notes = await Note.find({ userId })
         .sort({ updatedAt: -1 })  // Descending order (latest first)
-        .limit(5)                 // Only 5 results
+        .select("-documentChunkIds -qdrantCollectionName")
+        .limit(5)                 // Only 5 results 
         .lean();
 
     // return response
@@ -204,7 +205,7 @@ const updateNote = asyncHandler(async (req, res) => {
         {
             new: true,
         }
-    )
+    ).select("-documentChunkIds -qdrantCollectionName");
 
     if (!note) {
         throw new ApiError(404, "Note not found");

@@ -80,7 +80,137 @@ const uploadAndProcessDocument = asyncHandler(async (req, res) => {
 
 })
 
+const getNotesWithOptionalFilters = asyncHandler(async (req, res) => {
+    // get userId form request
+    const { _id: userId } = req.user
+    const { subject, tags, search, sortBy = 'createdAt', order = "desc" } = req.query
+    
+    // Build query for database search
+    const query = { userId };
+
+    if (subject) {
+        query.subject = subject.trim();
+    }   
+
+    if (tags) {
+        const tagArray = Array.isArray(tags) ? tags : [tags];
+        query.tags = { $in: tagArray };
+    }
+
+    if (search) {
+        query.$text = { $search: search.trim() };
+    }
+
+    // Execute query with sorting
+    const notes = await Note.find(query)
+        .sort({ [sortBy]: order === 'asc' ? 1 : -1 })
+        .lean();
+    
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200,
+            {
+                count: notes.length,
+                notes,
+            },
+            "Notes fetched successfully"
+        ));
+
+})
+
+const getLastUpdatedNotes = asyncHandler(async (req, res) => {
+    // get userId from request
+    const { _id: userId } = req.user;
+
+    // Fetch last 5 updated notes (sorted by updatedAt descending)
+    const notes = await Note.find({ userId })
+        .sort({ updatedAt: -1 })  // Descending order (latest first)
+        .limit(5)                 // Only 5 results
+        .lean();
+
+    // return response
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    count: notes.length,
+                    notes
+                },
+                "Last 5 updated notes fetched successfully"
+            ));
+});
+
+const getNoteById = asyncHandler(async (req, res) => {
+    // get noteId from params
+    const { noteId } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!noteId) {
+        throw new ApiError(400, "Note ID is required");
+    }
+
+    // Find note that matches both ID and user
+    const note = await Note.findOne({ _id: noteId, userId });
+
+    if (!note) {
+        throw new ApiError(404, "Note not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, note, "Note fetched successfully"));
+});
+
+const updateNote = asyncHandler(async (req, res) => {
+    // get noteId from params
+    const { noteId } = req.params;
+    const { _id: userId } = req.user;
+
+    // get updated note details from frontend
+    const { subject, tags, content } = req.body;
+
+    if (!noteId) {
+        throw new ApiError(400, "Note ID is required");
+    }
+
+    // find and update the note
+    const note = await Note.findOneAndUpdate(
+        {
+            _id: noteId,
+            userId,
+        },
+        {
+            $set: {
+                subject,
+                tags,
+                content,
+            }
+        },
+        {
+            new: true,
+        }
+    )
+
+    if (!note) {
+        throw new ApiError(404, "Note not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, note, "Note updated successfully"));
+});
+
+
 export {
     createNote,
     uploadAndProcessDocument,
+    getNotesWithOptionalFilters,
+    getLastUpdatedNotes,
+    getNoteById,
+    updateNote,
 }

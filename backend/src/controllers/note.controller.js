@@ -65,6 +65,10 @@ const uploadAndProcessDocument = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Note not found");
     }
 
+    if (note.documentUrl) {
+        throw new ApiError(400, "A document is already uploaded for this note. You cannot upload another.");
+    }
+
     // Process document and generate embeddings
     const processedNote = await processNoteDocument(req.file, userName, noteId);
 
@@ -97,8 +101,10 @@ const getNotesWithOptionalFilters = asyncHandler(async (req, res) => {
     }
 
     if (tags) {
+        // Normalize tags: ensure array + lowercase
         const tagArray = Array.isArray(tags) ? tags : [tags];
-        query.tags = { $in: tagArray };
+        const lowerCaseTags = tagArray.map(tag => tag.toLowerCase().trim());
+        query.tags = { $in: lowerCaseTags };
     }
 
     if (search) {
@@ -108,6 +114,7 @@ const getNotesWithOptionalFilters = asyncHandler(async (req, res) => {
     // Execute query with sorting
     const notes = await Note.find(query)
         .sort({ [sortBy]: order === 'asc' ? 1 : -1 })
+        .select("-documentChunkIds -qdrantCollectionName")
         .lean();
 
     // return response

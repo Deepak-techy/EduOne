@@ -11,15 +11,19 @@ const uploadOnCloudinary = async (localFilePath) => {
 
         // Decide folder based on file extension
         let folder = "others";
+        let resourceType = "auto";
+
         if ([".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tiff", ".svg"].includes(ext)) {
             folder = "images";
+            resourceType = "image";
         } else if (ext === ".pdf") {
             folder = "documents";
+            resourceType = "raw";
         }
 
         // Upload file to Cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto",
+            resource_type: resourceType,
             folder: folder
         })
         // file has been uploaded successfully

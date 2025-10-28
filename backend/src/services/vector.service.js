@@ -5,6 +5,36 @@ import { ollamaEmbeddings } from '../config/ollama.config.js';
 import { SUBJECT_COLLECTIONS, TEMP_COLLECTION, getCollectionName } from '../constants.js';
 import { generateDocumentEmbeddings, generateQueryEmbedding } from './textEmbedding.service.js';
 
+// Create a new Qdrant collection for a specific user for the Notes feature
+export const createUserCollection = async (userName) => {
+    try {
+        const collectionName = getCollectionName(userName);
+
+        // Check if collection already exists
+        const collections = await qdrantClient.getCollections();
+        const exists = collections.collections.some(
+            (col) => col.name === collectionName
+        );
+
+        if (!exists) {
+            const vectorSize = 768;
+
+            await qdrantClient.createCollection(collectionName, {
+                vectors: {
+                    size: vectorSize,
+                    distance: 'Cosine',
+                },
+            });
+            console.log(`Collection ${collectionName} created successfully`);
+        }
+
+        return collectionName;
+    } catch (error) {
+        console.error('Error creating user collection:', error);
+        throw new Error('Failed to create user collection');
+    }
+};
+
 // Store documents in a subject-specific collection
 // QdrantVectorStore handles embedding storage automatically
 export const storeDocumentsInSubjectCollection = async (subject, documents, metadata) => {
@@ -117,8 +147,12 @@ export const storeDocumentEmbeddingsInNotesCollection = async (collectionName, t
     try {
         const documentEmbeddings = await generateDocumentEmbeddings(textChunks);
 
+
+        // Generate numeric IDs using timestamp and index
+        const baseTimestamp = Date.now();
+
         const points = textChunks.map((chunk, index) => ({
-            id: `${noteId}_chunk_${index}_${Date.now()}`,
+            id: baseTimestamp + index, 
             vector: documentEmbeddings[index],
             payload: {
                 text: chunk,
@@ -128,16 +162,20 @@ export const storeDocumentEmbeddingsInNotesCollection = async (collectionName, t
             },
         }));
 
-        await qdrantClient.upsert(collectionName, {
-            wait: true,
-            points: points,
-        });
+        await qdrantClient.upsert(collectionName,
+            {
+                points: points,
+            },
+            {
+                wait: true,
+            }
+        );
 
-        return points.map((p) => p.id);
-    } catch (error) {
-        console.error('Error storing document embeddings:', error);
-        throw new Error('Failed to store document embeddings');
-    }
+    return points.map((p) => p.id);
+} catch (error) {
+    console.error('Error storing document embeddings:', error);
+    throw new Error('Failed to store document embeddings');
+}
 };
 
 

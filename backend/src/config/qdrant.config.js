@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export const qdrantClient = new QdrantClient({
     url: process.env.QDRANT_URL || 'http://localhost:6333',
+    timeout: 60000,
     checkCompatibility: false
 });
 
@@ -20,6 +21,7 @@ export const connectQdrant = async () => {
                 .replace('https://', '');
 
             console.log(`✅ QDRANT Connected !! Host: ${host}`);
+            console.log("Access web UI at http://127.0.0.1:6333/dashboard")
             console.log(`   Version: ${response.data.version} | Title: ${response.data.title}`);
             console.log(`   Collections: ${info.collections.length} found`);
             return true;

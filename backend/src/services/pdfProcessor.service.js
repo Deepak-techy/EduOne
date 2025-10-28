@@ -5,6 +5,7 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { getCollectionName } from '../constants.js';
 import { storeDocumentEmbeddingsInNotesCollection } from './vector.service.js';
 import { uploadOnCloudinary } from './cloudinaryUpload.service.js';
+import { createUserCollection } from './vector.service.js';
 
 // Extract text from PDF file
 export const extractTextFromPDF = async (filePath) => {
@@ -32,21 +33,25 @@ export const processNoteDocument = async (file, userName, noteId) => {
         const extractedText = await extractTextFromPDF(file.path);
 
         // Split text into chunks for embedding
-        const textChunks = chunkText(extractedText);
+        const textChunks = await chunkText(extractedText);
+
+        //   create the collection
+        const collectionName = await createUserCollection(userName);
 
         // Generate embeddings and store in Qdrant
         const chunkIds = await storeDocumentEmbeddingsInNotesCollection(
-            getCollectionName(userName),
+            collectionName,
             textChunks,
             noteId
         );
 
         // Upload to Cloudinary after successful embedding
         const cloudinaryResponse = await uploadOnCloudinary(file.path);
+        // console.log('Cloudinary response:', cloudinaryResponse);
 
         return {
-            documentUrl: cloudinaryResponse.url,
-            collectionName: getCollectionName(userName),
+            documentUrl: cloudinaryResponse.secure_url,
+            collectionName: collectionName,
             chunkIds: chunkIds,
             metadata: {
                 fileName: file.originalname,    

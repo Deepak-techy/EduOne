@@ -30,6 +30,10 @@ const noteSchema = new Schema(
             type: String,
             default: null,
         },
+        documentPublicId: {
+            type: String,
+            default: null,
+        },
         documentMetadata: {
             fileName: String,
             fileSize: Number,

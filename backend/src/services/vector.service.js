@@ -213,14 +213,24 @@ export const searchSimilarContentInNotesCollection = async (collectionName, quer
 
 
 // Delete specific document chunks from Qdrant
-export const deleteDocumentChunksFromNotesCollection = async (collectionName, chunkIds) => {
+export const deleteDocumentChunksFromNotesCollection = async (noteId, collectionName, chunkIds) => {
     try {
         if (chunkIds && chunkIds.length > 0) {
-            await qdrantClient.delete(collectionName, {
-                wait: true,
-                points: chunkIds,
+            const result = await qdrantClient.delete(collectionName, {
+                filter: {
+                    must: [
+                        {
+                            key: 'noteId',
+                            match: {
+                                value: noteId,
+                            },
+                        },
+                    ],
+                },
             });
             console.log(`Deleted ${chunkIds.length} chunks from ${collectionName}`);
+
+            return result;
         }
     } catch (error) {
         console.error('Error deleting document chunks:', error);

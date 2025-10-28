@@ -74,6 +74,7 @@ const uploadAndProcessDocument = asyncHandler(async (req, res) => {
 
     // Update note with document details
     note.documentUrl = processedNote.documentUrl;
+    note.documentPublicId = processedNote.documentPublicId;
     note.qdrantCollectionName = processedNote.collectionName;
     note.documentChunkIds = processedNote.chunkIds;
     note.documentMetadata = processedNote.metadata;
@@ -235,12 +236,13 @@ const deleteNote = asyncHandler(async (req, res) => {
 
     // delete from cloudinary if documentUrl exists
     if (note.documentUrl) {
-        await deleteFromCloudinary(note.documentUrl);
+        await deleteFromCloudinary(note.documentPublicId);
     }
 
     // Delete from qdrant if embeddings exist
     if (note.documentChunkIds && note.documentChunkIds.length > 0) {
         await deleteDocumentChunksFromNotesCollection(
+            noteId,
             note.qdrantCollectionName,
             note.documentChunkIds
         );

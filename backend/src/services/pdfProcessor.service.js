@@ -51,6 +51,7 @@ export const processNoteDocument = async (file, userName, noteId) => {
 
         return {
             documentUrl: cloudinaryResponse.secure_url,
+            documentPublicId: cloudinaryResponse.public_id,
             collectionName: collectionName,
             chunkIds: chunkIds,
             metadata: {

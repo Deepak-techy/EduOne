@@ -32,9 +32,12 @@ export const answerQuestionFromNotesDocument = async (question, collectionName, 
 
         // Filter only chunks related to this specific note
         const relevantChunks = searchResults
-            .filter(result => result.payload.noteId === noteId)
+            .filter(result => {
+                const noteIdField = result.payload?.noteId || result.metadata?.noteId;
+                return noteIdField === noteId;
+            })
             .map(result => ({
-                pageContent: result.payload.text,   // original text chunk
+                pageContent: result.payload?.text || result.pageContent,
             }));
 
         // Handle case where no relevant content was found

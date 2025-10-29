@@ -1,4 +1,5 @@
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { StringOutputParser } from '@langchain/core/output_parsers';
 
 import { geminiModel } from '../config/gemini.config.js';
 import { QA_PROMPT, GENERATE_TAGS_PROMPT } from '../constants.js';

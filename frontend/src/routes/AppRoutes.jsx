@@ -12,6 +12,7 @@ import Home from "../pages/Home/Home";
 
 // Feature Routes
 import PdfQARoutes from "./PdfQARoutes";
+import NotesRoutes from "./NotesRoutes";
 
 const AppRoutes = () => {
   return (
@@ -27,6 +28,10 @@ const AppRoutes = () => {
 
       {/* PDF Q&A Feature Routes */}
       <Route path="/pdf-qa/*" element={<PdfQARoutes />} />
+      
+      {/* note organizer Feature Routes */}
+      <Route path="/notes-organizer/*" element={<NotesRoutes />} /> {/* ← NEW */}
+
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

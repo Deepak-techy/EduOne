@@ -65,7 +65,7 @@ Use appropriate Markdown elements such as:
 - Bold and italic text
 If the answer is not present in the context, clearly say: "The answer is not available in the provided context."`,
 
-    human: (contextText) => `
+    human: `
 ### 📘 Context:
 {contextText}
 

@@ -26,7 +26,7 @@ router.route("/tag-suggestions").get(verifyJWT, getTagSuggestions)    // GET /ap
 router.route("/subjects").get(verifyJWT, getSubjects)    // GET /api/notes/subjects
 
 // dynamic routes
-router.route("/:noteId/upload").post(verifyJWT, upload.single("pdf"), uploadAndProcessDocument)    // POST /api/notes/:noteId/upload
+router.route("/:noteId/upload").post(verifyJWT, upload.single("document"), uploadAndProcessDocument)    // POST /api/notes/:noteId/upload
 router.route("/:noteId").get(verifyJWT, getNoteById)    // GET /api/notes/:noteId
 router.route("/:noteId/update").patch(verifyJWT, updateNote)    // PATCH /api/notes/:noteId/update
 router.route("/:noteId/delete").delete(verifyJWT, deleteNote)    // DELETE /api/notes/:noteId/delete

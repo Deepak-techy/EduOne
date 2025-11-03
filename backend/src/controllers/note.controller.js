@@ -66,7 +66,7 @@ const uploadAndProcessDocument = asyncHandler(async (req, res) => {
     }
 
     if (note.documentUrl) {
-        throw new ApiError(400, "A document is already uploaded for this note. You cannot upload another.");
+        throw new ApiError(400, "A document is already uploaded. Please delete it before uploading a new one.");
     }
 
     // Process document and generate embeddings
@@ -87,6 +87,52 @@ const uploadAndProcessDocument = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, note, "Document uploaded and processed successfully"));
 
+})
+
+const deleteDocument = asyncHandler(async (req, res) => {
+    // get noteId from params
+    const { noteId } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!noteId) {
+        throw new ApiError(400, "Note ID is required");
+    }
+
+    // find the note
+    const note = await Note.findOne({ _id: noteId, userId });
+
+    if (!note) {
+        throw new ApiError(404, "Note not found");
+    }
+
+    // delete from cloudinary if documentUrl exists
+    if (note.documentUrl) {
+        await deleteFromCloudinary(note.documentPublicId);
+    }
+
+    // Delete from qdrant if embeddings exist
+    if (note.documentChunkIds && note.documentChunkIds.length > 0) {
+        await deleteDocumentChunksFromNotesCollection(
+            noteId,
+            note.qdrantCollectionName,
+            note.documentChunkIds
+        );
+    }
+
+    // Clear document fields
+    note.documentUrl = null;
+    note.documentPublicId = null;
+    note.qdrantCollectionName = null;
+    note.documentChunkIds = [];
+    note.documentMetadata = null;
+
+    // Save updated note
+    await note.save();
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Document deleted successfully"));
 })
 
 const getNotesWithOptionalFilters = asyncHandler(async (req, res) => {
@@ -448,6 +494,7 @@ const searchNotes = asyncHandler(async (req, res) => {
 export {
     createNote,
     uploadAndProcessDocument,
+    deleteDocument,
     getNotesWithOptionalFilters,
     getLastUpdatedNotes,
     getNoteById,

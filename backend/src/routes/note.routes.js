@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     createNote,
     uploadAndProcessDocument,
+    deleteDocument,
     getNotesWithOptionalFilters,
     getLastUpdatedNotes,
     getNoteById,
@@ -27,6 +28,7 @@ router.route("/subjects").get(verifyJWT, getSubjects)    // GET /api/notes/subje
 
 // dynamic routes
 router.route("/:noteId/upload").post(verifyJWT, upload.single("document"), uploadAndProcessDocument)    // POST /api/notes/:noteId/upload
+router.route("/:noteId/delete-document").delete(verifyJWT, deleteDocument)    // DELETE /api/notes/:noteId/delete-document
 router.route("/:noteId").get(verifyJWT, getNoteById)    // GET /api/notes/:noteId
 router.route("/:noteId/update").patch(verifyJWT, updateNote)    // PATCH /api/notes/:noteId/update
 router.route("/:noteId/delete").delete(verifyJWT, deleteNote)    // DELETE /api/notes/:noteId/delete

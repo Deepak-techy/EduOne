@@ -100,7 +100,7 @@ const NotesHome = () => {
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-cyan-100/70 dark:bg-cyan-900/30 rounded-full">
                     <Shield className="w-3 h-3 text-cyan-500" />
-                    <span className="text-xs font-medium text-cyan-600 dark:text-cyan-400">Auto-save</span>
+                    <span className="text-xs font-medium text-cyan-600 dark:text-cyan-400">Digital Notes</span>
                   </div>
                 </div>
 

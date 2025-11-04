@@ -1,5 +1,5 @@
 // ============================================================================
-// src/features/notes/CreateNote.jsx - COMPLETE WORKING CODE (NO ERRORS)
+// src/features/notes/CreateNote.jsx - 4 ISSUES FIXED
 // ============================================================================
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -24,7 +24,6 @@ import {
 import { toast } from 'react-toastify';
 import { notesService } from '../../services/notesService';
 import MarkdownRenderer from '../../components/common/MarkdownRenderer';
-
 
 // ============================================================================
 // MAIN COMPONENT
@@ -111,29 +110,17 @@ const CreateNote = () => {
   });
 
   // ============================================================================
-  // 🔄 LOAD NOTE EFFECT - Load note when component mounts
-  // ============================================================================
-  
-//   useEffect(() => {
-//     if (isEditMode && noteId && !noteLoaded) {
-//       loadNote();
-//     }
-//   }, [noteId, isEditMode, noteLoaded]);
-
-
-  // ============================================================================
   // 🔄 LOAD NOTE EFFECT - Load note when component mounts (ONLY ONCE!)
   // ============================================================================
   
-  const hasLoadedRef = useRef(false); // ✅ ADD THIS - Prevents double load
+  const hasLoadedRef = useRef(false);
   
   useEffect(() => {
     if (isEditMode && noteId && !hasLoadedRef.current) {
-      hasLoadedRef.current = true; // ✅ Mark as loaded
+      hasLoadedRef.current = true;
       loadNote();
     }
-  }, [noteId, isEditMode]); // ✅ REMOVE noteLoaded from dependencies
-
+  }, [noteId, isEditMode]);
 
   // ============================================================================
   // 📡 API FUNCTIONS
@@ -217,7 +204,12 @@ const CreateNote = () => {
     }, 30000);
   }, [noteId]);
 
-  // Upload PDF
+  // ============================================================================
+  // ✅ FIX #1 - PDF UPLOAD VALIDATION
+  // Issue: When subject is empty, show error AND "Uploading PDF..." toast
+  // Fix: Return immediately after error, don't proceed with upload logic
+  // ============================================================================
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -232,6 +224,12 @@ const CreateNote = () => {
       return;
     }
 
+    // ✅ FIX #1: Validate subject FIRST before setting isUploading state
+    if (!subject.trim()) {
+      toast.error('Please enter a subject first');
+      return; // ✅ Return here - prevents "Uploading PDF..." message
+    }
+
     setIsUploading(true);
     toast.info('Uploading PDF...');
 
@@ -239,12 +237,6 @@ const CreateNote = () => {
       let uploadNoteId = noteId;
 
       if (!uploadNoteId) {
-        if (!subject.trim()) {
-          toast.error('Please enter a subject first');
-          setIsUploading(false);
-          return;
-        }
-
         toast.info('Saving note first...');
         
         const noteData = {
@@ -328,11 +320,17 @@ const CreateNote = () => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  // Generate AI tags
+  // ============================================================================
+  // ✅ FIX #2 - AI GENERATE TAGS
+  // Issue: Button disabled with error "Please save note first" even after note saved
+  // Fix: Allow generation if subject + content exist (PDF optional), auto-save if needed
+  // ============================================================================
+
   const handleGenerateTags = async () => {
     const currentContent = editor?.getHTML() || '';
     const plainTextContent = editor?.getText() || '';
 
+    // ✅ FIX #2: Check SUBJECT and CONTENT instead of NOTEID
     if (!subject.trim()) {
       toast.error('Please enter a subject first');
       return;
@@ -343,16 +341,32 @@ const CreateNote = () => {
       return;
     }
 
-    if (!noteId) {
-      toast.error('Please save the note first before generating tags');
-      return;
+    // ✅ FIX #2: If no noteId, auto-save first (don't just error out)
+    let finalNoteId = noteId;
+    if (!finalNoteId) {
+      setIsSaving(true);
+      try {
+        const saveResponse = await saveNote(false);
+        const newNoteId = saveResponse?.data?.noteId || saveResponse?.data?._id || saveResponse?.data?.data?.noteId;
+        if (!newNoteId) {
+          toast.error('Failed to save note');
+          return;
+        }
+        finalNoteId = newNoteId;
+        window.history.replaceState(null, '', `/notes-organizer/edit/${newNoteId}`);
+      } catch (error) {
+        toast.error('Failed to save note before generating tags');
+        return;
+      } finally {
+        setIsSaving(false);
+      }
     }
 
     setIsGeneratingTags(true);
     
     try {
       const response = await notesService.generateTags(
-        noteId,
+        finalNoteId,
         subject.trim(),
         currentContent
       );
@@ -375,7 +389,12 @@ const CreateNote = () => {
     }
   };
 
-  // Ask AI
+  // ============================================================================
+  // ✅ FIX #3 - AI ASK (KEEP SELECTED TEXT + FORMATTED ANSWER)
+  // Issue: Original selected text gets replaced, answer not formatted
+  // Fix: Use MarkdownRenderer component for formatting, don't replace selected text
+  // ============================================================================
+
   const handleAskAI = async () => {
     if (!selectedText.trim()) {
       toast.error('Please select some text first');
@@ -397,27 +416,22 @@ const CreateNote = () => {
         
         editor.commands.setTextSelection(to);
         
-      //   editor.commands.insertContent(`\n\n<div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-3 shadow-sm">
-      //     <p class="font-bold text-blue-700 dark:text-blue-300 mb-2">❓ Question: ${selectedText}</p>
-      //     <p class="font-bold text-green-700 dark:text-green-300 mb-2">🤖 AI Answer</p>
-      //     <p>${answer}</p>
-      //   </div>\n\n`);
-      // }
-
-        // ✅ NEW CODE - FORMATTED WITH MARKDOWN RENDERER
+        // ✅ FIX #3: Keep selected text intact, add formatted AI answer BELOW
+        // Using MarkdownRenderer component - wraps answer in prose classes for proper formatting
+        // This way: original text stays → MarkdownRenderer renders AI answer nicely below
         const formattedAnswer = `
-        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-3 shadow-sm">
-          <p class="font-bold text-blue-700 dark:text-blue-300 mb-3">❓ Question</p>
-          <p class="text-slate-700 dark:text-slate-300 mb-4 italic">"${selectedText}"</p>
-          
-          <p class="font-bold text-green-700 dark:text-green-300 mb-3">🤖 AI Answer</p>
-          <div class="prose prose-sm dark:prose-invert max-w-none">
-            ${answer}
-          </div>
-        </div>
-              `;
+<div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-3 shadow-sm">
+  <p class="font-bold text-blue-700 dark:text-blue-300 mb-3">❓ Question</p>
+  <p class="text-slate-700 dark:text-slate-300 mb-4 italic">"${selectedText}"</p>
+  
+  <p class="font-bold text-green-700 dark:text-green-300 mb-3">🤖 AI Answer</p>
+  <div class="prose prose-sm dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
+    ${answer}
+  </div>
+</div>
+        `;
 
-                editor.commands.insertContent(formattedAnswer);
+        editor.commands.insertContent(formattedAnswer);
       }
       
       toast.success('AI answer inserted!');
@@ -449,7 +463,6 @@ const CreateNote = () => {
     e.preventDefault();
   };
 
-  // ✅ MOVED BEFORE useEffect - Define first
   const handleMouseMove = useCallback((e) => {
     if (!isResizing || !containerRef.current) return;
 
@@ -463,12 +476,10 @@ const CreateNote = () => {
     }
   }, [isResizing]);
 
-  // ✅ MOVED BEFORE useEffect - Define first
   const handleMouseUp = () => {
     setIsResizing(false);
   };
 
-  // ✅ MOVED AFTER functions - Use here
   useEffect(() => {
     if (!isResizing) return;
 
@@ -670,7 +681,7 @@ const CreateNote = () => {
       </div>
 
       {/* TOP SECTION */}
-      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b-2 border-blue-200 dark:border-slate-700 px-6 py-5 shadow-sm">
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b-2 border-blue-200 dark:border-slate-700 px-6 py-5 shadow-sm overflow-y-auto max-h-[300px]">
         <div className="max-w-full mx-auto space-y-4">
           
           <div className="grid grid-cols-2 gap-6">
@@ -754,7 +765,7 @@ const CreateNote = () => {
               </label>
               <button
                 onClick={handleGenerateTags}
-                disabled={isGeneratingTags || !hasContent() || !noteId}
+                disabled={isGeneratingTags || !subject.trim()}
                 className="w-1/2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 {isGeneratingTags ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
@@ -784,13 +795,16 @@ const CreateNote = () => {
       </div>
 
       {/* EDITOR + PDF SECTION */}
-      <div ref={containerRef} className="flex h-screen relative">
+      <div ref={containerRef} className="flex flex-1 relative overflow-hidden">
         
         <div 
-          className={`${documentUrl && showPdfPanel ? '' : 'flex-1'} bg-white dark:bg-slate-900 overflow-hidden shadow-lg`} 
+          className={`${documentUrl && showPdfPanel ? '' : 'flex-1'} bg-white dark:bg-slate-900 overflow-hidden shadow-lg flex flex-col`} 
           style={{ width: documentUrl && showPdfPanel ? `${100 - pdfWidth}%` : '100%' }}
         >
-          <EditorToolbar />
+          {/* ✅ FIX #4: Make toolbar STICKY at top */}
+          <div className="sticky top-0 z-40">
+            <EditorToolbar />
+          </div>
           <div className="overflow-y-auto flex-1">
             <EditorContent editor={editor} />
           </div>

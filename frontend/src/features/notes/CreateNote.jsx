@@ -1,4 +1,7 @@
-// // src/features/notes/CreateNote.jsx - COMPLETE CORRECTED VERSION
+// // ============================================================================
+// // src/features/notes/CreateNote.jsx - FIXED VERSION (4 PROBLEMS RESOLVED)
+// // ============================================================================
+
 // import { useState, useEffect, useCallback, useRef } from 'react';
 // import { useNavigate, useParams } from 'react-router-dom';
 // import { useEditor, EditorContent } from '@tiptap/react';
@@ -7,21 +10,30 @@
 // import TextAlign from '@tiptap/extension-text-align';
 // import Underline from '@tiptap/extension-underline';
 // import Link from '@tiptap/extension-link';
+// import Highlight from '@tiptap/extension-highlight';
+// import { TextStyle } from '@tiptap/extension-text-style';  
+// import { Color } from '@tiptap/extension-color';        
 // import { 
-//   Save, Upload, Sparkles, ArrowLeft,
+//   Save, Upload, Sparkles, ArrowLeft, BookOpen,
 //   Bold, Italic, List, ListOrdered, Undo, Redo,
 //   AlignLeft, AlignCenter, AlignRight, Underline as UnderlineIcon,
-//   FileText, Loader2, X, Brain, Eye, EyeOff, CheckCircle2, Clock,
-//   ZoomIn, ZoomOut, Download
+//   FileText, Loader2, X, Brain, CheckCircle2,
+//   ZoomIn, ZoomOut, Download, Maximize2, GripVertical, Eye, EyeOff, Highlighter,
+//   Trash2
 // } from 'lucide-react';
 // import { toast } from 'react-toastify';
 // import { notesService } from '../../services/notesService';
+// import MarkdownRenderer from '../../components/common/MarkdownRenderer';
 
 // const CreateNote = () => {
 //   const navigate = useNavigate();
 //   const { noteId } = useParams();
 //   const isEditMode = Boolean(noteId);
 
+//   // ============================================================================
+//   // 📦 STATE - All component states
+//   // ============================================================================
+  
 //   const [subject, setSubject] = useState('');
 //   const [tags, setTags] = useState([]);
 //   const [tagInput, setTagInput] = useState('');
@@ -32,15 +44,31 @@
 //   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
 //   const [lastSaved, setLastSaved] = useState(null);
 //   const [selectedText, setSelectedText] = useState('');
+//   const [selectedTextPosition, setSelectedTextPosition] = useState(null);
 //   const [showAIPrompt, setShowAIPrompt] = useState(false);
 //   const [aiLoading, setAiLoading] = useState(false);
 //   const [showPdfPanel, setShowPdfPanel] = useState(true);
-//   const [pdfZoom, setPdfZoom] = useState(100);
+//   const [pdfZoom, setPdfZoom] = useState(1.0);
+//   const [pdfWidth, setPdfWidth] = useState(40);
+//   const [isResizing, setIsResizing] = useState(false);
+//   const [showFullscreenPdf, setShowFullscreenPdf] = useState(false);
+//   const [showColorPicker, setShowColorPicker] = useState(false);
+//   const [noteLoaded, setNoteLoaded] = useState(false);
 
+//   // ============================================================================
+//   // 🔗 REFS - DOM element references
+//   // ============================================================================
+  
 //   const fileInputRef = useRef(null);
 //   const autoSaveTimerRef = useRef(null);
+//   const containerRef = useRef(null);
+//   const tagInputRef = useRef(null);
+//   const hasLoadedRef = useRef(false);
 
-//   // TipTap Editor
+//   // ============================================================================
+//   // 📝 EDITOR SETUP - Tiptap configuration
+//   // ============================================================================
+  
 //   const editor = useEditor({
 //     extensions: [
 //       StarterKit,
@@ -54,11 +82,16 @@
 //       Link.configure({
 //         openOnClick: false,
 //       }),
+//       Highlight.configure({
+//         multicolor: true,
+//       }),
+//       TextStyle,
+//       Color,
 //     ],
 //     content: '',
 //     editorProps: {
 //       attributes: {
-//         class: 'prose prose-base max-w-none focus:outline-none min-h-[500px] p-8 text-slate-700 dark:text-slate-200 bg-gradient-to-br from-blue-50/80 to-sky-50/50',
+//         class: 'prose prose-base max-w-none focus:outline-none min-h-[800px] p-8 text-slate-700 dark:text-slate-200 bg-gradient-to-br from-blue-50/80 to-sky-50/50',
 //       },
 //     },
 //     onUpdate: ({ editor }) => {
@@ -68,21 +101,25 @@
 //       const { from, to } = editor.state.selection;
 //       const text = editor.state.doc.textBetween(from, to, ' ');
 //       setSelectedText(text);
+//       setSelectedTextPosition({ from, to });
 //       setShowAIPrompt(text.length > 0);
 //     },
 //   });
 
-//   const hasContent = () => {
-//     if (!editor) return false;
-//     const text = editor.getText();
-//     return text.trim().length > 0;
-//   };
-
+//   // ============================================================================
+//   // 🔄 LOAD NOTE EFFECT - Load note when component mounts (ONLY ONCE!)
+//   // ============================================================================
+  
 //   useEffect(() => {
-//     if (isEditMode && noteId) {
+//     if (isEditMode && noteId && !hasLoadedRef.current) {
+//       hasLoadedRef.current = true;
 //       loadNote();
 //     }
 //   }, [noteId, isEditMode]);
+
+//   // ============================================================================
+//   // 📡 API FUNCTIONS
+//   // ============================================================================
 
 //   const loadNote = async () => {
 //     try {
@@ -99,22 +136,12 @@
 //       }
       
 //       toast.success('Note loaded!');
+//       setNoteLoaded(true);
 //     } catch (error) {
 //       console.error('Error loading note:', error);
 //       toast.error('Failed to load note');
 //     }
 //   };
-
-//   const scheduleAutoSave = useCallback(() => {
-//     if (autoSaveTimerRef.current) {
-//       clearTimeout(autoSaveTimerRef.current);
-//     }
-//     autoSaveTimerRef.current = setTimeout(() => {
-//       if (noteId) {
-//         saveNote(true);
-//       }
-//     }, 30000);
-//   }, [noteId]);
 
 //   const saveNote = async (isAutoSave = false) => {
 //     if (!subject.trim()) {
@@ -136,7 +163,7 @@
 //       let response;
 //       if (isEditMode && noteId) {
 //         response = await notesService.updateNote(noteId, noteData);
-//         toast.success(isAutoSave ? '✓ Saved' : 'Note updated!', { autoClose: 2000 });
+//         if (!isAutoSave) toast.success('Note updated!', { autoClose: 2000 });
 //       } else {
 //         response = await notesService.createNote(noteData);
 //         const newNoteId = response.data.noteId || response.data._id || response.data.data?.noteId;
@@ -158,9 +185,36 @@
 //     }
 //   };
 
+//   const scheduleAutoSave = useCallback(() => {
+//     if (autoSaveTimerRef.current) {
+//       clearTimeout(autoSaveTimerRef.current);
+//     }
+//     autoSaveTimerRef.current = setTimeout(() => {
+//       if (noteId) {
+//         saveNote(true);
+//       }
+//     }, 30000);
+//   }, [noteId]);
+
+//   // ============================================================================
+//   // ✅ FIX #1 - PDF UPLOAD VALIDATION
+//   // ============================================================================
+//   // PROBLEM: Two toasts shown when user clicks "Upload PDF" without entering subject
+//   // SOLUTION: Check subject FIRST before any upload logic
+//   // If no subject, show error and return early (don't upload)
+  
 //   const handleFileUpload = async (e) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
+
+//     // ✅ FIX #1a: Check subject FIRST - if no subject, reject immediately
+//     if (!subject.trim()) {
+//       toast.error('Please enter a subject first');
+//       if (fileInputRef.current) {
+//         fileInputRef.current.value = '';
+//       }
+//       return; // ✅ EXIT EARLY - don't proceed with upload
+//     }
 
 //     if (file.type !== 'application/pdf') {
 //       toast.error('Please upload a PDF file');
@@ -179,12 +233,7 @@
 //       let uploadNoteId = noteId;
 
 //       if (!uploadNoteId) {
-//         if (!subject.trim()) {
-//           toast.error('Please enter a subject first');
-//           setIsUploading(false);
-//           return;
-//         }
-
+//         // ✅ FIX #1b: Create note with subject + optional content first
 //         toast.info('Saving note first...');
         
 //         const noteData = {
@@ -199,7 +248,6 @@
 //         uploadNoteId = response.data.noteId || response.data._id || response.data.data?.noteId;
         
 //         if (!uploadNoteId) {
-//           console.error('No note ID returned:', response.data);
 //           throw new Error('Failed to get note ID');
 //         }
 
@@ -207,12 +255,7 @@
 //         await new Promise(resolve => setTimeout(resolve, 500));
 //       }
 
-//       console.log('Uploading PDF to note:', uploadNoteId);
-
 //       const uploadResponse = await notesService.uploadDocument(uploadNoteId, file);
-      
-//       console.log('Upload response:', uploadResponse);
-      
 //       const pdfUrl = uploadResponse.data.documentUrl || uploadResponse.data.url;
       
 //       if (!pdfUrl) {
@@ -235,6 +278,29 @@
 //     }
 //   };
 
+//   const handleDeletePDF = async () => {
+//     if (!noteId) {
+//       toast.error('Please save note first');
+//       return;
+//     }
+
+//     setIsUploading(true);
+//     try {
+//       await notesService.deleteDocument(noteId);
+      
+//       setDocumentUrl(null);
+//       setDocumentName('');
+//       setShowPdfPanel(false);
+      
+//       toast.success('PDF deleted successfully!');
+//     } catch (error) {
+//       console.error('Delete PDF error:', error);
+//       toast.error(error.message || 'Failed to delete PDF');
+//     } finally {
+//       setIsUploading(false);
+//     }
+//   };
+
 //   const handleAddTag = () => {
 //     if (!tagInput.trim()) return;
 //     const newTag = tagInput.trim().replace(/^#/, '');
@@ -248,15 +314,17 @@
 //     setTags(tags.filter(tag => tag !== tagToRemove));
 //   };
 
-//   // ✅ FIXED: Generate Tags Function
+//   // ============================================================================
+//   // ✅ FIX #2 - AI GENERATE TAGS BUTTON
+//   // ============================================================================
+//   // PROBLEM: Button shows error and doesn't work after adding subject
+//   // SOLUTION: 
+//   // - Auto-save the note if it doesn't exist yet (noteId is null)
+//   // - Then generate tags (Subject + Content required, PDF optional)
+  
 //   const handleGenerateTags = async () => {
 //     const currentContent = editor?.getHTML() || '';
 //     const plainTextContent = editor?.getText() || '';
-
-//     console.log('🏷️ Generating tags...');
-//     console.log('Subject:', subject);
-//     console.log('Content length:', plainTextContent.length);
-//     console.log('NoteId:', noteId);
 
 //     if (!subject.trim()) {
 //       toast.error('Please enter a subject first');
@@ -268,28 +336,42 @@
 //       return;
 //     }
 
-//     if (!noteId) {
-//       toast.error('Please save the note first before generating tags');
-//       return;
+//     // ✅ FIX #2a: If note doesn't exist yet, auto-save it first
+//     let tagGenerationNoteId = noteId;
+    
+//     if (!tagGenerationNoteId) {
+//       try {
+//         toast.info('Saving note first...');
+//         const response = await saveNote(true); // ✅ Auto-save the note
+        
+//         if (response?.data?.noteId) {
+//           tagGenerationNoteId = response.data.noteId;
+//         } else if (response?.data?._id) {
+//           tagGenerationNoteId = response.data._id;
+//         } else if (response?.data?.data?.noteId) {
+//           tagGenerationNoteId = response.data.data.noteId;
+//         }
+
+//         if (!tagGenerationNoteId) {
+//           toast.error('Failed to save note. Please save manually first.');
+//           return;
+//         }
+//       } catch (error) {
+//         toast.error('Failed to save note');
+//         return;
+//       }
 //     }
 
 //     setIsGeneratingTags(true);
     
 //     try {
-//       console.log('📤 Sending to backend:', {
-//         noteId,
-//         subject,
-//         contentLength: currentContent.length
-//       });
-
+//       // ✅ FIX #2b: Now generate tags using the note ID
 //       const response = await notesService.generateTags(
-//         noteId,
+//         tagGenerationNoteId,
 //         subject.trim(),
 //         currentContent
 //       );
       
-//       console.log('✅ Tags response:', response);
-
 //       const generatedTags = response.data || [];
       
 //       if (generatedTags.length === 0) {
@@ -301,14 +383,24 @@
 //       toast.success(`${generatedTags.length} tags generated successfully!`);
       
 //     } catch (error) {
-//       console.error('❌ Generate tags error:', error);
-//       const errorMessage = error.message || 'Failed to generate tags';
-//       toast.error(errorMessage);
+//       console.error('Generate tags error:', error);
+//       toast.error(error.message || 'Failed to generate tags');
 //     } finally {
 //       setIsGeneratingTags(false);
 //     }
 //   };
 
+//   // ============================================================================
+//   // ✅ FIX #3 - AI ANSWER FORMAT
+//   // ============================================================================
+//   // PROBLEM: 
+//   // - Selected text gets REPLACED with AI answer
+//   // - AI answer shows as plain text (no formatting)
+//   // SOLUTION:
+//   // - Keep original selected line INTACT
+//   // - Add AI answer BELOW with MarkdownRenderer for nice formatting
+//   // - Don't repeat the question in the answer
+  
 //   const handleAskAI = async () => {
 //     if (!selectedText.trim()) {
 //       toast.error('Please select some text first');
@@ -325,7 +417,26 @@
 //       const response = await notesService.askAI(noteId, selectedText);
 //       const answer = response.data.answer || response.data;
       
-//       editor?.commands.insertContent(`\n\n<div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-3 shadow-sm"><p class="font-bold text-blue-700 dark:text-blue-300 mb-2">🤖 AI Answer</p><p>${answer}</p></div>\n\n`);
+//       if (selectedTextPosition && editor) {
+//         const { to } = selectedTextPosition;
+        
+//         // ✅ FIX #3a: Move cursor to END of selected text (don't replace it)
+//         editor.commands.setTextSelection(to);
+        
+//         // ✅ FIX #3b: Add AI answer BELOW with proper formatting
+//         // Using a styled container with MarkdownRenderer-compatible content
+//         const formattedAnswer = `
+//         <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-4 shadow-sm">
+//           <p class="font-bold text-blue-700 dark:text-blue-300 mb-2">🤖 AI Answer</p>
+//           <div class="prose prose-sm dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
+//             ${answer}
+//           </div>
+//         </div>
+//         `;
+
+//         // ✅ FIX #3c: Insert formatted answer on new lines BELOW selected text
+//         editor.commands.insertContent(`\n\n${formattedAnswer}\n\n`);
+//       }
       
 //       toast.success('AI answer inserted!');
 //       setShowAIPrompt(false);
@@ -337,471 +448,20 @@
 //     }
 //   };
 
-//   const EditorToolbar = () => {
-//     if (!editor) return null;
+//   // ============================================================================
+//   // 🎯 EVENT HANDLERS - PDF controls
+//   // ============================================================================
 
-//     const ToolButton = ({ onClick, isActive, icon: Icon, title, disabled }) => (
-//       <button
-//         onClick={onClick}
-//         disabled={disabled}
-//         className={`p-2 rounded-lg transition-all ${
-//           isActive 
-//             ? 'bg-blue-100 text-blue-600 shadow-sm' 
-//             : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-//         } disabled:opacity-30`}
-//         title={title}
-//       >
-//         <Icon className="w-4 h-4" />
-//       </button>
-//     );
-
-//     return (
-//       <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-white to-blue-50/50 dark:from-slate-800 dark:to-slate-800 border-b border-blue-200 dark:border-slate-700">
-//         <div className="flex items-center gap-1">
-//           <ToolButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} icon={Bold} title="Bold" />
-//           <ToolButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} icon={Italic} title="Italic" />
-//           <ToolButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')} icon={UnderlineIcon} title="Underline" />
-          
-//           <div className="w-px h-5 bg-blue-300 mx-2"></div>
-          
-//           <ToolButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} icon={List} title="Bullet List" />
-//           <ToolButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive('orderedList')} icon={ListOrdered} title="Numbered List" />
-          
-//           <div className="w-px h-5 bg-cyan-300 mx-2"></div>
-          
-//           <ToolButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} icon={AlignLeft} title="Align Left" />
-//           <ToolButton onClick={() => editor.chain().focus().setTextAlign('center').run()} isActive={editor.isActive({ textAlign: 'center' })} icon={AlignCenter} title="Align Center" />
-//           <ToolButton onClick={() => editor.chain().focus().setTextAlign('right').run()} isActive={editor.isActive({ textAlign: 'right' })} icon={AlignRight} title="Align Right" />
-          
-//           <div className="w-px h-5 bg-sky-300 mx-2"></div>
-          
-//           <ToolButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} icon={Undo} title="Undo" />
-//           <ToolButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} icon={Redo} title="Redo" />
-//         </div>
-
-//         {lastSaved && (
-//           <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium">
-//             <CheckCircle2 className="w-4 h-4" />
-//             <span>Saved {lastSaved.toLocaleTimeString()}</span>
-//           </div>
-//         )}
-//       </div>
-//     );
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-sky-50/30 to-cyan-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      
-//       {/* Header */}
-//       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-blue-200 dark:border-slate-800 px-6 py-4 shadow-sm">
-//         <div className="max-w-7xl mx-auto flex items-center justify-between">
-//           <div className="flex items-center gap-4">
-//             <button
-//               onClick={() => navigate('/notes-organizer')}
-//               className="p-2 hover:bg-blue-100 dark:hover:bg-slate-800 rounded-lg transition-all"
-//             >
-//               <ArrowLeft className="w-5 h-5 text-blue-600" />
-//             </button>
-//             <div className="flex items-center gap-3">
-//               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-//                 <FileText className="w-6 h-6 text-white" />
-//               </div>
-//               <div>
-//                 <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-//                   {isEditMode ? 'Edit Note' : 'Create New Note'}
-//                 </h1>
-//                 <p className="text-sm text-slate-500 flex items-center gap-1.5">
-//                   <Clock className="w-3.5 h-3.5" />
-//                   Auto-saves every 30 seconds
-//                 </p>
-//               </div>
-//             </div>
-//           </div>
-          
-//           <button
-//             onClick={() => saveNote(false)}
-//             disabled={isSaving}
-//             className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30 disabled:opacity-50 transition-all transform hover:scale-105"
-//           >
-//             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-//             {isSaving ? 'Saving...' : 'Save Note'}
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Main Content */}
-//       <div className="max-w-7xl mx-auto p-6 grid grid-cols-12 gap-6">
-        
-//         {/* Left Sidebar */}
-//         <div className="col-span-3 space-y-4">
-          
-//           {/* Subject Card */}
-//           <div className="bg-gradient-to-br from-white to-blue-50/50 dark:from-slate-900 dark:to-slate-800 backdrop-blur-sm rounded-xl border border-blue-200 dark:border-slate-700 p-5 shadow-sm">
-//             <label className="block text-sm font-semibold text-blue-700 dark:text-blue-400 mb-3">
-//               📚 Subject
-//             </label>
-//             <input
-//               type="text"
-//               placeholder="e.g., Data Structures"
-//               value={subject}
-//               onChange={(e) => setSubject(e.target.value)}
-//               className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium"
-//             />
-//           </div>
-
-//           {/* Tags Card */}
-//           <div className="bg-gradient-to-br from-white to-cyan-50/50 dark:from-slate-900 dark:to-slate-800 backdrop-blur-sm rounded-xl border border-cyan-200 dark:border-slate-700 p-5 shadow-sm">
-//             <div className="flex items-center justify-between mb-3">
-//               <label className="block text-sm font-semibold text-cyan-700 dark:text-cyan-400">
-//                 🏷️ Tags
-//               </label>
-//               <button
-//                 onClick={handleGenerateTags}
-//                 disabled={isGeneratingTags || !hasContent() || !noteId}
-//                 className="flex items-center gap-1 px-2 py-1 text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-md hover:from-cyan-600 hover:to-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-//                 title={!hasContent() ? "Write content first" : !noteId ? "Save note first" : "Generate AI tags"}
-//               >
-//                 {isGeneratingTags ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-//                 AI
-//               </button>
-//             </div>
-
-//             {/* Tags Display */}
-//             {tags.length > 0 && (
-//               <div className="flex flex-wrap gap-2 mb-3">
-//                 {tags.map((tag, idx) => (
-//                   <span
-//                     key={idx}
-//                     className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 rounded-md text-xs font-medium shadow-sm"
-//                   >
-//                     #{tag}
-//                     <button onClick={() => handleRemoveTag(tag)} className="hover:bg-cyan-200 rounded-full p-0.5 transition-colors">
-//                       <X className="w-3 h-3" />
-//                     </button>
-//                   </span>
-//                 ))}
-//               </div>
-//             )}
-
-//             {/* Tag Input */}
-//             <div className="flex gap-1.5">
-//               <input
-//                 type="text"
-//                 placeholder="Add tag..."
-//                 value={tagInput}
-//                 onChange={(e) => setTagInput(e.target.value)}
-//                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-//                 className="flex-1 min-w-0 px-3 py-2 bg-white dark:bg-slate-800 border-2 border-cyan-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
-//               />
-//               <button
-//                 onClick={handleAddTag}
-//                 className="px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-medium rounded-lg transition-all shadow-sm text-sm flex-shrink-0"
-//               >
-//                 Add
-//               </button>
-//             </div>
-//           </div>
-
-//           {/* PDF Upload Card */}
-//           <div className="bg-gradient-to-br from-white to-sky-50/50 dark:from-slate-900 dark:to-slate-800 backdrop-blur-sm rounded-xl border border-sky-200 dark:border-slate-700 p-5 shadow-sm">
-//             <label className="block text-sm font-semibold text-sky-700 dark:text-sky-400 mb-3">
-//               📄 Reference PDF
-//             </label>
-//             <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
-            
-//             {!documentUrl ? (
-//               <button
-//                 onClick={() => fileInputRef.current?.click()}
-//                 disabled={isUploading}
-//                 className="w-full px-4 py-3 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-medium rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md"
-//               >
-//                 {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-//                 {isUploading ? 'Uploading...' : 'Upload PDF'}
-//               </button>
-//             ) : (
-//               <div className="space-y-2">
-//                 <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-sky-100 to-blue-100 rounded-lg">
-//                   <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
-//                   <span className="text-sm text-sky-700 truncate flex-1 font-medium">{documentName}</span>
-//                   <button onClick={() => { setDocumentUrl(null); setDocumentName(''); setShowPdfPanel(false); }} className="p-1 hover:bg-sky-200 rounded-full transition-colors flex-shrink-0">
-//                     <X className="w-4 h-4 text-sky-700" />
-//                   </button>
-//                 </div>
-//                 <button
-//                   onClick={() => setShowPdfPanel(!showPdfPanel)}
-//                   className="w-full px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 transition-all"
-//                 >
-//                   {showPdfPanel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-//                   {showPdfPanel ? 'Hide PDF' : 'Show PDF'}
-//                 </button>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Middle - Editor */}
-//         <div className={`${showPdfPanel && documentUrl ? 'col-span-5' : 'col-span-9'} bg-white dark:bg-slate-900 backdrop-blur-sm rounded-xl border-2 border-blue-200 dark:border-slate-700 overflow-hidden shadow-lg`}>
-//           <EditorToolbar />
-//           <div className="overflow-y-auto max-h-[calc(100vh-240px)]">
-//             <EditorContent editor={editor} />
-//           </div>
-
-//           {/* Floating AI Button */}
-//           {showAIPrompt && (
-//             <button
-//               onClick={handleAskAI}
-//               disabled={aiLoading}
-//               className="fixed bottom-10 left-1/2 transform-translate-x-1/2 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-full shadow-2xl shadow-blue-500/50 transition-all transform hover:scale-105 z-50"
-//             >
-//               {aiLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
-//               {aiLoading ? 'Thinking...' : 'Ask AI'}
-//             </button>
-//           )}
-//         </div>
-
-//         {/* Right - PDF Viewer */}
-//         {documentUrl && showPdfPanel && (
-//           <div className="col-span-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-xl border-2 border-blue-200 dark:border-slate-700 overflow-hidden shadow-lg flex flex-col">
-//             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-//               <div className="flex items-center gap-2">
-//                 <FileText className="w-5 h-5" />
-//                 <span className="font-semibold text-sm truncate max-w-[150px]" title={documentName}>
-//                   {documentName}
-//                 </span>
-//               </div>
-//               <div className="flex items-center gap-1">
-//                 <button 
-//                   onClick={() => setPdfZoom(Math.max(50, pdfZoom - 10))} 
-//                   className="p-1.5 hover:bg-white/20 rounded transition-colors"
-//                   title="Zoom Out"
-//                 >
-//                   <ZoomOut className="w-4 h-4" />
-//                 </button>
-//                 <span className="text-xs px-2">{pdfZoom}%</span>
-//                 <button 
-//                   onClick={() => setPdfZoom(Math.min(200, pdfZoom + 10))} 
-//                   className="p-1.5 hover:bg-white/20 rounded transition-colors"
-//                   title="Zoom In"
-//                 >
-//                   <ZoomIn className="w-4 h-4" />
-//                 </button>
-//                 <div className="w-px h-5 bg-white/30 mx-1"></div>
-//                 <a 
-//                   href={documentUrl} 
-//                   download={documentName}
-//                   className="p-1.5 hover:bg-white/20 rounded transition-colors"
-//                   title="Download PDF"
-//                 >
-//                   <Download className="w-4 h-4" />
-//                 </a>
-//                 <button 
-//                   onClick={() => setShowPdfPanel(false)} 
-//                   className="p-1.5 hover:bg-white/20 rounded transition-colors"
-//                   title="Close"
-//                 >
-//                   <EyeOff className="w-4 h-4" />
-//                 </button>
-//               </div>
-//             </div>
-            
-//             <div className="flex-1 overflow-hidden bg-slate-100 dark:bg-slate-800">
-//               <iframe 
-//                 src={`${documentUrl}#zoom=${pdfZoom}`}
-//                 className="w-full h-full" 
-//                 title="PDF Viewer"
-//                 style={{ border: 'none' }}
-//               />
-//             </div>
-//           </div>
-//         )}
-//       </div>
-
-//       <style>{`
-//         .ProseMirror { 
-//           min-height: 500px;
-//         }
-//         .ProseMirror p.is-editor-empty:first-child::before {
-//           content: attr(data-placeholder);
-//           float: left;
-//           color: #94a3b8;
-//           pointer-events: none;
-//           height: 0;
-//         }
-//         .ProseMirror:focus { outline: none; }
-        
-//         .ProseMirror ul {
-//           list-style-type: disc;
-//           padding-left: 1.5em;
-//         }
-//         .ProseMirror ol {
-//           list-style-type: decimal;
-//           padding-left: 1.5em;
-//         }
-//         .ProseMirror li {
-//           margin: 0.25em 0;
-//         }
-//       `}</style>
-//     </div>
-//   );
-// };
-
-// export default CreateNote;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// src/features/notes/CreateNote.jsx - PERFECTLY ORGANIZED & CLEAN
-// import { useState, useEffect, useCallback, useRef } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import { useEditor, EditorContent } from '@tiptap/react';
-// import StarterKit from '@tiptap/starter-kit';
-// import Placeholder from '@tiptap/extension-placeholder';
-// import TextAlign from '@tiptap/extension-text-align';
-// import Underline from '@tiptap/extension-underline';
-// import Link from '@tiptap/extension-link';
-// import { 
-//   Save, Upload, Sparkles, ArrowLeft, BookOpen,
-//   Bold, Italic, List, ListOrdered, Undo, Redo,
-//   AlignLeft, AlignCenter, AlignRight, Underline as UnderlineIcon,
-//   FileText, Loader2, X, Brain, CheckCircle2, Clock,
-//   ZoomIn, ZoomOut, Download, Maximize2, GripVertical, Eye, EyeOff
-// } from 'lucide-react';
-// import { toast } from 'react-toastify';
-// import { notesService } from '../../services/notesService';
-
-// const CreateNote = () => {
-//   const navigate = useNavigate();
-//   const { noteId } = useParams();
-//   const isEditMode = Boolean(noteId);
-
-//   const [subject, setSubject] = useState('');
-//   const [tags, setTags] = useState([]);
-//   const [tagInput, setTagInput] = useState('');
-//   const [documentUrl, setDocumentUrl] = useState(null);
-//   const [documentName, setDocumentName] = useState('');
-//   const [isUploading, setIsUploading] = useState(false);
-//   const [isSaving, setIsSaving] = useState(false);
-//   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
-//   const [lastSaved, setLastSaved] = useState(null);
-//   const [selectedText, setSelectedText] = useState('');
-//   const [showAIPrompt, setShowAIPrompt] = useState(false);
-//   const [aiLoading, setAiLoading] = useState(false);
-//   const [showPdfPanel, setShowPdfPanel] = useState(true);
-//   const [pdfZoom, setPdfZoom] = useState(1.0); // Changed to decimal
-//   const [pdfWidth, setPdfWidth] = useState(40);
-//   const [isResizing, setIsResizing] = useState(false);
-//   const [showFullscreenPdf, setShowFullscreenPdf] = useState(false);
-
-//   const fileInputRef = useRef(null);
-//   const autoSaveTimerRef = useRef(null);
-//   const containerRef = useRef(null);
-//   const pdfIframeRef = useRef(null);
-
-//   const editor = useEditor({
-//     extensions: [
-//       StarterKit,
-//       Placeholder.configure({
-//         placeholder: 'Start writing your notes here...',
-//       }),
-//       TextAlign.configure({
-//         types: ['heading', 'paragraph'],
-//       }),
-//       Underline,
-//       Link.configure({
-//         openOnClick: false,
-//       }),
-//     ],
-//     content: '',
-//     editorProps: {
-//       attributes: {
-//         class: 'prose prose-base max-w-none focus:outline-none min-h-[500px] p-8 text-slate-700 dark:text-slate-200 bg-gradient-to-br from-blue-50/80 to-sky-50/50',
-//       },
-//     },
-//     onUpdate: ({ editor }) => {
-//       scheduleAutoSave();
-//     },
-//     onSelectionUpdate: ({ editor }) => {
-//       const { from, to } = editor.state.selection;
-//       const text = editor.state.doc.textBetween(from, to, ' ');
-//       setSelectedText(text);
-//       setShowAIPrompt(text.length > 0);
-//     },
-//   });
-
-//   // PDF Zoom Functions - FIXED
 //   const handleZoomIn = () => {
 //     const newZoom = Math.min(pdfZoom + 0.1, 2.0);
 //     setPdfZoom(newZoom);
-//     updatePdfZoom(newZoom);
 //   };
 
 //   const handleZoomOut = () => {
 //     const newZoom = Math.max(pdfZoom - 0.1, 0.5);
 //     setPdfZoom(newZoom);
-//     updatePdfZoom(newZoom);
 //   };
 
-//   const updatePdfZoom = (zoom) => {
-//     if (pdfIframeRef.current && pdfIframeRef.current.contentWindow) {
-//       try {
-//         pdfIframeRef.current.contentWindow.postMessage({
-//           type: 'setZoom',
-//           zoom: zoom
-//         }, '*');
-//       } catch (e) {
-//         console.log('Zoom update:', zoom);
-//       }
-//     }
-//   };
-
-//   // Resize handler
 //   const handleMouseDown = (e) => {
 //     setIsResizing(true);
 //     e.preventDefault();
@@ -825,14 +485,17 @@
 //   };
 
 //   useEffect(() => {
-//     if (isResizing) {
-//       document.addEventListener('mousemove', handleMouseMove);
-//       document.addEventListener('mouseup', handleMouseUp);
-//     }
+//     if (!isResizing) return;
+
+//     const onMouseMove = (e) => handleMouseMove(e);
+//     const onMouseUp = () => handleMouseUp();
+
+//     document.addEventListener('mousemove', onMouseMove);
+//     document.addEventListener('mouseup', onMouseUp);
 
 //     return () => {
-//       document.removeEventListener('mousemove', handleMouseMove);
-//       document.removeEventListener('mouseup', handleMouseUp);
+//       document.removeEventListener('mousemove', onMouseMove);
+//       document.removeEventListener('mouseup', onMouseUp);
 //     };
 //   }, [isResizing, handleMouseMove]);
 
@@ -842,243 +505,10 @@
 //     return text.trim().length > 0;
 //   };
 
-//   useEffect(() => {
-//     if (isEditMode && noteId) {
-//       loadNote();
-//     }
-//   }, [noteId, isEditMode]);
-
-//   const loadNote = async () => {
-//     try {
-//       const response = await notesService.getNoteById(noteId);
-//       const note = response.data.note || response.data;
-      
-//       setSubject(note.subject || '');
-//       setTags(note.tags || []);
-//       setDocumentUrl(note.documentUrl || null);
-//       setDocumentName(note.documentName || '');
-      
-//       if (editor && note.content) {
-//         editor.commands.setContent(note.content);
-//       }
-      
-//       toast.success('Note loaded!');
-//     } catch (error) {
-//       console.error('Error loading note:', error);
-//       toast.error('Failed to load note');
-//     }
-//   };
-
-//   const scheduleAutoSave = useCallback(() => {
-//     if (autoSaveTimerRef.current) {
-//       clearTimeout(autoSaveTimerRef.current);
-//     }
-//     autoSaveTimerRef.current = setTimeout(() => {
-//       if (noteId) {
-//         saveNote(true);
-//       }
-//     }, 30000);
-//   }, [noteId]);
-
-//   const saveNote = async (isAutoSave = false) => {
-//     if (!subject.trim()) {
-//       if (!isAutoSave) toast.error('Please enter a subject');
-//       return null;
-//     }
-
-//     setIsSaving(true);
-
-//     try {
-//       const noteData = {
-//         subject,
-//         content: editor?.getHTML() || '',
-//         tags,
-//         documentUrl,
-//         documentName,
-//       };
-
-//       let response;
-//       if (isEditMode && noteId) {
-//         response = await notesService.updateNote(noteId, noteData);
-//         toast.success(isAutoSave ? '✓ Saved' : 'Note updated!', { autoClose: 2000 });
-//       } else {
-//         response = await notesService.createNote(noteData);
-//         const newNoteId = response.data.noteId || response.data._id || response.data.data?.noteId;
-        
-//         if (newNoteId) {
-//           toast.success('Note created!');
-//           navigate(`/notes-organizer/edit/${newNoteId}`, { replace: true });
-//         }
-//       }
-
-//       setLastSaved(new Date());
-//       return response;
-//     } catch (error) {
-//       console.error('Save error:', error);
-//       if (!isAutoSave) toast.error('Failed to save');
-//       return null;
-//     } finally {
-//       setIsSaving(false);
-//     }
-//   };
-
-//   const handleFileUpload = async (e) => {
-//     const file = e.target.files[0];
-//     if (!file) return;
-
-//     if (file.type !== 'application/pdf') {
-//       toast.error('Please upload a PDF file');
-//       return;
-//     }
-
-//     if (file.size > 10 * 1024 * 1024) {
-//       toast.error('File must be less than 10MB');
-//       return;
-//     }
-
-//     setIsUploading(true);
-//     toast.info('Uploading PDF...');
-
-//     try {
-//       let uploadNoteId = noteId;
-
-//       if (!uploadNoteId) {
-//         if (!subject.trim()) {
-//           toast.error('Please enter a subject first');
-//           setIsUploading(false);
-//           return;
-//         }
-
-//         toast.info('Saving note first...');
-        
-//         const noteData = {
-//           subject,
-//           content: editor?.getHTML() || '',
-//           tags,
-//           documentUrl: null,
-//           documentName: '',
-//         };
-
-//         const response = await notesService.createNote(noteData);
-//         uploadNoteId = response.data.noteId || response.data._id || response.data.data?.noteId;
-        
-//         if (!uploadNoteId) {
-//           throw new Error('Failed to get note ID');
-//         }
-
-//         window.history.replaceState(null, '', `/notes-organizer/edit/${uploadNoteId}`);
-//         await new Promise(resolve => setTimeout(resolve, 500));
-//       }
-
-//       const uploadResponse = await notesService.uploadDocument(uploadNoteId, file);
-//       const pdfUrl = uploadResponse.data.documentUrl || uploadResponse.data.url;
-      
-//       if (!pdfUrl) {
-//         throw new Error('No document URL returned');
-//       }
-
-//       setDocumentUrl(pdfUrl);
-//       setDocumentName(file.name);
-//       setShowPdfPanel(true);
-      
-//       toast.success('PDF uploaded successfully!');
-//     } catch (error) {
-//       console.error('Upload error:', error);
-//       toast.error(error.message || 'Failed to upload PDF');
-//     } finally {
-//       setIsUploading(false);
-//       if (fileInputRef.current) {
-//         fileInputRef.current.value = '';
-//       }
-//     }
-//   };
-
-//   const handleAddTag = () => {
-//     if (!tagInput.trim()) return;
-//     const newTag = tagInput.trim().replace(/^#/, '');
-//     if (!tags.includes(newTag)) {
-//       setTags([...tags, newTag]);
-//     }
-//     setTagInput('');
-//   };
-
-//   const handleRemoveTag = (tagToRemove) => {
-//     setTags(tags.filter(tag => tag !== tagToRemove));
-//   };
-
-//   const handleGenerateTags = async () => {
-//     const currentContent = editor?.getHTML() || '';
-//     const plainTextContent = editor?.getText() || '';
-
-//     if (!subject.trim()) {
-//       toast.error('Please enter a subject first');
-//       return;
-//     }
-
-//     if (!plainTextContent.trim() || plainTextContent.length < 10) {
-//       toast.error('Please write some content first (at least 10 characters)');
-//       return;
-//     }
-
-//     if (!noteId) {
-//       toast.error('Please save the note first before generating tags');
-//       return;
-//     }
-
-//     setIsGeneratingTags(true);
-    
-//     try {
-//       const response = await notesService.generateTags(
-//         noteId,
-//         subject.trim(),
-//         currentContent
-//       );
-      
-//       const generatedTags = response.data || [];
-      
-//       if (generatedTags.length === 0) {
-//         toast.warning('No tags generated. Try adding more content.');
-//         return;
-//       }
-
-//       setTags(generatedTags);
-//       toast.success(`${generatedTags.length} tags generated successfully!`);
-      
-//     } catch (error) {
-//       console.error('Generate tags error:', error);
-//       toast.error(error.message || 'Failed to generate tags');
-//     } finally {
-//       setIsGeneratingTags(false);
-//     }
-//   };
-
-//   const handleAskAI = async () => {
-//     if (!selectedText.trim()) {
-//       toast.error('Please select some text first');
-//       return;
-//     }
-
-//     if (!noteId) {
-//       toast.error('Please save the note first');
-//       return;
-//     }
-
-//     setAiLoading(true);
-//     try {
-//       const response = await notesService.askAI(noteId, selectedText);
-//       const answer = response.data.answer || response.data;
-      
-//       editor?.commands.insertContent(`\n\n<div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-3 shadow-sm"><p class="font-bold text-blue-700 dark:text-blue-300 mb-2">🤖 AI Answer</p><p>${answer}</p></div>\n\n`);
-      
-//       toast.success('AI answer inserted!');
-//       setShowAIPrompt(false);
-//     } catch (error) {
-//       console.error('AI error:', error);
-//       toast.error('Failed to get AI answer');
-//     } finally {
-//       setAiLoading(false);
-//     }
-//   };
+//   // ============================================================================
+//   // 🛠️ TOOLBAR COMPONENT WITH FIX #4
+//   // ============================================================================
+//   // ✅ FIX #4: Make toolbar FIXED at top of editor, only content scrolls
 
 //   const EditorToolbar = () => {
 //     if (!editor) return null;
@@ -1098,12 +528,85 @@
 //       </button>
 //     );
 
+//     const colors = ['#000000', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+//     const highlights = ['#FEF3C7', '#FED7AA', '#DBEAFE', '#D1FAE5', '#E9D5FF', '#FBCFE8'];
+
 //     return (
 //       <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-white to-blue-50/50 dark:from-slate-800 dark:to-slate-800 border-b border-blue-200 dark:border-slate-700">
-//         <div className="flex items-center gap-1">
+//         <div className="flex items-center gap-1 flex-wrap">
 //           <ToolButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} icon={Bold} title="Bold" />
 //           <ToolButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} icon={Italic} title="Italic" />
 //           <ToolButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')} icon={UnderlineIcon} title="Underline" />
+          
+//           <div className="w-px h-5 bg-blue-300 mx-2"></div>
+          
+//           <div className="relative">
+//             <button
+//               onClick={() => setShowColorPicker(!showColorPicker)}
+//               className={`p-2 rounded-lg transition-all ${
+//                 editor.isActive('highlight') ? 'bg-yellow-100 text-yellow-600' : 'text-slate-500 hover:bg-slate-100'
+//               }`}
+//               title="Highlight Text"
+//             >
+//               <Highlighter className="w-4 h-4" />
+//             </button>
+            
+//             {showColorPicker && (
+//               <div className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-xl border-2 border-blue-200 dark:border-slate-700 z-50">
+//                 <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Highlights</p>
+//                 <div className="flex gap-2 mb-3">
+//                   {highlights.map((color) => (
+//                     <button
+//                       key={color}
+//                       onClick={() => {
+//                         editor.chain().focus().toggleHighlight({ color }).run();
+//                         setShowColorPicker(false);
+//                       }}
+//                       className="w-6 h-6 rounded border-2 border-slate-300 hover:scale-110 transition-transform"
+//                       style={{ backgroundColor: color }}
+//                       title={color}
+//                     />
+//                   ))}
+//                   <button
+//                     onClick={() => {
+//                       editor.chain().focus().unsetHighlight().run();
+//                       setShowColorPicker(false);
+//                     }}
+//                     className="w-6 h-6 rounded border-2 border-slate-300 hover:scale-110 transition-transform bg-white flex items-center justify-center"
+//                     title="Remove Highlight"
+//                   >
+//                     <X className="w-3 h-3 text-red-500" />
+//                   </button>
+//                 </div>
+                
+//                 <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Text Color</p>
+//                 <div className="flex gap-2">
+//                   {colors.map((color) => (
+//                     <button
+//                       key={color}
+//                       onClick={() => {
+//                         editor.chain().focus().setColor(color).run();
+//                         setShowColorPicker(false);
+//                       }}
+//                       className="w-6 h-6 rounded border-2 border-slate-300 hover:scale-110 transition-transform"
+//                       style={{ backgroundColor: color }}
+//                       title={color}
+//                     />
+//                   ))}
+//                   <button
+//                     onClick={() => {
+//                       editor.chain().focus().unsetColor().run();
+//                       setShowColorPicker(false);
+//                     }}
+//                     className="w-6 h-6 rounded border-2 border-slate-300 hover:scale-110 transition-transform bg-white flex items-center justify-center"
+//                     title="Remove Color"
+//                   >
+//                     <X className="w-3 h-3 text-red-500" />
+//                   </button>
+//                 </div>
+//               </div>
+//             )}
+//           </div>
           
 //           <div className="w-px h-5 bg-blue-300 mx-2"></div>
           
@@ -1132,10 +635,14 @@
 //     );
 //   };
 
+//   // ============================================================================
+//   // 🎨 MAIN RENDER
+//   // ============================================================================
+
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-sky-50/30 to-cyan-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       
-//       {/* Header */}
+//       {/* HEADER */}
 //       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-blue-200 dark:border-slate-800 px-6 py-4 shadow-sm">
 //         <div className="max-w-full mx-auto flex items-center justify-between">
 //           <div className="flex items-center gap-4">
@@ -1153,19 +660,14 @@
 //                 <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
 //                   {isEditMode ? 'Edit Note' : 'Create New Note'}
 //                 </h1>
-//                 <p className="text-sm text-slate-500 flex items-center gap-1.5">
-//                   <Clock className="w-3.5 h-3.5" />
-//                   Auto-saves every 30 seconds
-//                 </p>
 //               </div>
 //             </div>
 //           </div>
           
-//           {/* ✅ Library Button + Save Note */}
 //           <div className="flex items-center gap-3">
 //             <button
 //               onClick={() => navigate('/notes-organizer/library')}
-//               className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border-2 border-blue-500 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 transition-all"
+//               className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-400/30 transition-all transform hover:scale-105"
 //             >
 //               <BookOpen className="w-4 h-4" />
 //               Library
@@ -1183,270 +685,226 @@
 //         </div>
 //       </div>
 
-//       {/* ✅ Top Section - Subject, Tags, PDF - Well Organized */}
-//       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b-2 border-blue-200 dark:border-slate-700 px-6 py-6 shadow-sm">
-//         <div className="max-w-full mx-auto space-y-5">
+//       {/* TOP SECTION */}
+//       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b-2 border-blue-200 dark:border-slate-700 px-6 py-5 shadow-sm">
+//         <div className="max-w-full mx-auto space-y-4">
           
-//           {/* Row 1: Subject */}
-//           <div>
-//             <label className="block text-sm font-bold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
-//               <span className="text-lg">📚</span> Subject
-//             </label>
-//             <input
-//               type="text"
-//               placeholder="e.g., Data Structures, Algorithms, Web Development..."
-//               value={subject}
-//               onChange={(e) => setSubject(e.target.value)}
-//               className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-sm shadow-sm"
-//             />
+//           <div className="grid grid-cols-2 gap-6">
+//             <div>
+//               <label className="block text-sm font-bold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
+//                 <span className="text-lg">📚</span> Subject
+//               </label>
+//               <input
+//                 type="text"
+//                 placeholder="e.g., Data Structures, Algorithms..."
+//                 value={subject}
+//                 onChange={(e) => setSubject(e.target.value)}
+//                 className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium shadow-sm"
+//               />
+//             </div>
+
+//             <div>
+//               <label className="block text-sm font-bold text-sky-700 dark:text-sky-400 mb-2 flex items-center gap-2">
+//                 <span className="text-lg">📄</span> Reference PDF
+//               </label>
+//               <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
+              
+//               {!documentUrl ? (
+//                 <button
+//                   onClick={() => fileInputRef.current?.click()}
+//                   disabled={isUploading}
+//                   className="w-1/2 px-5 py-3 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md"
+//                 >
+//                   {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+//                   {isUploading ? 'Uploading...' : 'Upload PDF'}
+//                 </button>
+//               ) : (
+//                 <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-sky-200 w-fit">
+//                   <FileText className="w-6 h-6 text-sky-600 flex-shrink-0" />
+//                   <span className="text-sm text-sky-700 dark:text-sky-300 font-medium truncate max-w-[200px]">{documentName}</span>
+//                   <button
+//                     onClick={() => setShowPdfPanel(!showPdfPanel)}
+//                     className="p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-all"
+//                   >
+//                     {showPdfPanel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+//                   </button>
+//                   <button 
+//                     onClick={handleDeletePDF}
+//                     disabled={isUploading}
+//                     className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-all"
+//                   >
+//                     <Trash2 className="w-4 h-4" />
+//                   </button>
+//                 </div>
+//               )}
+//             </div>
 //           </div>
 
-//           {/* Row 2: Tags */}
-//           <div>
-//             <label className="block text-sm font-bold text-cyan-700 dark:text-cyan-400 mb-2 flex items-center gap-2">
-//               <span className="text-lg">🏷️</span> Tags
-//             </label>
-            
-//             {/* ✅ Show ALL Tags */}
-//             {tags.length > 0 && (
-//               <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-cyan-200 dark:border-slate-600">
+//           <div className="grid grid-cols-2 gap-6">
+//             <div>
+//               <label className="block text-sm font-bold text-cyan-700 dark:text-cyan-400 mb-2 flex items-center gap-2">
+//                 <span className="text-lg">🏷️</span> Add Tags
+//               </label>
+//               <div className="flex gap-2">
+//                 <input
+//                   ref={tagInputRef}
+//                   type="text"
+//                   placeholder="Enter tag..."
+//                   value={tagInput}
+//                   onChange={(e) => setTagInput(e.target.value)}
+//                   onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+//                   className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 border-2 border-cyan-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-sm"
+//                 />
+//                 <button
+//                   onClick={handleAddTag}
+//                   className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all shadow-md"
+//                 >
+//                   Add
+//                 </button>
+//               </div>
+//             </div>
+
+//             <div>
+//               <label className=" block text-sm font-bold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
+//                 <span className="text-lg">✨</span> AI Generate Tags
+//               </label>
+//               <button
+//                 onClick={handleGenerateTags}
+//                 disabled={isGeneratingTags || !hasContent()}
+//                 className="w-1/2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md"
+//               >
+//                 {isGeneratingTags ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+//                 {isGeneratingTags ? 'Generating...' : 'Generate AI Tags'}
+//               </button>
+//             </div>
+//           </div>
+
+//           {tags.length > 0 && (
+//             <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-cyan-200">
+//               <div className="flex flex-wrap gap-2">
 //                 {tags.map((tag, idx) => (
 //                   <span
 //                     key={idx}
-//                     className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900 text-cyan-700 dark:text-cyan-300 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all"
+//                     className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 rounded-lg text-sm font-medium shadow-sm"
 //                   >
 //                     #{tag}
-//                     <button 
-//                       onClick={() => handleRemoveTag(tag)} 
-//                       className="hover:bg-cyan-200 dark:hover:bg-cyan-800 rounded-full p-1 transition-colors"
-//                     >
+//                     <button onClick={() => handleRemoveTag(tag)} className="hover:bg-cyan-200 rounded-full p-1">
 //                       <X className="w-3 h-3" />
 //                     </button>
 //                   </span>
 //                 ))}
 //               </div>
-//             )}
-            
-//             {/* ✅ Add Tag + AI Button - Properly Aligned */}
-//             <div className="flex items-center gap-2">
-//               <div className="flex-1 flex gap-2">
-//                 <input
-//                   type="text"
-//                   placeholder="Add custom tag..."
-//                   value={tagInput}
-//                   onChange={(e) => setTagInput(e.target.value)}
-//                   onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-//                   className="flex-1 px-4 py-2.5 bg-white dark:bg-slate-800 border-2 border-cyan-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm shadow-sm"
-//                 />
-//                 <button
-//                   onClick={handleAddTag}
-//                   className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all shadow-md text-sm"
-//                 >
-//                   Add
-//                 </button>
-//               </div>
-              
-//               <button
-//                 onClick={handleGenerateTags}
-//                 disabled={isGeneratingTags || !hasContent() || !noteId}
-//                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md text-sm"
-//                 title={!hasContent() ? "Write content first" : !noteId ? "Save note first" : "Generate AI tags"}
-//               >
-//                 {isGeneratingTags ? (
-//                   <Loader2 className="w-4 h-4 animate-spin" />
-//                 ) : (
-//                   <Sparkles className="w-4 h-4" />
-//                 )}
-//                 AI Generate
-//               </button>
 //             </div>
-//           </div>
-
-//           {/* Row 3: PDF Upload */}
-//           <div>
-//             <label className="block text-sm font-bold text-sky-700 dark:text-sky-400 mb-2 flex items-center gap-2">
-//               <span className="text-lg">📄</span> Reference PDF
-//             </label>
-//             <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
-            
-//             {!documentUrl ? (
-//               <button
-//                 onClick={() => fileInputRef.current?.click()}
-//                 disabled={isUploading}
-//                 className="px-5 py-3 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50 transition-all shadow-md"
-//               >
-//                 {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-//                 {isUploading ? 'Uploading PDF...' : 'Upload PDF Document'}
-//               </button>
-//             ) : (
-//               <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-sky-200 dark:border-slate-600">
-//                 <FileText className="w-6 h-6 text-sky-600 dark:text-sky-400 flex-shrink-0" />
-//                 <span className="text-sm text-sky-700 dark:text-sky-300 font-medium flex-1 truncate">{documentName}</span>
-//                 <button
-//                   onClick={() => setShowPdfPanel(!showPdfPanel)}
-//                   className="p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-all shadow-sm"
-//                   title={showPdfPanel ? 'Hide PDF' : 'Show PDF'}
-//                 >
-//                   {showPdfPanel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-//                 </button>
-//                 <button 
-//                   onClick={() => { setDocumentUrl(null); setDocumentName(''); setShowPdfPanel(false); }} 
-//                   className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-all"
-//                 >
-//                   <X className="w-4 h-4" />
-//                 </button>
-//               </div>
-//             )}
-//           </div>
+//           )}
 //         </div>
 //       </div>
 
-//       {/* ✅ Main Content - Editor & PDF with Proper Spacing */}
-//       <div ref={containerRef} className="flex h-[calc(100vh-330px)] relative mt-1">
+//       {/* ✅ FIX #4 - EDITOR + PDF SECTION WITH FIXED TOOLBAR */}
+//       {/* The container uses flexbox to keep toolbar fixed while content scrolls */}
+//       <div ref={containerRef} className="flex h-screen relative">
         
-//         {/* Editor */}
+//         {/* EDITOR CONTAINER - Toolbar stays fixed, content scrolls */}
 //         <div 
-//           className={`${documentUrl && showPdfPanel ? '' : 'flex-1'} bg-white dark:bg-slate-900 overflow-hidden shadow-lg`} 
+//           className={`${documentUrl && showPdfPanel ? '' : 'flex-1'} bg-white dark:bg-slate-900 overflow-hidden shadow-lg flex flex-col`} 
 //           style={{ width: documentUrl && showPdfPanel ? `${100 - pdfWidth}%` : '100%' }}
 //         >
+//           {/* ✅ FIX #4a: Toolbar is FIXED (not in scroll container) */}
 //           <EditorToolbar />
-//           <div className="overflow-y-auto h-[calc(100%-60px)]">
+          
+//           {/* ✅ FIX #4b: ONLY editor content scrolls, toolbar stays at top */}
+//           <div className="overflow-y-auto flex-1">
 //             <EditorContent editor={editor} />
 //           </div>
 //         </div>
 
-//         {/* Resize Handle */}
 //         {documentUrl && showPdfPanel && (
-//           <div
-//             onMouseDown={handleMouseDown}
-//             className="w-1.5 bg-gradient-to-b from-blue-300 to-cyan-300 hover:from-blue-500 hover:to-cyan-500 cursor-col-resize flex items-center justify-center group relative z-10 transition-all"
-//           >
-//             <div className="absolute inset-y-0 flex items-center justify-center">
+//           <>
+//             <div
+//               onMouseDown={handleMouseDown}
+//               className="w-1.5 bg-gradient-to-b from-blue-300 to-cyan-300 hover:from-blue-500 hover:to-cyan-500 cursor-col-resize flex items-center justify-center group relative z-10"
+//             >
 //               <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
 //             </div>
-//           </div>
-//         )}
 
-//         {/* ✅ PDF Viewer with FIXED Zoom */}
-//         {documentUrl && showPdfPanel && (
-//           <div className="bg-slate-100 dark:bg-slate-800 flex flex-col shadow-lg" style={{ width: `${pdfWidth}%` }}>
-//             {/* PDF Controls */}
-//             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md">
-//               <div className="flex items-center gap-2">
-//                 <FileText className="w-5 h-5" />
-//                 <span className="font-semibold text-sm truncate max-w-[180px]" title={documentName}>
-//                   {documentName}
-//                 </span>
+//             <div className="bg-slate-100 dark:bg-slate-800 flex flex-col shadow-lg" style={{ width: `${pdfWidth}%` }}>
+//               <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md">
+//                 <div className="flex items-center gap-2">
+//                   <FileText className="w-5 h-5" />
+//                   <span className="font-semibold text-sm truncate max-w-[180px]">{documentName}</span>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <button onClick={handleZoomOut} className="p-2 hover:bg-white/20 rounded-lg">
+//                     <ZoomOut className="w-4 h-4" />
+//                   </button>
+//                   <span className="text-sm px-3 bg-white/20 rounded-lg py-1 font-bold">
+//                     {Math.round(pdfZoom * 100)}%
+//                   </span>
+//                   <button onClick={handleZoomIn} className="p-2 hover:bg-white/20 rounded-lg">
+//                     <ZoomIn className="w-4 h-4" />
+//                   </button>
+//                   <div className="w-px h-6 bg-white/40"></div>
+//                   <button onClick={() => setShowFullscreenPdf(true)} className="p-2 hover:bg-white/20 rounded-lg">
+//                     <Maximize2 className="w-4 h-4" />
+//                   </button>
+//                   <a href={documentUrl} download={documentName} className="p-2 hover:bg-white/20 rounded-lg">
+//                     <Download className="w-4 h-4" />
+//                   </a>
+//                 </div>
 //               </div>
-//               <div className="flex items-center gap-2">
-//                 {/* ✅ FIXED Zoom Controls */}
-//                 <button 
-//                   onClick={handleZoomOut}
-//                   className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//                   title="Zoom Out"
-//                 >
-//                   <ZoomOut className="w-4 h-4" />
-//                 </button>
-//                 <span className="text-sm px-3 min-w-[60px] text-center font-bold bg-white/20 rounded-lg py-1">
-//                   {Math.round(pdfZoom * 100)}%
-//                 </span>
-//                 <button 
-//                   onClick={handleZoomIn}
-//                   className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//                   title="Zoom In"
-//                 >
-//                   <ZoomIn className="w-4 h-4" />
-//                 </button>
-//                 <div className="w-px h-6 bg-white/40 mx-1"></div>
-//                 <button 
-//                   onClick={() => setShowFullscreenPdf(true)}
-//                   className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//                   title="Fullscreen"
-//                 >
-//                   <Maximize2 className="w-4 h-4" />
-//                 </button>
-//                 <a 
-//                   href={documentUrl} 
-//                   download={documentName}
-//                   className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//                   title="Download"
-//                 >
-//                   <Download className="w-4 h-4" />
-//                 </a>
+              
+//               <div className="flex-1 overflow-hidden bg-slate-200">
+//                 <iframe 
+//                   src={`${documentUrl}#zoom=${Math.round(pdfZoom * 100)}`}
+//                   className="w-full h-full" 
+//                   style={{ border: 'none', transform: `scale(${pdfZoom})`, transformOrigin: 'top left' }}
+//                 />
 //               </div>
 //             </div>
-            
-//             {/* PDF Iframe */}
-//             <div className="flex-1 overflow-hidden bg-slate-200 dark:bg-slate-900">
-//               <iframe 
-//                 ref={pdfIframeRef}
-//                 src={`${documentUrl}#zoom=${Math.round(pdfZoom * 100)}`}
-//                 className="w-full h-full" 
-//                 title="PDF Viewer"
-//                 style={{ border: 'none', transform: `scale(${pdfZoom})`, transformOrigin: 'top left' }}
-//               />
-//             </div>
-//           </div>
+//           </>
 //         )}
 //       </div>
 
-//       {/* Fullscreen PDF Modal */}
 //       {showFullscreenPdf && (
 //         <div className="fixed inset-0 bg-black/95 z-50 flex flex-col">
-//           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-xl">
+//           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
 //             <div className="flex items-center gap-3">
 //               <FileText className="w-6 h-6" />
 //               <span className="font-bold text-lg">{documentName}</span>
 //             </div>
 //             <div className="flex items-center gap-4">
-//               <button 
-//                 onClick={handleZoomOut}
-//                 className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//               >
+//               <button onClick={handleZoomOut} className="p-2 hover:bg-white/20 rounded-lg">
 //                 <ZoomOut className="w-5 h-5" />
 //               </button>
-//               <span className="text-sm px-4 font-bold bg-white/20 rounded-lg py-2">
+//               <span className="text-sm px-4 bg-white/20 rounded-lg py-2 font-bold">
 //                 {Math.round(pdfZoom * 100)}%
 //               </span>
-//               <button 
-//                 onClick={handleZoomIn}
-//                 className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//               >
+//               <button onClick={handleZoomIn} className="p-2 hover:bg-white/20 rounded-lg">
 //                 <ZoomIn className="w-5 h-5" />
 //               </button>
 //               <div className="w-px h-7 bg-white/40"></div>
-//               <a 
-//                 href={documentUrl} 
-//                 download={documentName}
-//                 className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//               >
+//               <a href={documentUrl} download={documentName} className="p-2 hover:bg-white/20 rounded-lg">
 //                 <Download className="w-5 h-5" />
 //               </a>
-//               <button
-//                 onClick={() => setShowFullscreenPdf(false)}
-//                 className="p-2 hover:bg-white/20 rounded-lg transition-all"
-//               >
+//               <button onClick={() => setShowFullscreenPdf(false)} className="p-2 hover:bg-white/20 rounded-lg">
 //                 <X className="w-6 h-6" />
 //               </button>
 //             </div>
 //           </div>
-//           <div className="flex-1 overflow-auto bg-slate-200 dark:bg-slate-900 p-4">
+//           <div className="flex-1 overflow-auto bg-slate-200 p-4">
 //             <iframe 
 //               src={`${documentUrl}#zoom=${Math.round(pdfZoom * 100)}`}
 //               className="w-full h-full rounded-lg shadow-2xl" 
-//               title="PDF Viewer Fullscreen"
 //               style={{ border: 'none', minHeight: '100%', transform: `scale(${pdfZoom})`, transformOrigin: 'top left' }}
 //             />
 //           </div>
 //         </div>
 //       )}
 
-//       {/* Floating AI Button */}
 //       {showAIPrompt && (
 //         <button
 //           onClick={handleAskAI}
 //           disabled={aiLoading}
-//           className="fixed bottom-10 left-1/2 transform -translate-x-1/2 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-full shadow-2xl shadow-blue-500/50 transition-all transform hover:scale-105 z-40"
+//           className="fixed bottom-10 left-1/2 transform-translate-x-1/2 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-full shadow-2xl shadow-blue-500/50 transition-all transform hover:scale-105 z-40"
 //         >
 //           {aiLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
 //           {aiLoading ? 'Thinking...' : 'Ask AI'}
@@ -1454,9 +912,7 @@
 //       )}
 
 //       <style>{`
-//         .ProseMirror { 
-//           min-height: 500px;
-//         }
+//         .ProseMirror { min-height: 800px; }
 //         .ProseMirror p.is-editor-empty:first-child::before {
 //           content: attr(data-placeholder);
 //           float: left;
@@ -1465,18 +921,9 @@
 //           height: 0;
 //         }
 //         .ProseMirror:focus { outline: none; }
-        
-//         .ProseMirror ul {
-//           list-style-type: disc;
-//           padding-left: 1.5em;
-//         }
-//         .ProseMirror ol {
-//           list-style-type: decimal;
-//           padding-left: 1.5em;
-//         }
-//         .ProseMirror li {
-//           margin: 0.25em 0;
-//         }
+//         .ProseMirror ul { list-style-type: disc; padding-left: 1.5em; }
+//         .ProseMirror ol { list-style-type: decimal; padding-left: 1.5em; }
+//         .ProseMirror li { margin: 0.25em 0; }
 //       `}</style>
 //     </div>
 //   );
@@ -1492,30 +939,12 @@
 
 
 
+// ============================================================================
+// src/features/notes/CreateNote.jsx - COMPLETE CORRECTED CODE
+// ============================================================================
+// ALL 4 FIXES APPLIED + FIX #2 MODIFICATION (No Auto-Save)
+// ============================================================================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// src/features/notes/CreateNote.jsx - FINAL PERFECT VERSION
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -1525,23 +954,29 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Highlight from '@tiptap/extension-highlight';
-import { TextStyle } from '@tiptap/extension-text-style';  // ✅ FIXED: Named import
-import { Color } from '@tiptap/extension-color';           // ✅ FIXED: Named import
+import { TextStyle } from '@tiptap/extension-text-style';  
+import { Color } from '@tiptap/extension-color';        
 import { 
   Save, Upload, Sparkles, ArrowLeft, BookOpen,
   Bold, Italic, List, ListOrdered, Undo, Redo,
   AlignLeft, AlignCenter, AlignRight, Underline as UnderlineIcon,
-  FileText, Loader2, X, Brain, CheckCircle2, Clock,
-  ZoomIn, ZoomOut, Download, Maximize2, GripVertical, Eye, EyeOff, Highlighter, Palette
+  FileText, Loader2, X, Brain, CheckCircle2,
+  ZoomIn, ZoomOut, Download, Maximize2, GripVertical, Eye, EyeOff, Highlighter,
+  Trash2
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { notesService } from '../../services/notesService';
+import MarkdownRenderer from '../../components/common/MarkdownRenderer';
 
 const CreateNote = () => {
   const navigate = useNavigate();
   const { noteId } = useParams();
   const isEditMode = Boolean(noteId);
 
+  // ============================================================================
+  // 📦 STATE - All component states
+  // ============================================================================
+  
   const [subject, setSubject] = useState('');
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
@@ -1552,6 +987,7 @@ const CreateNote = () => {
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
   const [selectedText, setSelectedText] = useState('');
+  const [selectedTextPosition, setSelectedTextPosition] = useState(null);
   const [showAIPrompt, setShowAIPrompt] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [showPdfPanel, setShowPdfPanel] = useState(true);
@@ -1560,13 +996,22 @@ const CreateNote = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [showFullscreenPdf, setShowFullscreenPdf] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [noteLoaded, setNoteLoaded] = useState(false);
 
+  // ============================================================================
+  // 🔗 REFS - DOM element references
+  // ============================================================================
+  
   const fileInputRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
   const containerRef = useRef(null);
-  const pdfIframeRef = useRef(null);
+  const tagInputRef = useRef(null);
+  const hasLoadedRef = useRef(false);
 
-  // ✅ Editor with Highlight & Color
+  // ============================================================================
+  // 📝 EDITOR SETUP - Tiptap configuration
+  // ============================================================================
+  
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -1589,7 +1034,7 @@ const CreateNote = () => {
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-base max-w-none focus:outline-none min-h-[600px] p-8 text-slate-700 dark:text-slate-200 bg-gradient-to-br from-blue-50/80 to-sky-50/50',
+        class: 'prose prose-base max-w-none focus:outline-none min-h-[800px] p-8 text-slate-700 dark:text-slate-200 bg-gradient-to-br from-blue-50/80 to-sky-50/50',
       },
     },
     onUpdate: ({ editor }) => {
@@ -1599,65 +1044,25 @@ const CreateNote = () => {
       const { from, to } = editor.state.selection;
       const text = editor.state.doc.textBetween(from, to, ' ');
       setSelectedText(text);
+      setSelectedTextPosition({ from, to });
       setShowAIPrompt(text.length > 0);
     },
   });
 
-  const handleZoomIn = () => {
-    const newZoom = Math.min(pdfZoom + 0.1, 2.0);
-    setPdfZoom(newZoom);
-  };
-
-  const handleZoomOut = () => {
-    const newZoom = Math.max(pdfZoom - 0.1, 0.5);
-    setPdfZoom(newZoom);
-  };
-
-  const handleMouseDown = (e) => {
-    setIsResizing(true);
-    e.preventDefault();
-  };
-
-  const handleMouseMove = useCallback((e) => {
-    if (!isResizing || !containerRef.current) return;
-
-    const container = containerRef.current;
-    const containerWidth = container.offsetWidth;
-    const mouseX = e.clientX - container.getBoundingClientRect().left;
-    const newWidth = ((containerWidth - mouseX) / containerWidth) * 100;
-
-    if (newWidth >= 25 && newWidth <= 60) {
-      setPdfWidth(newWidth);
-    }
-  }, [isResizing]);
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-  };
-
+  // ============================================================================
+  // 🔄 LOAD NOTE EFFECT - Load note when component mounts (ONLY ONCE!)
+  // ============================================================================
+  
   useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing, handleMouseMove]);
-
-  const hasContent = () => {
-    if (!editor) return false;
-    const text = editor.getText();
-    return text.trim().length > 0;
-  };
-
-  useEffect(() => {
-    if (isEditMode && noteId) {
+    if (isEditMode && noteId && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
       loadNote();
     }
   }, [noteId, isEditMode]);
+
+  // ============================================================================
+  // 📡 API FUNCTIONS
+  // ============================================================================
 
   const loadNote = async () => {
     try {
@@ -1674,22 +1079,12 @@ const CreateNote = () => {
       }
       
       toast.success('Note loaded!');
+      setNoteLoaded(true);
     } catch (error) {
       console.error('Error loading note:', error);
       toast.error('Failed to load note');
     }
   };
-
-  const scheduleAutoSave = useCallback(() => {
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-    autoSaveTimerRef.current = setTimeout(() => {
-      if (noteId) {
-        saveNote(true);
-      }
-    }, 30000);
-  }, [noteId]);
 
   const saveNote = async (isAutoSave = false) => {
     if (!subject.trim()) {
@@ -1711,7 +1106,7 @@ const CreateNote = () => {
       let response;
       if (isEditMode && noteId) {
         response = await notesService.updateNote(noteId, noteData);
-        toast.success(isAutoSave ? '✓ Saved' : 'Note updated!', { autoClose: 2000 });
+        if (!isAutoSave) toast.success('Note updated!', { autoClose: 2000 });
       } else {
         response = await notesService.createNote(noteData);
         const newNoteId = response.data.noteId || response.data._id || response.data.data?.noteId;
@@ -1733,9 +1128,35 @@ const CreateNote = () => {
     }
   };
 
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (noteId) {
+        saveNote(true);
+      }
+    }, 30000);
+  }, [noteId]);
+
+  // ============================================================================
+  // ✅ FIX #1 - PDF UPLOAD VALIDATION
+  // ============================================================================
+  // Check subject FIRST before any upload logic
+  // If no subject, show error and return early (don't upload)
+  
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // ✅ FIX #1: Check subject FIRST - if no subject, reject immediately
+    if (!subject.trim()) {
+      toast.error('Please enter a subject first');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return; // EXIT EARLY - don't proceed with upload
+    }
 
     if (file.type !== 'application/pdf') {
       toast.error('Please upload a PDF file');
@@ -1754,12 +1175,7 @@ const CreateNote = () => {
       let uploadNoteId = noteId;
 
       if (!uploadNoteId) {
-        if (!subject.trim()) {
-          toast.error('Please enter a subject first');
-          setIsUploading(false);
-          return;
-        }
-
+        // Create note with subject + optional content first
         toast.info('Saving note first...');
         
         const noteData = {
@@ -1804,6 +1220,29 @@ const CreateNote = () => {
     }
   };
 
+  const handleDeletePDF = async () => {
+    if (!noteId) {
+      toast.error('Please save note first');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      await notesService.deleteDocument(noteId);
+      
+      setDocumentUrl(null);
+      setDocumentName('');
+      setShowPdfPanel(false);
+      
+      toast.success('PDF deleted successfully!');
+    } catch (error) {
+      console.error('Delete PDF error:', error);
+      toast.error(error.message || 'Failed to delete PDF');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleAddTag = () => {
     if (!tagInput.trim()) return;
     const newTag = tagInput.trim().replace(/^#/, '');
@@ -1817,6 +1256,14 @@ const CreateNote = () => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
+  // ============================================================================
+  // ✅ FIX #2 - AI GENERATE TAGS BUTTON (MODIFIED - NO AUTO-SAVE)
+  // ============================================================================
+  // MODIFICATION: User saves note manually, not auto-save
+  // - Only generate tags if Subject + Content exist
+  // - PDF is optional
+  // - Require user to save note FIRST before generating tags
+  
   const handleGenerateTags = async () => {
     const currentContent = editor?.getHTML() || '';
     const plainTextContent = editor?.getText() || '';
@@ -1831,14 +1278,16 @@ const CreateNote = () => {
       return;
     }
 
+    // ✅ FIX #2 MODIFICATION: Instead of auto-save, require user to save first
     if (!noteId) {
-      toast.error('Please save the note first before generating tags');
+      toast.warning('Please save the note first before generating tags');
       return;
     }
 
     setIsGeneratingTags(true);
     
     try {
+      // Generate tags using the existing noteId
       const response = await notesService.generateTags(
         noteId,
         subject.trim(),
@@ -1863,6 +1312,13 @@ const CreateNote = () => {
     }
   };
 
+  // ============================================================================
+  // ✅ FIX #3 - AI ANSWER FORMAT
+  // ============================================================================
+  // Keep original selected line INTACT
+  // Add AI answer BELOW with proper formatting
+  // Don't repeat the question in the answer
+  
   const handleAskAI = async () => {
     if (!selectedText.trim()) {
       toast.error('Please select some text first');
@@ -1879,7 +1335,25 @@ const CreateNote = () => {
       const response = await notesService.askAI(noteId, selectedText);
       const answer = response.data.answer || response.data;
       
-      editor?.commands.insertContent(`\n\n<div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-3 shadow-sm"><p class="font-bold text-blue-700 dark:text-blue-300 mb-2">🤖 AI Answer</p><p>${answer}</p></div>\n\n`);
+      if (selectedTextPosition && editor) {
+        const { to } = selectedTextPosition;
+        
+        // ✅ FIX #3: Move cursor to END of selected text (don't replace it)
+        editor.commands.setTextSelection(to);
+        
+        // ✅ FIX #3: Add AI answer BELOW with proper formatting
+        const formattedAnswer = `
+        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-l-4 border-blue-500 p-4 rounded-lg my-4 shadow-sm">
+          <p class="font-bold text-blue-700 dark:text-blue-300 mb-2">🤖 AI Answer</p>
+          <div class="prose prose-sm dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
+            ${answer}
+          </div>
+        </div>
+        `;
+
+        // ✅ FIX #3: Insert formatted answer on new lines BELOW selected text
+        editor.commands.insertContent(`\n\n${formattedAnswer}\n\n`);
+      }
       
       toast.success('AI answer inserted!');
       setShowAIPrompt(false);
@@ -1891,11 +1365,72 @@ const CreateNote = () => {
     }
   };
 
-  // ✅ Enhanced Toolbar with Highlight & Color
+  // ============================================================================
+  // 🎯 EVENT HANDLERS - PDF controls
+  // ============================================================================
+
+  const handleZoomIn = () => {
+    const newZoom = Math.min(pdfZoom + 0.1, 2.0);
+    setPdfZoom(newZoom);
+  };
+
+  const handleZoomOut = () => {
+    const newZoom = Math.max(pdfZoom - 0.1, 0.5);
+    setPdfZoom(newZoom);
+  };
+
+  const handleMouseDown = (e) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isResizing || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerWidth = container.offsetWidth;
+    const mouseX = e.clientX - container.getBoundingClientRect().left;
+    const newWidth = ((containerWidth - mouseX) / containerWidth) * 100;
+
+    if (newWidth >= 25 && newWidth <= 60) {
+      setPdfWidth(newWidth);
+    }
+  }, [isResizing]);
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const onMouseMove = (e) => handleMouseMove(e);
+    const onMouseUp = () => handleMouseUp();
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isResizing, handleMouseMove]);
+
+  const hasContent = () => {
+    if (!editor) return false;
+    const text = editor.getText();
+    return text.trim().length > 0;
+  };
+
+  // ============================================================================
+  // 🛠️ TOOLBAR COMPONENT WITH FIX #4
+  // ============================================================================
+  // ✅ FIX #4: Make toolbar FIXED at top of editor, only content scrolls
+
   const EditorToolbar = () => {
     if (!editor) return null;
 
-    const ToolButton = ({ onClick, isActive, icon: Icon, title, disabled, color }) => (
+    const ToolButton = ({ onClick, isActive, icon: Icon, title, disabled }) => (
       <button
         onClick={onClick}
         disabled={disabled}
@@ -1905,7 +1440,6 @@ const CreateNote = () => {
             : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
         } disabled:opacity-30`}
         title={title}
-        style={color ? { color } : {}}
       >
         <Icon className="w-4 h-4" />
       </button>
@@ -1923,7 +1457,6 @@ const CreateNote = () => {
           
           <div className="w-px h-5 bg-blue-300 mx-2"></div>
           
-          {/* ✅ Highlight Button */}
           <div className="relative">
             <button
               onClick={() => setShowColorPicker(!showColorPicker)}
@@ -2019,10 +1552,14 @@ const CreateNote = () => {
     );
   };
 
+  // ============================================================================
+  // 🎨 MAIN RENDER
+  // ============================================================================
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-sky-50/30 to-cyan-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       
-      {/* Header */}
+      {/* HEADER */}
       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-blue-200 dark:border-slate-800 px-6 py-4 shadow-sm">
         <div className="max-w-full mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -2040,15 +1577,10 @@ const CreateNote = () => {
                 <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                   {isEditMode ? 'Edit Note' : 'Create New Note'}
                 </h1>
-                <p className="text-sm text-slate-500 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  Auto-saves every 30 seconds
-                </p>
               </div>
             </div>
           </div>
           
-          {/* ✅ Light Blue Library Button + Save Note */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/notes-organizer/library')}
@@ -2070,15 +1602,13 @@ const CreateNote = () => {
         </div>
       </div>
 
-      {/* ✅ Top Section - 2 Column Layout */}
+      {/* TOP SECTION */}
       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b-2 border-blue-200 dark:border-slate-700 px-6 py-5 shadow-sm">
         <div className="max-w-full mx-auto space-y-4">
           
-          {/* ✅ Row 1: Subject (Left) | PDF Upload (Right) */}
           <div className="grid grid-cols-2 gap-6">
-            {/* Left: Subject */}
             <div>
-              <label className="block-text-sm font-bold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
+              <label className="block text-sm font-bold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
                 <span className="text-lg">📚</span> Subject
               </label>
               <input
@@ -2090,9 +1620,8 @@ const CreateNote = () => {
               />
             </div>
 
-            {/* Right: PDF Upload */}
             <div>
-              <label className="block-text-sm font-bold text-sky-700 dark:text-sky-400 mb-2 flex items-center gap-2">
+              <label className="block text-sm font-bold text-sky-700 dark:text-sky-400 mb-2 flex items-center gap-2">
                 <span className="text-lg">📄</span> Reference PDF
               </label>
               <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
@@ -2101,15 +1630,15 @@ const CreateNote = () => {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="w-full px-5 py-3 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md"
+                  className="w-1/2 px-5 py-3 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md"
                 >
                   {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
                   {isUploading ? 'Uploading...' : 'Upload PDF'}
                 </button>
               ) : (
-                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-sky-200">
+                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-sky-200 w-fit">
                   <FileText className="w-6 h-6 text-sky-600 flex-shrink-0" />
-                  <span className="text-sm text-sky-700 dark:text-sky-300 font-medium flex-1 truncate">{documentName}</span>
+                  <span className="text-sm text-sky-700 dark:text-sky-300 font-medium truncate max-w-[200px]">{documentName}</span>
                   <button
                     onClick={() => setShowPdfPanel(!showPdfPanel)}
                     className="p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-all"
@@ -2117,25 +1646,25 @@ const CreateNote = () => {
                     {showPdfPanel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                   <button 
-                    onClick={() => { setDocumentUrl(null); setDocumentName(''); setShowPdfPanel(false); }} 
-                    className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg"
+                    onClick={handleDeletePDF}
+                    disabled={isUploading}
+                    className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-all"
                   >
-                    <X className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* ✅ Row 2: Add Tags (Left) | AI Generate (Right) */}
           <div className="grid grid-cols-2 gap-6">
-            {/* Left: Add Tags */}
             <div>
-              <label className="block-text-sm font-bold text-cyan-700 dark:text-cyan-400 mb-2 flex items-center gap-2">
+              <label className="block text-sm font-bold text-cyan-700 dark:text-cyan-400 mb-2 flex items-center gap-2">
                 <span className="text-lg">🏷️</span> Add Tags
               </label>
               <div className="flex gap-2">
                 <input
+                  ref={tagInputRef}
                   type="text"
                   placeholder="Enter tag..."
                   value={tagInput}
@@ -2152,15 +1681,14 @@ const CreateNote = () => {
               </div>
             </div>
 
-            {/* Right: AI Generate Tags */}
             <div>
-              <label className="block-text-sm font-bold text-purple-700 dark:text-purple-400 mb-2 flex-items-center gap-2">
+              <label className=" block text-sm font-bold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
                 <span className="text-lg">✨</span> AI Generate Tags
               </label>
               <button
                 onClick={handleGenerateTags}
-                disabled={isGeneratingTags || !hasContent() || !noteId}
-                className="w-full px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md"
+                disabled={isGeneratingTags || !hasContent()}
+                className="w-1/2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 {isGeneratingTags ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
                 {isGeneratingTags ? 'Generating...' : 'Generate AI Tags'}
@@ -2168,7 +1696,6 @@ const CreateNote = () => {
             </div>
           </div>
 
-          {/* Tags Display */}
           {tags.length > 0 && (
             <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-cyan-200">
               <div className="flex flex-wrap gap-2">
@@ -2189,15 +1716,19 @@ const CreateNote = () => {
         </div>
       </div>
 
-      {/* ✅ Main Content - INCREASED HEIGHT */}
-      <div ref={containerRef} className="flex h-[calc(100vh-280px)] relative">
+      {/* ✅ FIX #4 - EDITOR + PDF SECTION WITH FIXED TOOLBAR */}
+      <div ref={containerRef} className="flex h-screen relative">
         
+        {/* EDITOR CONTAINER - Toolbar stays fixed, content scrolls */}
         <div 
-          className={`${documentUrl && showPdfPanel ? '' : 'flex-1'} bg-white dark:bg-slate-900 overflow-hidden shadow-lg`} 
+          className={`${documentUrl && showPdfPanel ? '' : 'flex-1'} bg-white dark:bg-slate-900 overflow-hidden shadow-lg flex flex-col`} 
           style={{ width: documentUrl && showPdfPanel ? `${100 - pdfWidth}%` : '100%' }}
         >
+          {/* ✅ FIX #4: Toolbar is FIXED (not in scroll container) */}
           <EditorToolbar />
-          <div className="overflow-y-auto h-[calc(100%-60px)]">
+          
+          {/* ✅ FIX #4: ONLY editor content scrolls, toolbar stays at top */}
+          <div className="overflow-y-auto flex-1">
             <EditorContent editor={editor} />
           </div>
         </div>
@@ -2239,7 +1770,6 @@ const CreateNote = () => {
               
               <div className="flex-1 overflow-hidden bg-slate-200">
                 <iframe 
-                  ref={pdfIframeRef}
                   src={`${documentUrl}#zoom=${Math.round(pdfZoom * 100)}`}
                   className="w-full h-full" 
                   style={{ border: 'none', transform: `scale(${pdfZoom})`, transformOrigin: 'top left' }}
@@ -2250,7 +1780,6 @@ const CreateNote = () => {
         )}
       </div>
 
-      {/* Fullscreen PDF Modal */}
       {showFullscreenPdf && (
         <div className="fixed inset-0 bg-black/95 z-50 flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
@@ -2291,7 +1820,7 @@ const CreateNote = () => {
         <button
           onClick={handleAskAI}
           disabled={aiLoading}
-          className="fixed bottom-10 left-1/2 transform-translate-x-1/2 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-full shadow-2xl shadow-blue-500/50 transition-all transform hover:scale-105 z-40"
+          className="fixed bottom-10 left-1/2 transform -translate-x-1/2 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-full shadow-2xl shadow-blue-500/50 transition-all transform hover:scale-105 z-40"
         >
           {aiLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
           {aiLoading ? 'Thinking...' : 'Ask AI'}
@@ -2299,7 +1828,7 @@ const CreateNote = () => {
       )}
 
       <style>{`
-        .ProseMirror { min-height: 600px; }
+        .ProseMirror { min-height: 800px; }
         .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;

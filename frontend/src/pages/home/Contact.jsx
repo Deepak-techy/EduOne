@@ -1,13 +1,37 @@
 import { Mail, Clock, Send, Sparkles, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const Contact = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false); // ✅ FIX: Track sidebar state
+
+  // ✅ FIX: Listen for sidebar width changes
+  useEffect(() => {
+    const checkSidebar = () => {
+      const sidebar = document.querySelector('[style*="width"]');
+      if (sidebar) {
+        const width = parseInt(sidebar.style.width);
+        setSidebarOpen(width > 70);
+      }
+    };
+
+    checkSidebar();
+    const interval = setInterval(checkSidebar, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section 
       id="contact" 
       className="py-20 md:py-24 lg:py-28 px-6 md:px-10 lg:px-12 
         bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
-        transition-colors duration-300 relative overflow-hidden"
+        transition-all duration-300 relative overflow-hidden"
+      style={{
+        // ✅ FIX: Shift content based on sidebar state
+        marginLeft: sidebarOpen ? '250px' : '70px',
+        width: sidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
+        transition: 'margin-left 0.35s cubic-bezier(.72,-0.2,.25,1), width 0.35s cubic-bezier(.72,-0.2,.25,1)'
+      }}
     >
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

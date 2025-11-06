@@ -1,6 +1,24 @@
 import { Twitter, Mail, Instagram, Github, Linkedin, Phone } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const Footer = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false); // ✅ FIX: Track sidebar state
+
+  // ✅ FIX: Listen for sidebar width changes
+  useEffect(() => {
+    const checkSidebar = () => {
+      const sidebar = document.querySelector('[style*="width"]');
+      if (sidebar) {
+        const width = parseInt(sidebar.style.width);
+        setSidebarOpen(width > 70);
+      }
+    };
+
+    checkSidebar();
+    const interval = setInterval(checkSidebar, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   const socialLinks = [
     { icon: Twitter, url: '#', label: 'Twitter' },
     { icon: Mail, url: 'mailto:contact@eduone.com', label: 'Email' },
@@ -10,7 +28,16 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-r from-pink-300 via-purple-300 to-blue-400" style={{ padding: '32px 0' }}>
+    <footer 
+      className="bg-gradient-to-r from-pink-300 via-purple-300 to-blue-400 transition-all duration-300"
+      style={{
+        padding: '32px 0',
+        // ✅ FIX: Shift footer content based on sidebar state
+        marginLeft: sidebarOpen ? '250px' : '70px',
+        width: sidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
+        transition: 'margin-left 0.35s cubic-bezier(.72,-0.2,.25,1), width 0.35s cubic-bezier(.72,-0.2,.25,1)'
+      }}
+    >
       <div className="max-w-[1400px] mx-auto px-12">
         <div className="flex flex-col md:flex-row justify-between items-center" style={{ gap: '24px' }}>
           

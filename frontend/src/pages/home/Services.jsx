@@ -1,6 +1,31 @@
+//src/pages/home/Services.jsx
+
 import { FileText, BookOpen, Users, Mic, Calendar, Shield, Sparkles, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const Services = () => {
+  // ✅ FIX: Track sidebar state to make content responsive
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ✅ FIX: Listen for sidebar width changes (same as PDF Q&A and Notes pages)
+  useEffect(() => {
+    const checkSidebar = () => {
+      const sidebar = document.querySelector('[style*="width"]'); // Sidebar element
+      if (sidebar) {
+        const width = parseInt(sidebar.style.width);
+        setSidebarOpen(width > 70); // Open if width > 70px
+      }
+    };
+
+    // Check on mount
+    checkSidebar();
+
+    // Check on interval (sidebar changes dynamically)
+    const interval = setInterval(checkSidebar, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const services = [
     {
       icon: FileText,
@@ -52,7 +77,13 @@ const Services = () => {
       className="py-20 md:py-24 lg:py-28 px-6 md:px-10 lg:px-12 
         bg-gradient-to-br from-gray-50 via-blue-50 to-cyan-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
-        transition-colors duration-300 relative overflow-hidden"
+        transition-all duration-300 relative overflow-hidden"
+      style={{
+        // ✅ FIX: Shift content based on sidebar state (same as PDF Q&A and Notes pages)
+        marginLeft: sidebarOpen ? '250px' : '70px',
+        width: sidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
+        transition: 'margin-left 0.35s cubic-bezier(.72,-0.2,.25,1), width 0.35s cubic-bezier(.72,-0.2,.25,1)'
+      }}
     >
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">

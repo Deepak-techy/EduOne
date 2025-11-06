@@ -4,7 +4,23 @@ import { useState, useEffect, useRef } from 'react';
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [counts, setCounts] = useState([0, 0, 0]);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // ✅ FIX: Track sidebar state
   const statsRef = useRef(null);
+
+  // ✅ FIX: Listen for sidebar width changes
+  useEffect(() => {
+    const checkSidebar = () => {
+      const sidebar = document.querySelector('[style*="width"]');
+      if (sidebar) {
+        const width = parseInt(sidebar.style.width);
+        setSidebarOpen(width > 70);
+      }
+    };
+
+    checkSidebar();
+    const interval = setInterval(checkSidebar, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   const stats = [
     { 
@@ -30,7 +46,6 @@ const About = () => {
     }
   ];
 
-  // Intersection Observer to detect when stats section is visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -52,11 +67,10 @@ const About = () => {
     };
   }, []);
 
-  // Animate counting when visible
   useEffect(() => {
     if (!isVisible) return;
 
-    const duration = 2000; // 2 seconds
+    const duration = 2000;
     const steps = 60;
     const stepDuration = duration / steps;
 
@@ -77,7 +91,6 @@ const About = () => {
     return () => clearInterval(timer);
   }, [isVisible]);
 
-  // Format number display
   const formatNumber = (value, index) => {
     if (index === 0) return `${(value / 1000).toFixed(value >= 1000 ? 0 : 1)}K+`;
     if (index === 1) return `${value}+`;
@@ -118,7 +131,13 @@ const About = () => {
       className="py-20 md:py-24 lg:py-28 px-6 md:px-10 lg:px-12 
         bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
-        transition-colors duration-300 relative overflow-hidden"
+        transition-all duration-300 relative overflow-hidden"
+      style={{
+        // ✅ FIX: Shift content based on sidebar state
+        marginLeft: sidebarOpen ? '250px' : '70px',
+        width: sidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
+        transition: 'margin-left 0.35s cubic-bezier(.72,-0.2,.25,1), width 0.35s cubic-bezier(.72,-0.2,.25,1)'
+      }}
     >
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">

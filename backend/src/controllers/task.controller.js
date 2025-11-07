@@ -212,6 +212,137 @@ const getTasksByDueDate = asyncHandler(async (req, res) => {
 
 })
 
+const generateAIPrioritizedTasks = asyncHandler(async (req, res) => {
+    // get userId from request
+    const { _id: userId } = req.user
+
+    // get the date range
+    const { startDate, endDate } = getDateRange(7);
+
+    // get all incomplete tasks for the next 7 days
+    const upcomingTasks = await Task.find({
+        userId,
+        dueDate: {
+            $gte: startDate,
+            $lte: endDate,
+        },
+        isCompleted: false,
+    }).sort({ 
+        dueDate: 1
+    })
+
+    if (upcomingTasks.length === 0) {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, [], "No tasks found for the next 7 days"));
+    }
+
+    // generate AI prioritized tasks
+    const prioritizedTasks = await generateAIBasedDailyPriorities(upcomingTasks);
+
+    if (!prioritizedTasks) {
+        throw new ApiError(500, "Failed to generate AI prioritized tasks");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, prioritizedTasks, "AI prioritized tasks generated successfully"));
+})
+
+const markTaskCompleted = asyncHandler(async (req, res) => {
+    // get taskId from params and userId from request
+    const { taskId } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!taskId) {
+        throw new ApiError(400, "taskId is required");
+    }
+
+    // find and update the task
+    const task = await Task.findOneAndUpdate(
+        {
+            _id: taskId,
+            userId
+        },
+        {
+            isCompleted: true,
+            completedAt: new Date()
+        },
+        { new: true }
+    );
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, task, "Task marked as completed successfully"));
+});
+
+const updateTask = asyncHandler(async (req, res) => {
+    // get taskId from params and userId from request
+    const { taskId } = req.params;
+    const { _id: userId } = req.user;
+    const updates = req.body;
+
+    // update color if priority changed
+    if (updates.priority) {
+        updates.colorCode = getPriorityColor(updates.priority);
+    }
+
+    // find and update the task
+    const task = await Task.findOneAndUpdate(
+        {
+            _id: taskId,
+            userId
+        },
+        updates,
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, task, "Task updated successfully"));
+
+})
+
+const deleteTask = asyncHandler(async (req, res) => {
+    // get taskId from params and userId from request
+    const { taskId } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!taskId) {
+        throw new ApiError(400, "taskId is required");
+    }
+
+    // find and delete the task
+    const task = await Task.findOneAndDelete(
+        {
+            _id: taskId,
+            userId
+        });
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Task deleted successfully"));
+});
+
 
 export {
     createTask,
@@ -219,4 +350,8 @@ export {
     getAllTasks,
     getTasksByRange,
     getTasksByDueDate,
+    generateAIPrioritizedTasks,
+    markTaskCompleted,
+    updateTask,
+    deleteTask
 }

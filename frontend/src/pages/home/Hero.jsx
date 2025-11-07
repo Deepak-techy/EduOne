@@ -59,7 +59,8 @@ const Hero = () => {
             <div className="space-y-6 md:space-y-7 animate-fade-in order-1">
               <div className="flex items-start gap-4 lg:block">
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[64px] font-bold leading-tight text-black dark:text-white transition-colors flex-1">
-                  Your All-in-One<br />
+                  Your All-in-One <br />
+                  AI-powered 
                   Academic Companion
                 </h1>
                 <div className="lg:hidden relative flex-shrink-0 w-36 sm:w-44 md:w-52">

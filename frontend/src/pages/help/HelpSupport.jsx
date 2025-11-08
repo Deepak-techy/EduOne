@@ -25,13 +25,13 @@ const HelpSupport = () => {
       id: 3,
       question: 'How does PDF Q&A work?',
       answer:
-        'Upload a PDF document, ask questions about its content, and our AI will provide answers based on the document text.',
+        'Upload a PDF document OR select subjects, ask questions about its content, and our AI will provide answers based on the document text.',
     },
     {
       id: 4,
       question: 'Can I export my notes?',
       answer:
-        'Yes! Your notes can be exported as PDF or text files from the Notes Organizer feature.',
+        'NO! But Your notes can be saved in our Notes Organizer Libary.',
     },
     {
       id: 5,
@@ -56,7 +56,8 @@ const HelpSupport = () => {
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <button
-          onClick={() => navigate(-1)}
+          // onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:opacity-80 mb-6 transition"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -98,11 +99,12 @@ const HelpSupport = () => {
               Email our support team for personalized help
             </p>
             <a
-              href="mailto:support@eduone.com"
+              href="mailto:support@eduone.com?subject=Support Request&body=Hi Support Team,%0A%0AI need help with..."
               className="inline-flex items-center gap-2 text-green-600 dark:text-green-400 hover:opacity-80 transition font-medium"
             >
               Email Support <ExternalLink className="w-4 h-4" />
             </a>
+
           </div>
 
           {/* Community */}

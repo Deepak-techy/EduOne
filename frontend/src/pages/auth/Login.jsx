@@ -1,3 +1,4 @@
+// src/pages/auth/Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
@@ -7,7 +8,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    identifier: '', // username or email
+    identifier: '',
     password: '',
   });
 
@@ -40,7 +41,6 @@ const Login = () => {
     setApiError('');
 
     try {
-      // Detect if input is email or username and prepare payload for backend
       const isEmail = formData.identifier.includes('@');
       const payload = isEmail
         ? { email: formData.identifier, password: formData.password }
@@ -48,7 +48,14 @@ const Login = () => {
 
       const response = await authService.login(payload);
 
-      localStorage.setItem('user', JSON.stringify(response.data.user || response.data));
+      // ✅ FIX: Properly map avatar field to avatarUrl
+      const userData = response.data.user || response.data;
+      const userToSave = {
+        ...userData,
+        avatarUrl: userData.avatar || userData.avatarUrl || null, // Map 'avatar' to 'avatarUrl'
+      };
+
+      localStorage.setItem('user', JSON.stringify(userToSave));
 
       toast.success('Login successful! Welcome back! 🎉', {
         position: 'top-right',

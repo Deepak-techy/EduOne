@@ -93,7 +93,7 @@ const Notifications = () => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
               className="text-blue-600 dark:text-blue-400 hover:opacity-80 transition"
             >
               <ArrowLeft className="w-6 h-6" />

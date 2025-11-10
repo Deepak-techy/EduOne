@@ -1,19 +1,21 @@
+
 // // src/components/layout/Sidebar.jsx
 
 // import { Link, useLocation, useNavigate } from "react-router-dom";
-// import { useEffect, useState } from "react";
+// import { useEffect, useState, useRef } from "react";
 // import {
 //   Home, PhoneCall, Info, Briefcase,
 //   FileQuestion, StickyNote, Calendar,
 //   FileCheck, Users, ShieldCheck,
 //   Menu, Plus, Minus
 // } from "lucide-react";
+// import { useAuth } from "../../contexts/AuthContext";
 
 // const navItems = [
 //   { icon: Home, label: "Home", id: "home", path: "/" },
 //   { icon: Briefcase, label: "Services", id: "services", path: "/" },
-//   { icon: PhoneCall, label: "Contact", id: "contact", path: "/" },
 //   { icon: Info, label: "About", id: "about", path: "/" },
+//   { icon: PhoneCall, label: "Contact", id: "contact", path: "/" },
 // ];
 
 // const featuresItems = [
@@ -35,56 +37,97 @@
 //       { label: "Create Note", path: "/notes-organizer/create" }
 //     ]
 //   },
-//   {
-//     icon: Calendar,
-//     label: "Academic Planner",
-//     path: "/academic-planner",
-//     subFeatures: []
-//   },
-//   {
-//     icon: FileCheck,
-//     label: "Resume Analyzer",
-//     path: "/resume-analyzer",
-//     subFeatures: []
-//   },
-//   {
-//     icon: Users,
-//     label: "Interview AI",
-//     path: "/interview-ai",
-//     subFeatures: []
-//   },
-//   {
-//     icon: Users,
-//     label: "Community",
-//     path: "/community",
-//     subFeatures: []
-//   },
-//   {
-//     icon: ShieldCheck,
-//     label: "Admin Panel",
-//     path: "/admin",
-//     subFeatures: []
-//   }
+//   { icon: Calendar, label: "Academic Planner", path: "/academic-planner", subFeatures: [] },
+//   { icon: FileCheck, label: "Resume Analyzer", path: "/resume-analyzer", subFeatures: [] },
+//   { icon: Users, label: "Interview AI", path: "/interview-ai", subFeatures: [] },
+//   { icon: Users, label: "Community", path: "/community", subFeatures: [] },
+//   { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] }
 // ];
+
+// const FEATURE_ROOTS = [
+//   "/pdf-qa",
+//   "/notes-organizer",
+//   "/academic-planner",
+//   "/resume-analyzer",
+//   "/interview-ai",
+//   "/community",
+//   "/admin"
+// ];
+
+// const isFeatureRoot = (pathname) => FEATURE_ROOTS.some(root => pathname === root);
+// const isFeatureSubPage = (pathname) => FEATURE_ROOTS.some(root => pathname.startsWith(root + "/"));
 
 // const Sidebar = ({ open, setOpen }) => {
 //   const location = useLocation();
 //   const navigate = useNavigate();
-//   const [user, setUser] = useState(null);
+//   const { user } = useAuth();
 //   const [expanded, setExpanded] = useState({});
+//   const sidebarRef = useRef(null);
 
+//   // ✅ FIX 1: Don't render sidebar at all if user not logged in
+//   if (!user) {
+//     return null;
+//   }
+
+//   // ✅ FIX 2: Auto-open sidebar on first login with smooth animation
 //   useEffect(() => {
-//     const stored = localStorage.getItem("user");
-//     setUser(stored ? JSON.parse(stored) : null);
-//     if (stored && setOpen) setOpen(true);
-//   }, []);
+//     if (!setOpen || !user) return;
 
+//     // A) Open sidebar immediately when logged in on home page
+//     if (location.pathname === "/") {
+//       setOpen(true);
+//       return;
+//     }
+
+//     // B) Feature dashboard roots → open by default
+//     if (isFeatureRoot(location.pathname)) {
+//       setOpen(true);
+//       return;
+//     }
+
+//     // C) Feature subpages (like /pdf-qa/subject) → closed by default
+//     if (isFeatureSubPage(location.pathname)) {
+//       setOpen(false);
+//       return;
+//     }
+
+//     // D) Any other page → closed by default
+//     setOpen(false);
+//   }, [location.pathname, user, setOpen]);
+
+//   // ✅ FIX 3: Click outside closes sidebar when open (smooth animation)
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (
+//         open &&
+//         sidebarRef.current &&
+//         !sidebarRef.current.contains(event.target) &&
+//         !event.target.closest('[data-sidebar-toggle="true"]')
+//       ) {
+//         setOpen(false);
+//       }
+//     };
+
+//     if (open) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//       return () => document.removeEventListener("mousedown", handleClickOutside);
+//     }
+//   }, [open, setOpen]);
+
+//   // ✅ FIX 4: Smooth width transition with faster animation
 //   const sidebarWidth = open ? 250 : 70;
-//   const isOnFeaturePage = location.pathname !== '/';
+//   const isOnFeaturePage = location.pathname !== "/";
 
 //   const handleFeatureClick = (feature) => {
+//   // ✅ NEW: If already on this dashboard page and sidebar is closed, just open it
+//   if (location.pathname === feature.path && !open) {
+//     setOpen(true);
+//   } else {
+//     // Otherwise navigate to the feature page (which will auto-open sidebar)
 //     navigate(feature.path);
-//   };
+//   }
+// };
+
 
 //   const toggleExpand = (label, e) => {
 //     e.stopPropagation();
@@ -92,145 +135,177 @@
 //   };
 
 //   const handleNavClick = (item) => {
-//     if (location.pathname === '/') {
+//     if (location.pathname === "/") {
 //       const element = document.getElementById(item.id);
-//       if (element) {
-//         element.scrollIntoView({ behavior: 'smooth' });
-//       }
+//       if (element) element.scrollIntoView({ behavior: "smooth" });
 //     } else {
-//       navigate('/');
+//       navigate("/");
 //       setTimeout(() => {
 //         const element = document.getElementById(item.id);
-//         if (element) {
-//           element.scrollIntoView({ behavior: 'smooth' });
-//         }
+//         if (element) element.scrollIntoView({ behavior: "smooth" });
 //       }, 100);
 //     }
 //   };
 
-//   const menuNavigation = user ? navItems : navItems.slice(0, 2);
-//   const menuFeatures = user ? featuresItems : [];
+//   const menuNavigation = navItems;
+//   const menuFeatures = featuresItems;
 
 //   return (
 //     <div
+//       ref={sidebarRef}
 //       className="fixed top-[80px] left-0 h-[calc(100vh-80px)] shadow-lg z-40"
 //       style={{
 //         width: sidebarWidth,
-//         // ✅ FIX: Solid background - no curves
 //         background: "linear-gradient(132deg, #e3fafd, #dcf2ff 84%)",
 //         border: "none",
-//         transition: "width 0.35s cubic-bezier(.72,-0.2,.25,1)",
+//         // ✅ FIX 4: Faster, smoother transition (0.3s instead of 0.35s)
+//         transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
 //         overflowY: "auto",
+//         overflowX: "hidden", // ✅ FIX: Prevent horizontal scroll during animation
 //         scrollbarWidth: "none",
 //         msOverflowStyle: "none",
 //       }}
 //     >
-//       <style>{`
-//         div::-webkit-scrollbar { display: none; }
-//       `}</style>
+//       <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
 //       <div className="flex flex-col h-full">
-        
-//         {/* Menu Toggle Button */}
-//         <div 
+//         {/* Toggle Button */}
+//         <div
 //           className="flex-shrink-0 p-4 flex"
-//           style={{
-//             justifyContent: open ? 'flex-end' : 'center'
-//           }}
+//           style={{ justifyContent: open ? "flex-end" : "center" }}
 //         >
 //           <Menu
-//             className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600 transition-colors"
+//             className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600 
+//               transition-colors duration-200"
 //             onClick={() => setOpen((o) => !o)}
-//             title={open ? "Collapse menu" : "Expand menu"}
+//             data-sidebar-toggle="true"
+//             title="Toggle menu"
 //           />
 //         </div>
 
-//         {/* Navigation */}
+//         {/* Navigation Items */}
 //         <nav className="px-3 flex-shrink-0">
 //           {menuNavigation.map((item) => {
 //             const Icon = item.icon;
-//             const isActive = location.pathname === '/' && false;
+//             const isActive = location.pathname === "/" && false;
 //             return (
 //               <div
 //                 key={item.id}
 //                 onClick={() => handleNavClick(item)}
 //                 className={`flex items-center ${
 //                   open ? "" : "justify-center"
-//                 } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all cursor-pointer ${
-//                   isOnFeaturePage 
+//                 } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] 
+//                   transition-all duration-200 cursor-pointer ${
+//                   isOnFeaturePage
 //                     ? "text-slate-900"
-//                     : `${isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"}`
+//                     : `${
+//                         isActive
+//                           ? "bg-blue-100 text-blue-800 shadow font-semibold"
+//                           : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+//                       }`
 //                 }`}
 //                 style={{ height: "44px" }}
 //                 title={item.label}
 //               >
-//                 <Icon className="w-6 h-6" />
-//                 {open && <span className="ml-2">{item.label}</span>}
+//                 <Icon className="w-6 h-6 flex-shrink-0" />
+//                 {/* ✅ FIX 4: Smooth fade-in/out for text */}
+//                 {open && (
+//                   <span 
+//                     className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200"
+//                     style={{ opacity: open ? 1 : 0 }}
+//                   >
+//                     {item.label}
+//                   </span>
+//                 )}
 //               </div>
 //             );
 //           })}
 //         </nav>
 
-//         {user && <div className="mx-4 my-3 border-b border-slate-400 flex-shrink-0"></div>}
+//         <div className="mx-4 my-3 border-b border-slate-400 flex-shrink-0" />
 
-//         {user && open && (
-//           <div className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0">
+//         {/* Features Header */}
+//         {open && (
+//           <div 
+//             className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0
+//               transition-opacity duration-200"
+//             style={{ opacity: open ? 1 : 0 }}
+//           >
 //             Features
 //           </div>
 //         )}
 
-//         {/* Features */}
-//         {user && (
-//           <nav className="px-3 pb-4 flex-grow">
-//             {menuFeatures.map((feature) => {
-//               const Icon = feature.icon;
-//               const isExpanded = expanded[feature.label];
-//               const isActive = location.pathname === feature.path || 
-//                                location.pathname.startsWith(feature.path + '/');
+//         {/* Features Items */}
+//         <nav className="px-3 pb-4 flex-grow">
+//           {menuFeatures.map((feature) => {
+//             const Icon = feature.icon;
+//             const isExpanded = expanded[feature.label];
+//             const isActive =
+//               location.pathname === feature.path ||
+//               location.pathname.startsWith(feature.path + "/");
 
-//               return (
-//                 <div key={feature.label} className="mb-1">
+//             return (
+//               <div key={feature.label} className="mb-1">
+//                 <div
+//                   className={`flex items-center ${
+//                     open ? "" : "justify-center"
+//                   } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] 
+//                     transition-all duration-200 ${
+//                     isActive
+//                       ? "bg-blue-100 text-blue-800 shadow font-semibold"
+//                       : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+//                   }`}
+//                   style={{ height: "44px" }}
+//                   title={feature.label}
+//                 >
 //                   <div
-//                     className={`flex items-center ${
-//                       open ? "" : "justify-center"
-//                     } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] ${
-//                       isActive
-//                         ? "bg-blue-100 text-blue-800 shadow font-semibold"
-//                         : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
-//                     }`}
-//                     style={{ height: "44px" }}
-//                     title={feature.label}
+//                     className="flex items-center flex-grow"
+//                     onClick={() => handleFeatureClick(feature)}
 //                   >
-//                     {/* Icon + Label - Clickable to navigate */}
-//                     <div 
-//                       className="flex items-center flex-grow"
-//                       onClick={() => handleFeatureClick(feature)}
-//                     >
-//                       <Icon className={`w-6 h-6 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
-//                       {open && <span className="ml-2">{feature.label}</span>}
-//                     </div>
-                    
-//                     {/* Plus/Minus Icon - Only toggle, don't navigate */}
-//                     {open && feature.subFeatures && feature.subFeatures.length > 0 && (
-//                       <div 
+//                     <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
+//                     {/* ✅ FIX 4: Smooth fade for feature labels */}
+//                     {open && (
+//                       <span 
+//                         className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200"
+//                         style={{ opacity: open ? 1 : 0 }}
+//                       >
+//                         {feature.label}
+//                       </span>
+//                     )}
+//                   </div>
+
+//                   {/* Expand/Collapse Button */}
+//                   {open &&
+//                     feature.subFeatures &&
+//                     feature.subFeatures.length > 0 && (
+//                       <div
 //                         onClick={(e) => toggleExpand(feature.label, e)}
-//                         className="p-1 hover:bg-blue-200 rounded transition-colors"
+//                         className="p-1 hover:bg-blue-200 rounded transition-colors duration-200"
 //                       >
 //                         {isExpanded ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
 //                       </div>
 //                     )}
-//                   </div>
-                  
-//                   {/* Sub-features */}
-//                   {isExpanded && feature.subFeatures && feature.subFeatures.length > 0 && open && (
-//                     <div className="ml-10 mt-1 flex flex-col space-y-1">
+//                 </div>
+
+//                 {/* Sub-features with smooth slide animation */}
+//                 {isExpanded &&
+//                   feature.subFeatures &&
+//                   feature.subFeatures.length > 0 &&
+//                   open && (
+//                     <div 
+//                       className="ml-10 mt-1 flex flex-col space-y-1 animate-slideDown"
+//                       style={{
+//                         animation: "slideDown 0.2s ease-out"
+//                       }}
+//                     >
 //                       {feature.subFeatures.map((sub) => {
 //                         const isSubActive = location.pathname === sub.path;
 //                         return (
 //                           <Link
 //                             key={sub.path}
 //                             to={sub.path}
-//                             className={`text-[14px] font-normal rounded-lg px-3 py-2 ${
+//                             className={`text-[14px] font-normal rounded-lg px-3 py-2 
+//                               transition-all duration-200 ${
 //                               isSubActive
 //                                 ? "bg-blue-200 text-blue-900 font-semibold"
 //                                 : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
@@ -242,17 +317,33 @@
 //                       })}
 //                     </div>
 //                   )}
-//                 </div>
-//               );
-//             })}
-//           </nav>
-//         )}
+//               </div>
+//             );
+//           })}
+//         </nav>
 //       </div>
+
+//       {/* ✅ FIX 4: Add keyframe animation for sub-features */}
+//       <style>{`
+//         @keyframes slideDown {
+//           from {
+//             opacity: 0;
+//             transform: translateY(-10px);
+//           }
+//           to {
+//             opacity: 1;
+//             transform: translateY(0);
+//           }
+//         }
+//       `}</style>
 //     </div>
 //   );
 // };
 
 // export default Sidebar;
+
+
+
 
 
 
@@ -277,15 +368,14 @@ import {
   FileCheck, Users, ShieldCheck,
   Menu, Plus, Minus
 } from "lucide-react";
-
+import { useAuth } from "../../contexts/AuthContext";
 
 const navItems = [
   { icon: Home, label: "Home", id: "home", path: "/" },
   { icon: Briefcase, label: "Services", id: "services", path: "/" },
-  { icon: PhoneCall, label: "Contact", id: "contact", path: "/" },
   { icon: Info, label: "About", id: "about", path: "/" },
+  { icon: PhoneCall, label: "Contact", id: "contact", path: "/" },
 ];
-
 
 const featuresItems = [
   {
@@ -306,113 +396,116 @@ const featuresItems = [
       { label: "Create Note", path: "/notes-organizer/create" }
     ]
   },
-  {
-    icon: Calendar,
-    label: "Academic Planner",
-    path: "/academic-planner",
-    subFeatures: []
-  },
-  {
-    icon: FileCheck,
-    label: "Resume Analyzer",
-    path: "/resume-analyzer",
-    subFeatures: []
-  },
-  {
-    icon: Users,
-    label: "Interview AI",
-    path: "/interview-ai",
-    subFeatures: []
-  },
-  {
-    icon: Users,
-    label: "Community",
-    path: "/community",
-    subFeatures: []
-  },
-  {
-    icon: ShieldCheck,
-    label: "Admin Panel",
-    path: "/admin",
-    subFeatures: []
-  }
+  { icon: Calendar, label: "Academic Planner", path: "/academic-planner", subFeatures: [] },
+  { icon: FileCheck, label: "Resume Analyzer", path: "/resume-analyzer", subFeatures: [] },
+  { icon: Users, label: "Interview AI", path: "/interview-ai", subFeatures: [] },
+  { icon: Users, label: "Community", path: "/community", subFeatures: [] },
+  { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] }
 ];
 
+const FEATURE_ROOTS = [
+  "/pdf-qa",
+  "/notes-organizer",
+  "/academic-planner",
+  "/resume-analyzer",
+  "/interview-ai",
+  "/community",
+  "/admin"
+];
+
+const isFeatureRoot = (pathname) => FEATURE_ROOTS.some(root => pathname === root);
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState({});
   const sidebarRef = useRef(null);
+  
+  // ✅ Track if initial open has happened
+  const initialOpenDone = useRef(false);
 
+  if (!user) {
+    return null;
+  }
 
+  // ✅ SIMPLIFIED: Open sidebar on first mount only
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    setUser(stored ? JSON.parse(stored) : null);
-    // ✅ CHANGE 1: Don't auto-open sidebar
-    // if (stored && setOpen) setOpen(true);
-  }, []);
+    if (!setOpen || !user) return;
 
+    // Open sidebar ONCE when component first mounts
+    if (!initialOpenDone.current) {
+      initialOpenDone.current = true;
+      setOpen(true);
+    }
+  }, [user, setOpen]);
 
-  // ✅ CHANGE 2: Close sidebar when clicking outside
+  // Handle route-based sidebar behavior (runs AFTER initial open)
+  useEffect(() => {
+    if (!setOpen || !user) return;
+    
+    // Skip if this is the very first render
+    if (!initialOpenDone.current) return;
+
+    // Feature dashboard roots → open
+    if (isFeatureRoot(location.pathname)) {
+      setOpen(true);
+      return;
+    }
+
+    // All other pages → close
+    setOpen(false);
+  }, [location.pathname, user, setOpen]);
+
+  // Click outside closes sidebar
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        // Don't close if clicking the menu toggle button
-        if (!event.target.closest('[title*="menu"]')) {
-          setOpen(false);
-        }
+      if (
+        open &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest('[data-sidebar-toggle="true"]')
+      ) {
+        setOpen(false);
       }
     };
 
     if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [open, setOpen]);
 
-
   const sidebarWidth = open ? 250 : 70;
-  const isOnFeaturePage = location.pathname !== '/';
-
+  const isOnFeaturePage = location.pathname !== "/";
 
   const handleFeatureClick = (feature) => {
-    navigate(feature.path);
-    // ✅ CHANGE 3: Close sidebar after navigation
-    setOpen(false);
+    if (location.pathname === feature.path && !open) {
+      setOpen(true);
+    } else {
+      navigate(feature.path);
+    }
   };
-
 
   const toggleExpand = (label, e) => {
     e.stopPropagation();
     setExpanded((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-
   const handleNavClick = (item) => {
-    if (location.pathname === '/') {
+    if (location.pathname === "/") {
       const element = document.getElementById(item.id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+      if (element) element.scrollIntoView({ behavior: "smooth" });
     } else {
-      navigate('/');
+      navigate("/");
       setTimeout(() => {
         const element = document.getElementById(item.id);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
         }
-      }, 100);
+      }, 300);
     }
-    // Close sidebar after navigation
-    setOpen(false);
   };
-
-
-  const menuNavigation = user ? navItems : navItems.slice(0, 2);
-  const menuFeatures = user ? featuresItems : [];
-
 
   return (
     <div
@@ -422,145 +515,127 @@ const Sidebar = ({ open, setOpen }) => {
         width: sidebarWidth,
         background: "linear-gradient(132deg, #e3fafd, #dcf2ff 84%)",
         border: "none",
-        transition: "width 0.35s cubic-bezier(.72,-0.2,.25,1)",
+        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         overflowY: "auto",
+        overflowX: "hidden",
         scrollbarWidth: "none",
         msOverflowStyle: "none",
       }}
     >
-      <style>{`
-        div::-webkit-scrollbar { display: none; }
-      `}</style>
-
+      <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
       <div className="flex flex-col h-full">
-        
-        {/* Menu Toggle Button */}
-        <div 
-          className="flex-shrink-0 p-4 flex"
-          style={{
-            justifyContent: open ? 'flex-end' : 'center'
-          }}
-        >
+        <div className="flex-shrink-0 p-4 flex" style={{ justifyContent: open ? "flex-end" : "center" }}>
           <Menu
-            className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600 transition-colors"
+            className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600 transition-colors duration-200"
             onClick={() => setOpen((o) => !o)}
+            data-sidebar-toggle="true"
             title="Toggle menu"
           />
         </div>
 
-
-        {/* Navigation */}
         <nav className="px-3 flex-shrink-0">
-          {menuNavigation.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === '/' && false;
+            const isActive = location.pathname === "/" && false;
             return (
               <div
                 key={item.id}
                 onClick={() => handleNavClick(item)}
-                className={`flex items-center ${
-                  open ? "" : "justify-center"
-                } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all cursor-pointer ${
-                  isOnFeaturePage 
-                    ? "text-slate-900"
-                    : `${isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"}`
+                className={`flex items-center ${open ? "" : "justify-center"} mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all duration-200 cursor-pointer ${
+                  isOnFeaturePage ? "text-slate-900" : `${isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"}`
                 }`}
                 style={{ height: "44px" }}
                 title={item.label}
               >
-                <Icon className="w-6 h-6" />
-                {open && <span className="ml-2">{item.label}</span>}
+                <Icon className="w-6 h-6 flex-shrink-0" />
+                {open && (
+                  <span className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200" style={{ opacity: open ? 1 : 0 }}>
+                    {item.label}
+                  </span>
+                )}
               </div>
             );
           })}
         </nav>
 
+        <div className="mx-4 my-3 border-b border-slate-400 flex-shrink-0" />
 
-        {user && <div className="mx-4 my-3 border-b border-slate-400 flex-shrink-0"></div>}
-
-
-        {user && open && (
-          <div className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0">
+        {open && (
+          <div className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0 transition-opacity duration-200" style={{ opacity: open ? 1 : 0 }}>
             Features
           </div>
         )}
 
+        <nav className="px-3 pb-4 flex-grow">
+          {featuresItems.map((feature) => {
+            const Icon = feature.icon;
+            const isExpanded = expanded[feature.label];
+            const isActive = location.pathname === feature.path || location.pathname.startsWith(feature.path + "/");
 
-        {/* Features */}
-        {user && (
-          <nav className="px-3 pb-4 flex-grow">
-            {menuFeatures.map((feature) => {
-              const Icon = feature.icon;
-              const isExpanded = expanded[feature.label];
-              const isActive = location.pathname === feature.path || 
-                               location.pathname.startsWith(feature.path + '/');
-
-
-              return (
-                <div key={feature.label} className="mb-1">
-                  <div
-                    className={`flex items-center ${
-                      open ? "" : "justify-center"
-                    } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] ${
-                      isActive
-                        ? "bg-blue-100 text-blue-800 shadow font-semibold"
-                        : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
-                    }`}
-                    style={{ height: "44px" }}
-                    title={feature.label}
-                  >
-                    {/* Icon + Label - Clickable to navigate */}
-                    <div 
-                      className="flex items-center flex-grow"
-                      onClick={() => handleFeatureClick(feature)}
-                    >
-                      <Icon className={`w-6 h-6 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
-                      {open && <span className="ml-2">{feature.label}</span>}
-                    </div>
-                    
-                    {/* Plus/Minus Icon - Only toggle, don't navigate */}
-                    {open && feature.subFeatures && feature.subFeatures.length > 0 && (
-                      <div 
-                        onClick={(e) => toggleExpand(feature.label, e)}
-                        className="p-1 hover:bg-blue-200 rounded transition-colors"
-                      >
-                        {isExpanded ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                      </div>
+            return (
+              <div key={feature.label} className="mb-1">
+                <div
+                  className={`flex items-center ${open ? "" : "justify-center"} cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] transition-all duration-200 ${
+                    isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+                  }`}
+                  style={{ height: "44px" }}
+                  title={feature.label}
+                >
+                  <div className="flex items-center flex-grow" onClick={() => handleFeatureClick(feature)}>
+                    <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
+                    {open && (
+                      <span className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200" style={{ opacity: open ? 1 : 0 }}>
+                        {feature.label}
+                      </span>
                     )}
                   </div>
-                  
-                  {/* Sub-features */}
-                  {isExpanded && feature.subFeatures && feature.subFeatures.length > 0 && open && (
-                    <div className="ml-10 mt-1 flex flex-col space-y-1">
-                      {feature.subFeatures.map((sub) => {
-                        const isSubActive = location.pathname === sub.path;
-                        return (
-                          <Link
-                            key={sub.path}
-                            to={sub.path}
-                            onClick={() => setOpen(false)}
-                            className={`text-[14px] font-normal rounded-lg px-3 py-2 ${
-                              isSubActive
-                                ? "bg-blue-200 text-blue-900 font-semibold"
-                                : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                            }`}
-                          >
-                            {sub.label}
-                          </Link>
-                        );
-                      })}
+
+                  {open && feature.subFeatures && feature.subFeatures.length > 0 && (
+                    <div onClick={(e) => toggleExpand(feature.label, e)} className="p-1 hover:bg-blue-200 rounded transition-colors duration-200">
+                      {isExpanded ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                     </div>
                   )}
                 </div>
-              );
-            })}
-          </nav>
-        )}
+
+                {isExpanded && feature.subFeatures && feature.subFeatures.length > 0 && open && (
+                  <div className="ml-10 mt-1 flex flex-col space-y-1" style={{ animation: "slideDown 0.2s ease-out" }}>
+                    {feature.subFeatures.map((sub) => {
+                      const isSubActive = location.pathname === sub.path;
+                      return (
+                        <Link
+                          key={sub.path}
+                          to={sub.path}
+                          className={`text-[14px] font-normal rounded-lg px-3 py-2 transition-all duration-200 ${
+                            isSubActive ? "bg-blue-200 text-blue-900 font-semibold" : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                          }`}
+                        >
+                          {sub.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
       </div>
+
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
-
 
 export default Sidebar;

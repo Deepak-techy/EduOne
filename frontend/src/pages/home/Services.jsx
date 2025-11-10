@@ -1,30 +1,16 @@
-//src/pages/home/Services.jsx
+// src/pages/home/Services.jsx
 
 import { FileText, BookOpen, Users, Mic, Calendar, Shield, Sparkles, ArrowRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Services = () => {
-  // ✅ FIX: Track sidebar state to make content responsive
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // ❌ REMOVED: Local sidebar state tracking
+  // ✅ KEPT: useAuth for user authentication
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // ✅ FIX: Listen for sidebar width changes (same as PDF Q&A and Notes pages)
-  useEffect(() => {
-    const checkSidebar = () => {
-      const sidebar = document.querySelector('[style*="width"]'); // Sidebar element
-      if (sidebar) {
-        const width = parseInt(sidebar.style.width);
-        setSidebarOpen(width > 70); // Open if width > 70px
-      }
-    };
-
-    // Check on mount
-    checkSidebar();
-
-    // Check on interval (sidebar changes dynamically)
-    const interval = setInterval(checkSidebar, 100);
-
-    return () => clearInterval(interval);
-  }, []);
+  // ❌ REMOVED: useEffect polling for sidebar changes
 
   const services = [
     {
@@ -71,6 +57,15 @@ const Services = () => {
     }
   ];
 
+  const featureRoute = {
+    'PDF Q&A': '/pdf-qa',
+    'Note Organizer': '/notes-organizer',
+    'Academic Planner': '/academic-planner',
+    'Community': '/community',
+    'Interview AI': '/interview-ai',
+    'Resume Builder': '/resume-analyzer'
+  };
+
   return (
     <section 
       id="services" 
@@ -78,14 +73,8 @@ const Services = () => {
         bg-gradient-to-br from-gray-50 via-blue-50 to-cyan-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
         transition-all duration-300 relative overflow-hidden"
-      style={{
-        // ✅ FIX: Shift content based on sidebar state (same as PDF Q&A and Notes pages)
-        marginLeft: sidebarOpen ? '250px' : '70px',
-        width: sidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
-        transition: 'margin-left 0.35s cubic-bezier(.72,-0.2,.25,1), width 0.35s cubic-bezier(.72,-0.2,.25,1)'
-      }}
+      // ✅ FIXED: Removed inline styles - App.jsx handles layout now
     >
-      {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/5 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-400/5 dark:bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -93,7 +82,6 @@ const Services = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* Section Header */}
         <div className="text-center mb-16 md:mb-20 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
             bg-blue-100 dark:bg-blue-900/30 mb-6">
@@ -114,33 +102,35 @@ const Services = () => {
           </p>
         </div>
 
-        {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {services.map((service, index) => {
             const Icon = service.icon;
+            const route = featureRoute[service.title];
+
             return (
               <div
                 key={index}
-                className="group relative bg-white dark:bg-[#25262b] 
+                onClick={() => {
+                  if (!user) return;
+                  if (route) navigate(route);
+                }}
+                className={`group relative bg-white dark:bg-[#25262b] 
                   rounded-2xl p-8 
                   border border-gray-200 dark:border-gray-800
                   hover:border-transparent dark:hover:border-transparent
                   hover:shadow-2xl hover:-translate-y-2
-                  transition-all duration-500 cursor-pointer
-                  overflow-hidden"
+                  transition-all duration-500
+                  ${user ? 'cursor-pointer' : 'cursor-not-allowed'} 
+                  overflow-hidden`}
                 style={{ animationDelay: `${service.delay}ms` }}
               >
-                {/* Gradient Background on Hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${service.color} 
                   opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 
-                {/* Gradient Overlay for Better Text Visibility */}
                 <div className="absolute inset-0 bg-white dark:bg-[#25262b] 
                   group-hover:opacity-95 transition-opacity duration-500" />
 
-                {/* Content */}
                 <div className="relative z-10">
-                  {/* Icon */}
                   <div className={`w-16 h-16 mb-6 rounded-xl 
                     bg-gradient-to-br ${service.color}
                     flex items-center justify-center
@@ -149,21 +139,18 @@ const Services = () => {
                     <Icon className="w-8 h-8 text-white" />
                   </div>
 
-                  {/* Title */}
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3
                     group-hover:text-gray-900 dark:group-hover:text-white
                     transition-colors duration-300">
                     {service.title}
                   </h3>
 
-                  {/* Description */}
                   <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed mb-4
                     group-hover:text-gray-700 dark:group-hover:text-gray-300
                     transition-colors duration-300">
                     {service.description}
                   </p>
 
-                  {/* Learn More Link */}
                   <div className="flex items-center gap-2 text-[#2196F3] dark:text-blue-400 font-medium
                     opacity-0 group-hover:opacity-100 
                     transform translate-x-0 group-hover:translate-x-2
@@ -173,7 +160,14 @@ const Services = () => {
                   </div>
                 </div>
 
-                {/* Decorative Corner Element */}
+                {!user && (
+                  <div className="absolute inset-0 flex items-end justify-end p-3 pointer-events-none">
+                    <span className="text-xs font-medium text-white/90 bg-black/45 backdrop-blur px-2 py-1 rounded-lg">
+                      Login required
+                    </span>
+                  </div>
+                )}
+
                 <div className="absolute top-0 right-0 w-20 h-20 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
                   <div className={`w-full h-full bg-gradient-to-br ${service.color} rounded-bl-full`} />
                 </div>
@@ -182,7 +176,6 @@ const Services = () => {
           })}
         </div>
 
-        {/* Bottom CTA */}
         <div className="mt-16 text-center">
           <p className="text-gray-600 dark:text-gray-400 text-lg mb-6">
             Ready to experience all features?
@@ -197,7 +190,6 @@ const Services = () => {
             <ArrowRight className="w-5 h-5" />
           </button>
         </div>
-
       </div>
     </section>
   );

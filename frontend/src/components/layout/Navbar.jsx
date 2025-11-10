@@ -1,5 +1,5 @@
 
-// //src/components/layout/Navbar.jsx
+// src/components/layout/Navbar.jsx
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,57 +14,18 @@ import {
 import ThemeToggle from '../ui/ThemeToggle.jsx';
 import { useThemeStore } from '../../store/themeStore.js';
 import LogoutButton from '../common/LogoutButton';
-
+import { useAuth } from '../../contexts/AuthContext'; // ✅ Import AuthContext
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const theme = useThemeStore((state) => state.theme);
   const navigate = useNavigate();
+  const { user } = useAuth(); // ✅ Get user from AuthContext
 
-
-  const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) setUser(JSON.parse(stored));
-    else setUser(null);
-  }, []);
-
-
-  // Listen for profile changes - INSTANT UPDATES
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'user' && e.newValue) {
-        setUser(JSON.parse(e.newValue));
-      }
-    };
-
-
-    // Listen for storage changes from other tabs
-    window.addEventListener('storage', handleStorageChange);
-
-
-    // Listen for custom event from EditProfile page - UPDATES NAVBAR INSTANTLY
-    const handleProfileUpdate = (e) => {
-      const updatedUser = e.detail;
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    };
-
-
-    window.addEventListener('profileUpdated', handleProfileUpdate);
-
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('profileUpdated', handleProfileUpdate);
-    };
-  }, []);
-
+  // ✅ REMOVED all localStorage user logic - now using AuthContext
 
   // Close dropdown when click outside
   useEffect(() => {
@@ -77,7 +38,6 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -86,7 +46,6 @@ const Navbar = () => {
     }
   };
 
-
   const navLinks = [
     { name: 'Home', id: 'home' },
     { name: 'Services', id: 'services' },
@@ -94,17 +53,18 @@ const Navbar = () => {
     { name: 'About', id: 'about' },
   ];
 
-
   return (
     <>
       <nav className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a1b1e]/95 backdrop-blur-sm shadow-sm transition-all duration-300">
         <div className="max-w-[1400px] mx-auto px-12">
           <div className="flex justify-between items-center h-[80px]">
             
-            {/* Logo - Shifted Left with Gap & Bigger & Works Both Themes */}
+            {/* Logo */}
             <button 
               onClick={() => scrollToSection('home')} 
               className="flex-shrink-0 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 mr-7"
+              
+
             >
               <img 
                 src={theme === 'dark' 
@@ -120,30 +80,6 @@ const Navbar = () => {
               />
             </button>
 
-            {/* <nav className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a1b1e]/95 backdrop-blur-sm shadow-sm transition-all duration-300">
-            <div className="w-full">
-            <div className="flex justify-between items-center h-[80px] px-6">  */}
-                
-            {/* Logo - Same padding as navbar */}
-            {/* <div className="flex-shrink-0 -ml-6">
-                <button 
-                    onClick={() => scrollToSection('home')} 
-                    className="flex items-center rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
-                  >
-                    <img 
-                      src="/src/assets/icons/eduonelogo.png"
-                      alt="EDUONE" 
-                      className={`h-16 w-auto rounded-lg transition-all duration-300 hover:scale-105 ${
-                        theme === 'dark' 
-                          ? 'brightness-110 contrast-110' 
-                          : 'brightness-100 contrast-100'
-                      }`}
-                    />
-              </button>
-          </div> */}
-
-
-
             {/* Center Links (only show if NOT logged in) */}
             {!user && (
               <div className="hidden md:flex items-center gap-12 ml-12">
@@ -158,7 +94,6 @@ const Navbar = () => {
                 ))}
               </div>
             )}
-
 
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-4">
@@ -196,7 +131,6 @@ const Navbar = () => {
                         </p>
                       </div>
 
-
                       {/* Menu Items */}
                       <div className="py-2">
                         <button
@@ -210,7 +144,6 @@ const Navbar = () => {
                           <span>View Profile</span>
                         </button>
 
-
                         <button
                           onClick={() => {
                             setDropdownOpen(false);
@@ -221,7 +154,6 @@ const Navbar = () => {
                           <Edit className="w-5 h-5" />
                           <span>Edit Profile</span>
                         </button>
-
 
                         <button
                           onClick={() => {
@@ -234,7 +166,6 @@ const Navbar = () => {
                           <span>Notifications</span>
                         </button>
 
-
                         <button
                           onClick={() => {
                             setDropdownOpen(false);
@@ -246,7 +177,6 @@ const Navbar = () => {
                           <span>Help & Support</span>
                         </button>
                       </div>
-
 
                       {/* Logout Component */}
                       <div className="border-t border-gray-200 dark:border-[#2d3748] pt-2">
@@ -278,7 +208,6 @@ const Navbar = () => {
               )}
             </div>
 
-
             {/* Mobile */}
             <div className="md:hidden flex items-center gap-3">
               <ThemeToggle />
@@ -288,7 +217,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
@@ -315,7 +243,6 @@ const Navbar = () => {
                     </p>
                   </div>
 
-
                   <button
                     onClick={() => {
                       navigate('/profile');
@@ -326,7 +253,6 @@ const Navbar = () => {
                     <User className="w-5 h-5" />
                     <span>View Profile</span>
                   </button>
-
 
                   <button
                     onClick={() => {
@@ -339,7 +265,6 @@ const Navbar = () => {
                     <span>Edit Profile</span>
                   </button>
 
-
                   <button
                     onClick={() => {
                       navigate('/notifications');
@@ -351,7 +276,6 @@ const Navbar = () => {
                     <span>Notifications</span>
                   </button>
 
-
                   <button
                     onClick={() => {
                       navigate('/help');
@@ -362,7 +286,6 @@ const Navbar = () => {
                     <HelpCircle className="w-5 h-5" />
                     <span>Help & Support</span>
                   </button>
-
 
                   {/* Logout - Mobile Version */}
                   <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-4">
@@ -402,6 +325,5 @@ const Navbar = () => {
     </>
   );
 };
-
 
 export default Navbar;

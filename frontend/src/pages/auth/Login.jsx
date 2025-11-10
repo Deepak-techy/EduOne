@@ -1,3 +1,4 @@
+
 // src/pages/auth/Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -46,23 +47,20 @@ const Login = () => {
         ? { email: formData.identifier, password: formData.password }
         : { userName: formData.identifier, password: formData.password };
 
-      const response = await authService.login(payload);
+      // ✅ Backend sets httpOnly cookies automatically
+      await authService.login(payload);
 
-      // ✅ FIX: Properly map avatar field to avatarUrl
-      const userData = response.data.user || response.data;
-      const userToSave = {
-        ...userData,
-        avatarUrl: userData.avatar || userData.avatarUrl || null, // Map 'avatar' to 'avatarUrl'
-      };
-
-      localStorage.setItem('user', JSON.stringify(userToSave));
 
       toast.success('Login successful! Welcome back! 🎉', {
         position: 'top-right',
         autoClose: 2000,
       });
 
-      navigate('/');
+      // ✅ Reload to trigger AuthContext to fetch user from backend
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+      
     } catch (error) {
       setApiError(error.message || 'Login failed. Please try again.');
       toast.error(error.message || 'Login failed. Please try again.', {

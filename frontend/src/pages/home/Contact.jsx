@@ -1,13 +1,19 @@
+
+// src/pages/home/Contact.jsx
 import { Mail, Clock, Send, Sparkles, ArrowRight } from 'lucide-react';
 
 const Contact = () => {
+  // ❌ REMOVED: Local sidebar state tracking
+  // ❌ REMOVED: useEffect polling for sidebar changes
+
   return (
     <section 
       id="contact" 
       className="py-20 md:py-24 lg:py-28 px-6 md:px-10 lg:px-12 
         bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
-        transition-colors duration-300 relative overflow-hidden"
+        transition-all duration-300 relative overflow-hidden"
+      // ✅ FIXED: Removed inline styles - App.jsx handles layout now
     >
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

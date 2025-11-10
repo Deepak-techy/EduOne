@@ -1,3 +1,5 @@
+
+// src/pages/home/About.jsx
 import { Target, Zap, Users, Trophy, Sparkles, CheckCircle, Lightbulb, Rocket } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
@@ -5,6 +7,9 @@ const About = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [counts, setCounts] = useState([0, 0, 0]);
   const statsRef = useRef(null);
+
+  // ❌ REMOVED: Local sidebar state tracking
+  // ❌ REMOVED: useEffect polling for sidebar changes
 
   const stats = [
     { 
@@ -30,7 +35,6 @@ const About = () => {
     }
   ];
 
-  // Intersection Observer to detect when stats section is visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -52,11 +56,10 @@ const About = () => {
     };
   }, []);
 
-  // Animate counting when visible
   useEffect(() => {
     if (!isVisible) return;
 
-    const duration = 2000; // 2 seconds
+    const duration = 2000;
     const steps = 60;
     const stepDuration = duration / steps;
 
@@ -77,7 +80,6 @@ const About = () => {
     return () => clearInterval(timer);
   }, [isVisible]);
 
-  // Format number display
   const formatNumber = (value, index) => {
     if (index === 0) return `${(value / 1000).toFixed(value >= 1000 ? 0 : 1)}K+`;
     if (index === 1) return `${value}+`;
@@ -118,7 +120,8 @@ const About = () => {
       className="py-20 md:py-24 lg:py-28 px-6 md:px-10 lg:px-12 
         bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
-        transition-colors duration-300 relative overflow-hidden"
+        transition-all duration-300 relative overflow-hidden"
+      // ✅ FIXED: Removed inline styles - App.jsx handles layout now
     >
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">

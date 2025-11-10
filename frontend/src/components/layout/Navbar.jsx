@@ -1,9 +1,11 @@
+
+// src/components/layout/Navbar.jsx
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, 
   X, 
-  LogOut, 
   User, 
   Edit,
   HelpCircle, 
@@ -11,24 +13,19 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle.jsx';
 import { useThemeStore } from '../../store/themeStore.js';
+import LogoutButton from '../common/LogoutButton';
+import { useAuth } from '../../contexts/AuthContext'; // ✅ Import AuthContext
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const theme = useThemeStore((state) => state.theme);
   const navigate = useNavigate();
+  const { user } = useAuth(); // ✅ Get user from AuthContext
 
-  // State for user and avatar dropdown
-  const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showLogoutMessage, setShowLogoutMessage] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Detect login user from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) setUser(JSON.parse(stored));
-    else setUser(null);
-  }, []);
+  // ✅ REMOVED all localStorage user logic - now using AuthContext
 
   // Close dropdown when click outside
   useEffect(() => {
@@ -49,20 +46,6 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    setDropdownOpen(false);
-    setShowLogoutMessage(true);
-    
-    // Hide message after 3 seconds
-    setTimeout(() => {
-      setShowLogoutMessage(false);
-      navigate('/');
-      window.location.reload();
-    }, 2000);
-  };
-
   const navLinks = [
     { name: 'Home', id: 'home' },
     { name: 'Services', id: 'services' },
@@ -72,41 +55,34 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Logout Success Message */}
-      {showLogoutMessage && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] 
-          bg-green-500 text-white px-8 py-4 rounded-xl shadow-2xl 
-          animate-fade-in flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <p className="font-semibold text-base">Successfully logged out!</p>
-        </div>
-      )}
-
       <nav className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a1b1e]/95 backdrop-blur-sm shadow-sm transition-all duration-300">
         <div className="max-w-[1400px] mx-auto px-12">
           <div className="flex justify-between items-center h-[80px]">
+            
             {/* Logo */}
             <button 
               onClick={() => scrollToSection('home')} 
-              className="flex-shrink-0 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+              className="flex-shrink-0 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 mr-7"
+              
+
             >
               <img 
                 src={theme === 'dark' 
-                  ? '/src/assets/icons/darkmoodlogo.png' 
-                  : '/src/assets/icons/lightmoodlogo.png'
+                  ? '/src/assets/icons/eduonelogo.png' 
+                  : '/src/assets/icons/eduonelogo.png'
                 }
                 alt="EDUONE" 
-                className="h-12 w-auto rounded-lg transition-transform duration-300 hover:scale-105"
+                className={`h-16 w-auto rounded-lg transition-all duration-300 hover:scale-105 ${
+                  theme === 'dark' 
+                    ? 'brightness-110 contrast-110' 
+                    : 'brightness-100 contrast-100'
+                }`}
               />
             </button>
 
             {/* Center Links (only show if NOT logged in) */}
             {!user && (
-              <div className="hidden md:flex items-center gap-12">
+              <div className="hidden md:flex items-center gap-12 ml-12">
                 {navLinks.map((link) => (
                   <button
                     key={link.id}
@@ -135,10 +111,10 @@ const Navbar = () => {
                       <img
                         src={user.avatarUrl}
                         alt="Avatar"
-                        className="w-11 h-11 rounded-full border cursor-pointer object-cover bg-gray-100 transition-all duration-200"
+                        className="w-12 h-12 rounded-full border-2 border-blue-400 cursor-pointer object-cover bg-gray-100 transition-all duration-200 hover:shadow-lg"
                       />
                     ) : (
-                      <div className="w-11 h-11 rounded-full flex items-center justify-center bg-blue-500 text-white font-bold text-[22px] border cursor-pointer transition-all duration-200">
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white font-bold text-[24px] border-3 border-blue-600 cursor-pointer transition-all duration-200 hover:shadow-lg">
                         {(user.userName || user.fullName || user.email || 'U')[0].toUpperCase()}
                       </div>
                     )}
@@ -202,15 +178,14 @@ const Navbar = () => {
                         </button>
                       </div>
 
-                      {/* Logout - Separated */}
+                      {/* Logout Component */}
                       <div className="border-t border-gray-200 dark:border-[#2d3748] pt-2">
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#2d3748] transition-all cursor-pointer"
-                        >
-                          <LogOut className="w-5 h-5" />
-                          <span>Logout</span>
-                        </button>
+                        <LogoutButton 
+                          onLogoutSuccess={() => {
+                            setDropdownOpen(false);
+                            setMobileMenuOpen(false);
+                          }}
+                        />
                       </div>
                     </div>
                   )}
@@ -312,16 +287,14 @@ const Navbar = () => {
                     <span>Help & Support</span>
                   </button>
 
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#2d3748] rounded-xl transition-all cursor-pointer border-t border-gray-200 dark:border-gray-700 mt-2 pt-4"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <span>Logout</span>
-                  </button>
+                  {/* Logout - Mobile Version */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-4">
+                    <LogoutButton 
+                      onLogoutSuccess={() => {
+                        setMobileMenuOpen(false);
+                      }}
+                    />
+                  </div>
                 </div>
               ) : (
                 <>

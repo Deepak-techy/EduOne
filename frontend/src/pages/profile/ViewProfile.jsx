@@ -1,3 +1,4 @@
+// src/pages/profile/ViewProfile.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, User, Calendar, Sparkles } from 'lucide-react';
@@ -270,3 +271,6 @@ const ViewProfile = () => {
 };
 
 export default ViewProfile;
+
+
+

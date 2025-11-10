@@ -1,26 +1,15 @@
+
+// src/pages/home/About.jsx
 import { Target, Zap, Users, Trophy, Sparkles, CheckCircle, Lightbulb, Rocket } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [counts, setCounts] = useState([0, 0, 0]);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // ✅ FIX: Track sidebar state
   const statsRef = useRef(null);
 
-  // ✅ FIX: Listen for sidebar width changes
-  useEffect(() => {
-    const checkSidebar = () => {
-      const sidebar = document.querySelector('[style*="width"]');
-      if (sidebar) {
-        const width = parseInt(sidebar.style.width);
-        setSidebarOpen(width > 70);
-      }
-    };
-
-    checkSidebar();
-    const interval = setInterval(checkSidebar, 100);
-    return () => clearInterval(interval);
-  }, []);
+  // ❌ REMOVED: Local sidebar state tracking
+  // ❌ REMOVED: useEffect polling for sidebar changes
 
   const stats = [
     { 
@@ -132,12 +121,7 @@ const About = () => {
         bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50
         dark:from-[#1a1b1e] dark:via-[#1e1f24] dark:to-[#1a1b1e]
         transition-all duration-300 relative overflow-hidden"
-      style={{
-        // ✅ FIX: Shift content based on sidebar state
-        marginLeft: sidebarOpen ? '250px' : '70px',
-        width: sidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
-        transition: 'margin-left 0.35s cubic-bezier(.72,-0.2,.25,1), width 0.35s cubic-bezier(.72,-0.2,.25,1)'
-      }}
+      // ✅ FIXED: Removed inline styles - App.jsx handles layout now
     >
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">

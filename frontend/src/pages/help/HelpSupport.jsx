@@ -61,7 +61,7 @@ const HelpSupport = () => {
           className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:opacity-80 mb-6 transition"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
+          <span>Back to Home </span>
         </button>
 
         {/* Title */}

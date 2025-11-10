@@ -12,6 +12,7 @@ import Home from "../pages/Home/Home";
 
 // Feature Routes
 import PdfQARoutes from "./PdfQARoutes";
+import ResumeAnalyzerRoutes from "./ResumeAnalyzerRoutes";
 
 const AppRoutes = () => {
   return (
@@ -27,6 +28,9 @@ const AppRoutes = () => {
 
       {/* PDF Q&A Feature Routes */}
       <Route path="/pdf-qa/*" element={<PdfQARoutes />} />
+
+      {/* Resume Analyzer Feature Routes */}
+      <Route path="/resume-analyzer/*" element={ <ResumeAnalyzerRoutes />} />
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

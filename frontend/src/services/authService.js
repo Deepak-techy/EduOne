@@ -1,25 +1,23 @@
-//src/services/authService.js (Handles all API calls to backend)
-
+// src/services/authService.js
 import axios from 'axios';
 
-// Base URL from backend
-const API_URL = '/api/users';  // ← FIXED: Just /api/auth - proxy handles rest
+const API_URL = '/api/users'; // ✅ Full backend URL proxy
 
-// Create axios instance with base config
 const api = axios.create({
-  baseURL: API_URL,  // ← FIXED: Changed from API_BASE_URL to API_URL
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Send cookies with requests
+  withCredentials: true, // ✅ CRITICAL: Send cookies to backend
 });
 
-// Auth Service - All API functions
+// ✅ NO Authorization header interceptor needed!
+// Backend reads tokens from cookies automatically
+
 export const authService = {
-  // Register/Signup
   register: async (userData) => {
     try {
-      const response = await api.post('/register', {  // ← FIXED: Removed /users/
+      const response = await api.post('/register', {
         fullName: userData.fullName,
         userName: userData.userName,
         email: userData.email,
@@ -32,36 +30,78 @@ export const authService = {
     }
   },
 
-  // Login
-  login: async (credentials) => {
-    try {
-      const response = await api.post('/login', credentials);  // ← FIXED: Removed /users/
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Login failed' };
-    }
-  },
 
-  // Forget Password
+  login: async (credentials) => {
+  try {
+    const response = await api.post('/login', credentials);
+    // ✅ Backend sets cookies automatically - don't store anything!
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Login failed' };
+  }
+},
+
+logout: async () => {
+  try {
+    const response = await api.post('/logout');
+    // ✅ Backend clears cookies - no localStorage needed!
+    return response.data;
+  } catch (error) {
+    // ✅ Don't store anything on error either
+    throw error.response?.data || { message: 'Logout failed' };
+  }
+},
+
+
   forgetPassword: async (email) => {
     try {
-      const response = await api.post('/forget-password', { email });  // ← FIXED: Removed /users/
+      const response = await api.post('/forget-password', { email });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Request failed' };
     }
   },
 
-  // Reset Password
   resetPassword: async (token, passwords) => {
     try {
-      const response = await api.post(`/reset-password/${token}`, {  // ← FIXED: Removed /users/
+      const response = await api.post(`/reset-password/${token}`, {
         newPassword: passwords.newPassword,
         confirmNewPassword: passwords.confirmNewPassword,
       });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Reset failed' };
+    }
+  },
+
+  getProfile: async () => {
+    try {
+      const response = await api.get('/view-profile');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch profile' };
+    }
+  },
+
+  updateProfile: async (profileData) => {
+    try {
+      const response = await api.patch('/update-profile', profileData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update profile' };
+    }
+  },
+
+  updateAvatar: async (formData) => {
+    try {
+      const response = await api.patch('/update-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update avatar' };
     }
   },
 };

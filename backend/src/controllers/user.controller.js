@@ -285,6 +285,49 @@ const resetPassword = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, "Password reset successfully"))
 })
 
+const changePassword = asyncHandler(async (req, res) => {
+    // get user passwords from frontend
+    const { oldPassword, newPassword, confirmNewPassword } = req.body
+    const { _id: userId } = req.user
+
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
+
+    // verify the old password
+    const isPasswordValid = await user.isPasswordCorrect(oldPassword)
+
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Invalid old password")
+    }
+
+    // check if new password is same as old one
+    if (oldPassword === newPassword) {
+        throw new ApiError(400, "New password cannot be same as old password");
+    }
+
+    if(newPassword !== confirmNewPassword) {
+        throw new ApiError(400, "New password and confirm new password do not match")
+    }
+
+    // update the password
+    user.password = newPassword
+    await user.save({
+        validateBeforeSave: false
+    })
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Password changed successfully"))
+})
+
 const getUserProfile = asyncHandler(async (req, res) => {
     return res
         .status(200)
@@ -386,6 +429,7 @@ export {
     refreshAccessToken,
     forgetPassword,
     resetPassword,
+    changePassword,
     getUserProfile,
     updateAccountDetails,
     updateUserAvatar,

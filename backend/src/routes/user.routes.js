@@ -7,6 +7,7 @@ import {
     refreshAccessToken,
     forgetPassword,
     resetPassword,
+    changePassword,
     getUserProfile,
     updateAccountDetails,
     updateUserAvatar,
@@ -23,6 +24,7 @@ router.route("/forget-password").post(verifyJWT, forgetPassword)    // POST /api
 router.route("/reset-password/:token").post(resetPassword)    // POST /api/users/reset-password/:token
 
 // secured routes
+router.route("/change-password").post(verifyJWT, changePassword)    // POST /api/users/change-password
 router.route("/logout").post(verifyJWT, logoutUser)   // POST /api/users/logout
 router.route("/refresh-token").post(verifyJWT, refreshAccessToken)   // POST /api/users/refresh-token
 router.route("/view-profile").get(verifyJWT, getUserProfile)    // GET /api/users/view-profile

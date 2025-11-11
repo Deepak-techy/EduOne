@@ -50,7 +50,12 @@ const analysisResultSchema = new Schema(
             type: categoryScoresSchema,
             required: true
         },
-        suggestions: [
+        strengths: [
+            {
+                type: String
+            }
+        ],
+        improvements: [
             {
                 type: String
             }

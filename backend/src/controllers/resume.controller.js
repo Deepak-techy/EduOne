@@ -66,7 +66,17 @@ const uploadAndAnalyzeResume = asyncHandler(async (req, res) => {
     // return response
     return res
         .status(200)
-        .json(new ApiResponse(200, resume, "Resume uploaded and analyzed successfully"))
+        .json(new ApiResponse(200,
+            {
+                overallScore: aiAnalysisResponse.overallScore,
+                categoryScores: aiAnalysisResponse.categoryScores,
+                strengths: aiAnalysisResponse.strengths,
+                improvements: aiAnalysisResponse.improvements,
+                missingKeywords: aiAnalysisResponse.missingKeywords,
+                resume,
+            },
+            "Resume uploaded and analyzed successfully"
+        ))
 })
 
 const getResumeById = asyncHandler(async (req, res) => {

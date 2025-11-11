@@ -98,6 +98,10 @@ const resumeSchema = new Schema(
             type: String,
             default: "",
         },
+        resumePublicId: {
+            type: String,
+            default: null,
+        },
         analysisResult: {
             type: analysisResultSchema,
             required: true

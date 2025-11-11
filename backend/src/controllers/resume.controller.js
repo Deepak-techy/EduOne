@@ -69,9 +69,97 @@ const uploadAndAnalyzeResume = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, resume, "Resume uploaded and analyzed successfully"))
 })
 
+const getResumeById = asyncHandler(async (req, res) => {
+    // get resumeId from params
+    const { resumeId } = req.params;
+    const { _id: userId } = req.user;
 
+    if (!resumeId) {
+        throw new ApiError(400, "Resume ID is required");
+    }
 
+    // find resume that matches both ID and user
+    const resume = await Resume.findOne(
+        {
+            _id: resumeId,
+            userId
+        });
+
+    if (!resume) {
+        throw new ApiError(404, "Resume not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, resume, "Resume fetched successfully"));
+})
+
+const getUserResumes = asyncHandler(async (req, res) => {
+    // get userId from request
+    const { _id: userId } = req.user;
+
+    const resumes = await Resume.find(
+        {
+            userId
+        }
+    ).sort({ createdAt: -1 })
+
+    if (!resumes || resumes.length === 0) {
+        throw new ApiError(404, "No resumes found for this user");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200,
+            {
+                count: resumes.length,
+                resumes
+            },
+            "User resumes fetched successfully"
+        ));
+})
+
+const deleteResume = asyncHandler(async (req, res) => {
+    // get resumeId from params
+    const { resumeId } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!resumeId) {
+        throw new ApiError(400, "Resume ID is required");
+    }
+
+    // find resume that matches both ID and user
+    const resume = await Resume.findOne(
+        {
+            _id: resumeId,
+            userId
+        });
+
+    if (!resume) {
+        throw new ApiError(404, "Resume not found");
+    }
+
+    // delete resume from cloudinary
+    await deleteFromCloudinary(resume.resumePublicId)
+
+    // delete from database
+    await Resume.deleteOne(
+        {
+            _id: resumeId
+        }
+    )
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Resume deleted successfully"));
+})
 
 export {
     uploadAndAnalyzeResume,
+    getResumeById,
+    getUserResumes,
+    deleteResume
 }

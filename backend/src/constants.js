@@ -102,4 +102,59 @@ Tags:
   `
 };
 
+export const ANALYZE_RESUME_PROMPT = {
+    system: `You are an expert resume analyst and career coach. 
+Your goal is to evaluate resumes, identify strengths and weaknesses, and provide clear, structured, and data-driven feedback.
+Always respond strictly in valid JSON format without any additional commentary or markdown formatting.`,
+
+    human: `
+Resume Text:
+{resumeText}
+
+Candidate Information:
+- Full Name: {fullName}
+- Target Job Role: {jobRole}
+- Experience Level: {experienceLevel}
+- Job Description: {jobDescription}
+
+Analyze the resume and provide detailed feedback in JSON format with the following structure:
+
+{
+  "overallScore": <number between 0-100>,
+  "categoryScores": {
+    "grammarAndLanguage": <number between 0-100>,
+    "toneAndStyle": <number between 0-100>,
+    "structure": <number between 0-100>,
+    "skillsMatch": <number between 0-100>,
+    "contentQuality": <number between 0-100>
+  },
+  "suggestions": [
+    "<actionable suggestion 1>",
+    "<actionable suggestion 2>",
+    "<actionable suggestion 3>",
+    "<actionable suggestion 4>",
+    "<actionable suggestion 5>"
+  ],
+  "missingKeywords": [
+    "<keyword 1>",
+    "<keyword 2>",
+    "<keyword 3>"
+  ]
+}
+
+Scoring Criteria:
+- Grammar and Language: Check for spelling, grammar, clarity, and professional language.
+- Tone and Style: Evaluate professionalism, consistency, and appropriateness for {experienceLevel} level.
+- Structure: Assess formatting, organization, sections, and visual hierarchy.
+- Skills Match: Compare candidate skills against {jobRole} requirements and {jobDescription}.
+- Content Quality: Evaluate achievements, quantifiable results, relevance, and impact.
+
+Suggestions: Provide 3–5 specific, actionable recommendations for improvement.
+
+Missing Keywords: Identify important keywords from the job description that are missing or underrepresented in the resume.
+
+Return only valid JSON with no extra text or markdown.
+`
+};
+
 

@@ -396,7 +396,19 @@ const featuresItems = [
       { label: "Create Note", path: "/notes-organizer/create" }
     ]
   },
-  { icon: Calendar, label: "Academic Planner", path: "/academic-planner", subFeatures: [] },
+
+ {
+  icon: Calendar,
+  label: "Academic Planner",
+  path: "/academic-planner/dashboard",  
+  subFeatures: [
+    { label: "View Tasks", path: "/academic-planner/view-tasks" },
+    { label: "Create Tasks", path: "/academic-planner/create-task" },
+    { label: "Priority Tasks", path: "/academic-planner/priority-tasks" }
+  ]
+},
+
+
   { icon: FileCheck, label: "Resume Analyzer", path: "/resume-analyzer", subFeatures: [] },
   { icon: Users, label: "Interview AI", path: "/interview-ai", subFeatures: [] },
   { icon: Users, label: "Community", path: "/community", subFeatures: [] },
@@ -406,7 +418,7 @@ const featuresItems = [
 const FEATURE_ROOTS = [
   "/pdf-qa",
   "/notes-organizer",
-  "/academic-planner",
+  "/academic-planner/dashboard",
   "/resume-analyzer",
   "/interview-ai",
   "/community",

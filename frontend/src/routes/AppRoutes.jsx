@@ -22,6 +22,7 @@ import HelpSupport from "../pages/help/HelpSupport";
 // Feature Routes
 import PdfQARoutes from "./PdfQARoutes";
 import NotesRoutes from "./NotesRoutes";
+import PlannerRoutes from "./PlannerRoutes";
 
 const AppRoutes = () => {
   return (
@@ -46,6 +47,11 @@ const AppRoutes = () => {
       
       {/* Note Organizer Feature Routes */}
       <Route path="/notes-organizer/*" element={<NotesRoutes />} />
+
+      {/* Academic Planner Feature Routes */}
+      <Route path="/academic-planner/*" element={<PlannerRoutes />} />
+
+
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

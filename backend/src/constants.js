@@ -144,7 +144,8 @@ Analyze the resume and provide detailed feedback in JSON format with the followi
     "<keyword 1>",
     "<keyword 2>",
     "<keyword 3>"
-  ]
+  ],
+  "summary": "<Write a short, clear 2-line summary of the resume quality and alignment with the target job role.>"
 }}
 
 Scoring Criteria:

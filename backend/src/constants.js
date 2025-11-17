@@ -105,7 +105,7 @@ Tags:
 // Create prompt template for selecting top academic tasks
 export const ACADEMIC_TASK_PRIORITIZER_PROMPT = {
     system: `You are an intelligent academic task prioritizer. 
-Analyze the provided tasks and select the 5 most important tasks for today based on:
+Analyze the provided tasks and select the 10 most important tasks for today based on:
 1. Urgency (deadline proximity)
 2. Priority level (High/Medium/Low)
 3. Subject importance for academic success
@@ -118,7 +118,7 @@ Example format: [0, 3, 2, 5, 1]`,
 Here are the tasks from the next 7 days:
 {taskDetails}
 
-Select the 5 most important task indices for today.
+Select the 10 most important task indices for today.
 Return only the JSON array with no extra text or explanation.
   `
 };

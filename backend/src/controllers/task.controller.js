@@ -282,6 +282,39 @@ const markTaskCompleted = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, task, "Task marked as completed successfully"));
 });
 
+const markTaskUncompleted = asyncHandler(async (req, res) => {
+    // get taskId from params and userId from request
+    const { taskId } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!taskId) {
+        throw new ApiError(400, "taskId is required");
+    }
+
+    // find and update the task
+    const task = await Task.findOneAndUpdate(
+        {
+            _id: taskId,
+            userId
+        },
+        {
+            isCompleted: false,
+            completedAt: null
+        },
+        { new: true }
+    );
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    // return response
+    return res
+        .status(200)
+        .json(new ApiResponse(200, task, "Task marked as uncompleted successfully"));
+});
+
+
 const updateTask = asyncHandler(async (req, res) => {
     // get taskId from params and userId from request
     const { taskId } = req.params;
@@ -352,6 +385,7 @@ export {
     getTasksByDueDate,
     generateAIPrioritizedTasks,
     markTaskCompleted,
+    markTaskUncompleted,
     updateTask,
     deleteTask
 }

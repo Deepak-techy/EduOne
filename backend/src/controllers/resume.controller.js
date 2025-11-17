@@ -73,6 +73,7 @@ const uploadAndAnalyzeResume = asyncHandler(async (req, res) => {
                 strengths: aiAnalysisResponse.strengths,
                 improvements: aiAnalysisResponse.improvements,
                 missingKeywords: aiAnalysisResponse.missingKeywords,
+                summary: aiAnalysisResponse.summary,
                 resume,
             },
             "Resume uploaded and analyzed successfully"

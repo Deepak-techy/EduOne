@@ -64,7 +64,10 @@ const analysisResultSchema = new Schema(
             {
                 type: String
             }
-        ]
+        ],
+        summary: {
+            type: String
+        }
     },
     {
         _id: false

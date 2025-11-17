@@ -9,39 +9,15 @@ import ResumeAnalyzerForm from '../features/resumeAnalyzer/ResumeAnalyzerForm';
 
 const ResumeAnalyzerRoutes = () => {
   return (
-        <Routes>
+        <><Routes>
         <Route path="/" element={<ResumeAnalyzerHome />} />
         <Route path="/analyzer" element={<ResumeAnalyzerForm />} />
         <Route path="/result/:reportId" element={<ResumeAnalysisResult />} />
         <Route path="/history" element={<ResumeHistory />} />
       </Routes>
+      </>
   );
 }
 
 export default ResumeAnalyzerRoutes;
 
-
-
-
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import ResumeAnalyzerHome from './features/resumeAnalyzer/ResumeAnalyzerHome';
-// import ResumeAnalyzerForm from './features/resumeAnalyzer/ResumeAnalyzerForm';
-// import ResumeAnalysisResult from './features/resumeAnalyzer/ResumeAnalysisResult';
-// import ResumeHistory from './features/resumeAnalyzer/ResumeHistory';
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         {/* Other routes */}
-//         <Route path="/resume-analyzer" element={<ResumeAnalyzerHome />} />
-//         <Route path="/resume-analyzer/analyzer" element={<ResumeAnalyzerForm />} />
-//         <Route path="/resume-analyzer/result/:reportId" element={<ResumeAnalysisResult />} />
-//         <Route path="/resume-analyzer/history" element={<ResumeHistory />} />
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;

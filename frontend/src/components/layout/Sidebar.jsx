@@ -397,7 +397,15 @@ const featuresItems = [
     ]
   },
   { icon: Calendar, label: "Academic Planner", path: "/academic-planner", subFeatures: [] },
-  { icon: FileCheck, label: "Resume Analyzer", path: "/resume-analyzer", subFeatures: [] },
+  //added by bhaskar
+  { icon: FileCheck, 
+    label: "Resume Analyzer", 
+    path: "/resume-analyzer", 
+    subFeatures: [
+      { label: "Analyze Resume", path: "/resume-analyzer/analyzer" },
+      { label: "View Past Reports", path: "/resume-analyzer/history" }
+    ]
+  },
   { icon: Users, label: "Interview AI", path: "/interview-ai", subFeatures: [] },
   { icon: Users, label: "Community", path: "/community", subFeatures: [] },
   { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] }

@@ -1875,7 +1875,7 @@
 
 
 
-// src/features/notes/CreateNote.jsx - COMPLETE FIXED CODE
+//src/features/notes/CreateNote.jsx - COMPLETE FIXED CODE
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -2243,54 +2243,46 @@ const CreateNote = () => {
   };
 
   // ✅ FIX #1: Clean AI Answer display (ChatGPT-like)
-  const handleAskAI = async () => {
-    if (!selectedText.trim()) {
-      toast.error('Please select some text first');
-      return;
-    }
 
-    if (!currentNoteId) {
-      toast.error('Please save the note first');
-      return;
-    }
+const handleAskAI = async () => {
+  if (!selectedText.trim()) {
+    toast.error('Please select some text first');
+    return;
+  }
 
-    setAiLoading(true);
-    try {
-      const response = await notesService.askAI(currentNoteId, selectedText);
-      const answer = response.data.answer || response.data;
+  if (!currentNoteId) {
+    toast.error('Please save the note first');
+    return;
+  }
+
+  setAiLoading(true);
+  try {
+    const response = await notesService.askAI(currentNoteId, selectedText);
+    let answer = response.data.answer || response.data;
+    
+    // Convert line breaks to HTML
+    answer = answer.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+    
+    if (selectedTextPosition && editor) {
+      const { to } = selectedTextPosition;
       
-      if (selectedTextPosition && editor) {
-        const { to } = selectedTextPosition;
-        
-        // ✅ FIX #1: Move cursor to END of selected text (don't replace it)
-        editor.commands.setTextSelection(to);
-        
-        // ✅ FIX #1: Clean AI answer box (inline styles for reliability)
-        const aiAnswerHTML = `
-          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border-left: 4px solid #3B82F6; padding: 16px; border-radius: 12px; margin: 16px 0; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-              <span style="font-size: 18px;">🤖</span>
-              <p style="font-weight: 700; color: #1E40AF; margin: 0; font-size: 14px;">AI Answer</p>
-            </div>
-            <div style="color: #1E3A8A; font-size: 14px; line-height: 1.6;">
-              ${answer}
-            </div>
-          </div>
-        `;
-
-        // ✅ FIX #1: Insert formatted answer BELOW selected text
-        editor.commands.insertContent(`\n\n${aiAnswerHTML}\n\n`);
-      }
+      // Move cursor to END of selected text
+      editor.commands.setTextSelection(to);
       
-      toast.success('AI answer inserted!');
-      setShowAIPrompt(false);
-    } catch (error) {
-      console.error('AI error:', error);
-      toast.error('Failed to get AI answer');
-    } finally {
-      setAiLoading(false);
+      // Insert answer in simple format
+      const formattedAnswer = `<br><br>🤖 <strong>AI Answer:</strong> ${answer}<br><br>`;
+      editor.commands.insertContent(formattedAnswer);
     }
-  };
+    
+    toast.success('AI answer inserted!');
+    setShowAIPrompt(false);
+  } catch (error) {
+    console.error('AI error:', error);
+    toast.error('Failed to get AI answer');
+  } finally {
+    setAiLoading(false);
+  }
+};
 
   // ============================================================================
   // 🎯 EVENT HANDLERS - PDF controls

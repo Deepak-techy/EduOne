@@ -439,7 +439,7 @@
 // src/features/academicPlanner/MonthlyView.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, ChevronUp } from 'lucide-react';
+import { Calendar, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import plannerService from '../../services/plannerService';
 
 const MonthlyView = () => {
@@ -459,7 +459,6 @@ const MonthlyView = () => {
       const lastDay = monthDays[monthDays.length - 1].date.toISOString().split('T')[0];
       const res = await plannerService.getTasksByRange(startDate, lastDay);
       
-      // Handle multiple response formats
       const allTasks = res.data?.tasks || res.tasks || res.data || [];
       
       const tasksByDate = {};
@@ -474,7 +473,6 @@ const MonthlyView = () => {
     }
   };
 
-  // SUN-SAT month grid
   const getMonthDays = () => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -519,7 +517,6 @@ const MonthlyView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-8">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="bg-white p-2 rounded-lg shadow-sm">
@@ -528,7 +525,6 @@ const MonthlyView = () => {
           <h1 className="text-2xl font-bold text-gray-900">Academic planner</h1>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex gap-3">
           <button
             onClick={() => navigate('/academic-planner/dashboard')}
@@ -554,7 +550,6 @@ const MonthlyView = () => {
         </div>
       </div>
 
-      {/* Page Title with Today's Date */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-blue-900">Tasks in Calendar View</h2>
         <p className="text-red-600 font-semibold text-lg">
@@ -562,19 +557,48 @@ const MonthlyView = () => {
         </p>
       </div>
 
-      {/* Monthly Calendar */}
-      <div className="bg-white rounded-3xl shadow-lg p-6">
-        {/* Day Names */}
-        <div className="grid grid-cols-7 gap-4 mb-4">
+      {/* Monthly Calendar - SMALLER WITH NAVIGATION */}
+      <div className="bg-white rounded-2xl shadow-md p-5">
+        {/* Month Navigation Header */}
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={() => {
+              const newMonth = new Date(currentMonth);
+              newMonth.setMonth(newMonth.getMonth() - 1);
+              setCurrentMonth(newMonth);
+            }}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            title="Previous month"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          
+          <h3 className="text-xl font-bold text-gray-900">
+            {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </h3>
+          
+          <button
+            onClick={() => {
+              const newMonth = new Date(currentMonth);
+              newMonth.setMonth(newMonth.getMonth() + 1);
+              setCurrentMonth(newMonth);
+            }}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            title="Next month"
+          >
+            <ChevronRight className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 gap-2 mb-3">
           {dayNames.map((day) => (
-            <div key={day} className="text-center font-bold text-purple-600 text-sm">
+            <div key={day} className="text-center font-semibold text-purple-600 text-xs">
               {day}
             </div>
           ))}
         </div>
 
-        {/* Month Days Grid */}
-        <div className="grid grid-cols-7 gap-3 mb-6">
+        <div className="grid grid-cols-7 gap-2 mb-4">
           {monthDays.map((dayObj, idx) => {
             const isToday = isSameDay(dayObj.date, today);
             const dayTasks = monthTasks[dayObj.date.toDateString()] || [];
@@ -587,7 +611,7 @@ const MonthlyView = () => {
                   state: { selectedDate: dayObj.date.toISOString() } 
                 })}
                 className={`
-                  rounded-2xl p-4 min-h-[85px] flex flex-col items-center justify-center border-2 transition-all
+                  rounded-xl p-2 min-h-[60px] flex flex-col items-center justify-center border-2 transition-all
                   ${dayObj.isCurrentMonth ? 'cursor-pointer hover:border-blue-400' : 'cursor-default'}
                   ${!dayObj.isCurrentMonth ? 'opacity-30 bg-gray-50 border-gray-100' : ''}
                   ${dayObj.isCurrentMonth && taskCount === 0 ? 'bg-white border-gray-200' : ''}
@@ -595,7 +619,7 @@ const MonthlyView = () => {
                   ${isToday && dayObj.isCurrentMonth ? 'border-red-400' : ''}
                 `}
               >
-                <p className={`text-2xl font-bold ${
+                <p className={`text-lg font-bold ${
                   isToday ? 'text-red-600' : 
                   !dayObj.isCurrentMonth ? 'text-gray-400' : 
                   'text-gray-900'
@@ -604,8 +628,8 @@ const MonthlyView = () => {
                 </p>
                 
                 {taskCount > 0 && dayObj.isCurrentMonth && (
-                  <p className={`text-xs font-semibold mt-2 ${getTaskTextColor(dayTasks)}`}>
-                    {taskCount === 1 ? dayTasks[0].subject : `TASK: ${taskCount}`}
+                  <p className={`text-[10px] font-semibold mt-1 ${getTaskTextColor(dayTasks)}`}>
+                    {taskCount}
                   </p>
                 )}
               </div>
@@ -613,13 +637,12 @@ const MonthlyView = () => {
           })}
         </div>
 
-        {/* Dropdown Icon (Up Arrow) */}
         <div className="flex justify-end">
           <button
             onClick={() => navigate('/academic-planner/view-tasks')}
             className="text-gray-600 hover:text-blue-600 transition-all"
           >
-            <ChevronUp className="w-8 h-8" />
+            <ChevronUp className="w-6 h-6" />
           </button>
         </div>
       </div>

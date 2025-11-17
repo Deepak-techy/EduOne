@@ -257,11 +257,6 @@
 
 
 
-
-
-
-
-
 // src/features/academicPlanner/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -282,13 +277,14 @@ const Dashboard = () => {
     try {
       const res = await plannerService.getDashboard();
       
-      // Handle multiple response formats
+      // Your backend: { data: { today: {...}, week: {...} } }
       const dashboardData = res.data || res;
-      const allTasks = [
-        ...(dashboardData.today?.tasks || []),
-        ...(dashboardData.upcoming?.tasks || []),
-        ...(dashboardData.overdue?.tasks || [])
-      ];
+      
+      const todayTasks = dashboardData.today?.tasks || [];
+      const weekTasks = dashboardData.week?.tasks || [];
+      
+      // Combine unique tasks
+      const allTasks = [...todayTasks, ...weekTasks];
       
       const completed = allTasks.filter(t => t.isCompleted);
       const pending = allTasks.filter(t => !t.isCompleted);
@@ -321,7 +317,6 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold text-gray-900">Academic Planner</h1>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex gap-2">
           <button
             onClick={() => navigate('/academic-planner/dashboard')}
@@ -350,13 +345,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Grid Layout */}
+      {/* Main Grid */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Left Column - Stats */}
+        {/* Left - Stats */}
         <div className="col-span-8 space-y-6">
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-6">
-            {/* Total Tasks Card */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-blue-100 p-3 rounded-xl">
@@ -368,7 +362,6 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500">All Tasks</p>
             </div>
 
-            {/* Completed Card */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-green-100 p-3 rounded-xl">
@@ -380,7 +373,6 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500">Completed</p>
             </div>
 
-            {/* Pending Card */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-orange-100 p-3 rounded-xl">
@@ -393,7 +385,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Completed Tasks List */}
+          {/* Completed Tasks */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-lg font-bold text-gray-900 mb-5">Recent Completed Tasks</h3>
             <div className="space-y-3">
@@ -426,7 +418,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Column - Progress & Insights */}
+        {/* Right - Progress */}
         <div className="col-span-4 space-y-6">
           {/* Progress Card */}
           <div className="bg-gradient-to-br from-blue-500 to-blue-300 rounded-2xl p-6 shadow-lg">
@@ -473,7 +465,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Achievement Card */}
+          {/* Achievements */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 mb-4">
               <Award className="w-5 h-5 text-amber-500" />

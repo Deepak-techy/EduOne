@@ -8,6 +8,7 @@ import {
     getTasksByDueDate,
     generateAIPrioritizedTasks,
     markTaskCompleted,
+    markTaskUncompleted,
     updateTask,
     deleteTask
 } from "../controllers/task.controller.js";
@@ -26,6 +27,7 @@ router.route("/ai-prioritized").get(verifyJWT, generateAIPrioritizedTasks)    //
 
 // dynamic routes
 router.route("/:taskId/mark-completed").patch(verifyJWT, markTaskCompleted)    // POST /api/tasks/:taskId/mark-completed
+router.route("/:taskId/mark-uncompleted").patch(verifyJWT, markTaskUncompleted)    // POST /api/tasks/:taskId/mark-uncompleted
 router.route("/:taskId/update").patch(verifyJWT, updateTask)    // POST /api/tasks/:taskId/update
 router.route("/:taskId/delete").delete(verifyJWT, deleteTask)    // DELETE /api/tasks/:taskId/delete
 

@@ -11,7 +11,9 @@ const generateAIBasedDailyPriorities = async (tasks) => {
             task: task.task,
             deadline: task.dueDate,
             priority: task.priority,
-            daysRemaining: Math.ceil((new Date(task.dueDate) - new Date()) / (1000 * 60 * 60 * 24))
+            daysRemaining: Math.ceil(
+                (new Date(task.dueDate) - new Date()) / (1000 * 60 * 60 * 24)
+            )
         }));
 
         const prompt = ChatPromptTemplate.fromMessages([
@@ -29,7 +31,7 @@ const generateAIBasedDailyPriorities = async (tasks) => {
 
         // Return the top 5 tasks based on AI selection
         return selectedIndices
-            .slice(0, 5)
+            .slice(0, 10)
             .map(index => tasks[index])
             .filter(task => task);
 
@@ -44,7 +46,7 @@ const generateAIBasedDailyPriorities = async (tasks) => {
                 if (priorityDiff !== 0) return priorityDiff;
                 return new Date(a.dueDate) - new Date(b.dueDate);
             })
-            .slice(0, 5);
+            .slice(0, 10);
     }
 }
 

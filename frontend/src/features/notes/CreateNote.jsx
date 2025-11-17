@@ -2244,7 +2244,7 @@ const CreateNote = () => {
 
   // ✅ FIX #1: Clean AI Answer display (ChatGPT-like)
 
-const handleAskAI = async () => {
+  const handleAskAI = async () => {
   if (!selectedText.trim()) {
     toast.error('Please select some text first');
     return;
@@ -2260,8 +2260,32 @@ const handleAskAI = async () => {
     const response = await notesService.askAI(currentNoteId, selectedText);
     let answer = response.data.answer || response.data;
     
-    // Convert line breaks to HTML
-    answer = answer.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+    // Convert markdown to HTML with full formatting support
+    answer = answer
+      // Code blocks with syntax highlighting (``````) - ✅ FIXED!
+      .replace(/``````/g, (match, lang, code) => {
+        return `<pre><code class="language-${lang || 'javascript'}">${code.trim()}</code></pre>`;
+      })
+      // Inline code (`code`)
+      .replace(/`([^`]+)`/g, '<code style="background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #dc2626;">$1</code>')
+      // Bold text (**bold**)
+      .replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
+      // Italic text (*italic*)
+      .replace(/\*([^\*]+)\*/g, '<em>$1</em>')
+      // Bullet lists
+      .replace(/^\s*[-*]\s+(.+)$/gm, '<li>$1</li>')
+      // Numbered lists
+      .replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>')
+      // Headings (### Heading)
+      .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+      .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+      .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
+      // Line breaks
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br/>');
+    
+    // Wrap consecutive <li> items in <ul>
+    answer = answer.replace(/(<li>.*?<\/li>(?:\s*<li>.*?<\/li>)*)/gs, '<ul>$1</ul>');
     
     if (selectedTextPosition && editor) {
       const { to } = selectedTextPosition;
@@ -2269,8 +2293,16 @@ const handleAskAI = async () => {
       // Move cursor to END of selected text
       editor.commands.setTextSelection(to);
       
-      // Insert answer in simple format
-      const formattedAnswer = `<br><br>🤖 <strong>AI Answer:</strong> ${answer}<br><br>`;
+      // Insert formatted answer with proper styling
+      const formattedAnswer = `
+        <br><br>
+        <p><strong>🤖 AI Answer:</strong></p>
+        <div style="margin-left: 20px; color: #374151;">
+          <p>${answer}</p>
+        </div>
+        <br>
+      `;
+      
       editor.commands.insertContent(formattedAnswer);
     }
     
@@ -2283,6 +2315,7 @@ const handleAskAI = async () => {
     setAiLoading(false);
   }
 };
+
 
   // ============================================================================
   // 🎯 EVENT HANDLERS - PDF controls

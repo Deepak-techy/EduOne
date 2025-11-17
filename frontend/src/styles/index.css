@@ -239,3 +239,41 @@ html.dark .bg-gradient-to-br.from-gray-200 {
 .animate-fade-in {
   animation: fadeInUp 0.8s ease-out forwards;
 }
+
+
+/* Code block styling */
+pre {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+}
+
+/* Inline code */
+p code {
+  background-color: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #dc2626;
+  font-size: 0.9em;
+}
+
+/* Lists in AI answers */
+ul {
+  margin-left: 20px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+li {
+  margin-bottom: 4px;
+}

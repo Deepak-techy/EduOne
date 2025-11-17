@@ -559,10 +559,8 @@ const PriorityTasks = () => {
     try {
       const res = await plannerService.getAllTasks();
       
-      // Handle multiple response formats
       const allTasks = res.data?.tasks || res.tasks || res.data || [];
       
-      // Get current week (SUN-SAT)
       const today = new Date();
       const dayOfWeek = today.getDay();
       const sunday = new Date(today);
@@ -573,7 +571,6 @@ const PriorityTasks = () => {
       saturday.setDate(sunday.getDate() + 6);
       saturday.setHours(23, 59, 59, 999);
 
-      // Filter pending tasks from current week
       const pendingThisWeek = allTasks.filter(task => {
         if (task.isCompleted) return false;
         const dueDate = new Date(task.dueDate);
@@ -687,7 +684,6 @@ const PriorityTasks = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-8">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="bg-white p-2 rounded-lg shadow-sm">
@@ -696,7 +692,6 @@ const PriorityTasks = () => {
           <h1 className="text-2xl font-bold text-gray-900">Academic planner</h1>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex gap-3">
           <button
             onClick={() => navigate('/academic-planner/dashboard')}
@@ -722,13 +717,11 @@ const PriorityTasks = () => {
         </div>
       </div>
 
-      {/* Page Title */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Priority Overview</h2>
         <p className="text-gray-600">Top 10 pending tasks from this week by priority</p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-2">
@@ -765,7 +758,6 @@ const PriorityTasks = () => {
         </div>
       </div>
 
-      {/* Priority Sections */}
       <div className="space-y-8">
         <PrioritySection
           title="High Priority"

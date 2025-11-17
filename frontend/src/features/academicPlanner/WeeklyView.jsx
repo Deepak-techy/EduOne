@@ -649,11 +649,10 @@
 
 
 
-
 // src/features/academicPlanner/WeeklyView.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown, Trash2 } from 'lucide-react';
 import plannerService from '../../services/plannerService';
 
 const WeeklyView = () => {
@@ -684,7 +683,6 @@ const WeeklyView = () => {
       const dateStr = date.toISOString().split('T')[0];
       const res = await plannerService.getTasksByDate(dateStr);
       
-      // Handle multiple response formats
       const taskData = res.data?.tasks || res.tasks || res.data || [];
       setTasks(taskData);
     } catch (error) {
@@ -700,7 +698,6 @@ const WeeklyView = () => {
       const endDate = week[6].toISOString().split('T')[0];
       const res = await plannerService.getTasksByRange(startDate, endDate);
       
-      // Handle multiple response formats
       const allTasks = res.data?.tasks || res.tasks || res.data || [];
       
       const tasksByDate = {};
@@ -725,7 +722,18 @@ const WeeklyView = () => {
     }
   };
 
-  // SUN-SAT week
+  const handleDelete = async (taskId) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    
+    try {
+      await plannerService.deleteTask(taskId);
+      fetchTasksForDate(selectedDate);
+      fetchWeekTasks();
+    } catch (error) {
+      console.error('Delete error:', error);
+    }
+  };
+
   const getWeekDays = () => {
     const curr = new Date(selectedDate);
     const week = [];
@@ -767,7 +775,6 @@ const WeeklyView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-8">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="bg-white p-2 rounded-lg shadow-sm">
@@ -776,7 +783,6 @@ const WeeklyView = () => {
           <h1 className="text-2xl font-bold text-gray-900">Academic planner</h1>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex gap-3">
           <button
             onClick={() => navigate('/academic-planner/dashboard')}
@@ -802,7 +808,6 @@ const WeeklyView = () => {
         </div>
       </div>
 
-      {/* Page Title with Today's Date */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-blue-900">Tasks in Calendar View</h2>
         <p className="text-red-600 font-semibold text-lg">
@@ -810,19 +815,51 @@ const WeeklyView = () => {
         </p>
       </div>
 
-      {/* Weekly Calendar */}
-      <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-        {/* Day Names */}
-        <div className="grid grid-cols-7 gap-4 mb-4">
+      {/* Weekly Calendar - SMALLER WITH NAVIGATION */}
+      <div className="bg-white rounded-2xl shadow-md p-5 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={() => {
+              const newDate = new Date(selectedDate);
+              newDate.setDate(newDate.getDate() - 7);
+              setSelectedDate(newDate);
+            }}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            title="Previous week"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <h3 className="text-lg font-bold text-gray-900">
+            {weekDays[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {weekDays[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </h3>
+          
+          <button
+            onClick={() => {
+              const newDate = new Date(selectedDate);
+              newDate.setDate(newDate.getDate() + 7);
+              setSelectedDate(newDate);
+            }}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            title="Next week"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 gap-2 mb-3">
           {dayNames.map((day) => (
-            <div key={day} className="text-center font-bold text-purple-600 text-sm">
+            <div key={day} className="text-center font-semibold text-purple-600 text-xs">
               {day}
             </div>
           ))}
         </div>
 
-        {/* Week Days */}
-        <div className="grid grid-cols-7 gap-4 mb-4">
+        <div className="grid grid-cols-7 gap-2 mb-3">
           {weekDays.map((day, idx) => {
             const isToday = isSameDay(day, today);
             const isSelected = isSameDay(day, selectedDate);
@@ -834,12 +871,12 @@ const WeeklyView = () => {
                 key={idx}
                 onClick={() => setSelectedDate(day)}
                 className={`
-                  rounded-2xl p-4 cursor-pointer transition-all border-2 min-h-[90px] flex flex-col items-center justify-center
+                  rounded-xl p-2 cursor-pointer transition-all border-2 min-h-[65px] flex flex-col items-center justify-center
                   ${isSelected ? 'border-pink-400 bg-pink-100' : 'border-gray-200 bg-white hover:border-blue-300'}
                   ${isToday && !isSelected ? 'border-red-400 bg-red-50' : ''}
                 `}
               >
-                <p className={`text-2xl font-bold ${
+                <p className={`text-lg font-bold ${
                   isSelected ? 'text-pink-600' : 
                   isToday ? 'text-red-600' : 
                   'text-gray-800'
@@ -848,12 +885,12 @@ const WeeklyView = () => {
                 </p>
                 
                 {taskCount > 0 && (
-                  <p className={`text-xs font-semibold mt-2 px-2 py-1 rounded ${
+                  <p className={`text-[10px] font-semibold mt-1 px-1.5 py-0.5 rounded ${
                     isSelected 
                       ? 'text-pink-600' 
                       : getTaskDotColor(dayTasks)
                   }`}>
-                    {isSelected ? `TASK: ${taskCount}` : dayTasks[0].subject}
+                    {taskCount}
                   </p>
                 )}
               </div>
@@ -861,25 +898,22 @@ const WeeklyView = () => {
           })}
         </div>
 
-        {/* Dropdown Icon */}
         <div className="flex justify-end">
           <button
             onClick={() => navigate('/academic-planner/monthly-view')}
             className="text-gray-600 hover:text-blue-600 transition-all"
           >
-            <ChevronDown className="w-8 h-8" />
+            <ChevronDown className="w-6 h-6" />
           </button>
         </div>
       </div>
 
-      {/* Selected Date Badge */}
       <div className="bg-pink-200 rounded-2xl px-6 py-3 inline-block mb-5">
         <p className="font-bold text-pink-800">
           {selectedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/')}
         </p>
       </div>
 
-      {/* Tasks Section */}
       <h3 className="text-2xl font-bold text-purple-700 mb-5">TASKS</h3>
 
       <div className="space-y-4">
@@ -906,16 +940,26 @@ const WeeklyView = () => {
                 </p>
               </div>
               
-              <button
-                onClick={() => handleMarkComplete(task._id, task)}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                  task.isCompleted 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-gray-800 text-white hover:bg-gray-900'
-                }`}
-              >
-                {task.isCompleted ? '✓ Completed' : 'Mark Completed'}
-              </button>
+              <div className="flex items-center gap-3 ml-4">
+                <button
+                  onClick={() => handleMarkComplete(task._id, task)}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    task.isCompleted 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-gray-800 text-white hover:bg-gray-900'
+                  }`}
+                >
+                  {task.isCompleted ? '✓ Completed' : 'Mark Completed'}
+                </button>
+
+                <button
+                  onClick={() => handleDelete(task._id)}
+                  className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all"
+                  title="Delete task"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           ))
         )}

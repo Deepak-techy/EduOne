@@ -1,7 +1,7 @@
 // src/features/academicPlanner/CreateTask.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Plus, Tag, FileText, CalendarDays } from 'lucide-react';
+import { Calendar, BookOpen, FileText, CalendarDays, Flag } from 'lucide-react';
 import plannerService from '../../services/plannerService';
 import { toast } from 'react-toastify';
 
@@ -13,6 +13,21 @@ const CreateTask = () => {
     dueDate: '',
     priority: ''
   });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePrioritySelect = (priority) => {
+    setFormData(prev => ({
+      ...prev,
+      priority
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,23 +43,18 @@ const CreateTask = () => {
       setFormData({ subject: '', task: '', dueDate: '', priority: '' });
       navigate('/academic-planner/view-tasks');
     } catch (error) {
+      console.error('Error:', error);
       toast.error(error.message || 'Failed to create task');
     }
   };
 
-  const priorityOptions = [
-    { label: 'High', color: 'bg-red-500', ring: 'ring-red-200', text: 'text-red-600' },
-    { label: 'Medium', color: 'bg-yellow-500', ring: 'ring-yellow-200', text: 'text-yellow-600' },
-    { label: 'Low', color: 'bg-green-500', ring: 'ring-green-200', text: 'text-green-600' }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="bg-white p-2 rounded-lg shadow-sm">
-            <Calendar className="w-6 h-6 text-red-500" />
+          <div className="bg-blue-500 p-2.5 rounded-xl">
+            <Calendar className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Academic planner</h1>
         </div>
@@ -75,150 +85,167 @@ const CreateTask = () => {
         </div>
       </div>
 
-      {/* Main Content - Split Layout */}
+      {/* Main Content */}
       <div className="grid grid-cols-12 gap-8">
-        {/* Left Side - Form */}
-        <div className="col-span-7">
-          <div className="bg-white rounded-3xl shadow-lg p-8">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <Plus className="w-6 h-6 text-blue-600" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900">Create New Task</h2>
+        {/* Left - Form */}
+        <div className="col-span-7 bg-white rounded-3xl shadow-lg p-8">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="bg-blue-100 p-3 rounded-xl">
+              <FileText className="w-6 h-6 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Subject */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                <BookOpen className="w-4 h-4 text-blue-500" />
+                Subject
+              </label>
+              <input
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder="e.g., DSA, OS, DBMS"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Subject Input */}
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
-                  <FileText className="w-5 h-5 text-blue-500" />
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., DSA, OS, DBMS"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all text-gray-900 placeholder-gray-400"
-                />
-              </div>
+            {/* Task Description */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                <FileText className="w-4 h-4 text-blue-500" />
+                Task Description
+              </label>
+              <textarea
+                name="task"
+                value={formData.task}
+                onChange={handleChange}
+                placeholder="e.g., Complete Assignment 3"
+                rows="4"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all resize-none"
+              />
+            </div>
 
-              {/* Task Input */}
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
-                  <Tag className="w-5 h-5 text-blue-500" />
-                  Task Description
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Complete Assignment 3"
-                  value={formData.task}
-                  onChange={(e) => setFormData({ ...formData, task: e.target.value })}
-                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all text-gray-900 placeholder-gray-400"
-                />
-              </div>
+            {/* Due Date */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                <CalendarDays className="w-4 h-4 text-blue-500" />
+                Due Date
+              </label>
+              <input
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              />
+            </div>
 
-              {/* Date Input */}
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
-                  <CalendarDays className="w-5 h-5 text-blue-500" />
-                  Due Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all text-gray-900"
-                />
+            {/* Priority Level */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                <Flag className="w-4 h-4 text-blue-500" />
+                Priority Level
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => handlePrioritySelect('High')}
+                  className={`py-3 px-4 rounded-xl font-semibold transition-all border-2 ${
+                    formData.priority === 'High'
+                      ? 'bg-red-500 text-white border-red-500'
+                      : 'bg-red-50 text-red-600 border-red-200 hover:border-red-400'
+                  }`}
+                >
+                  High
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePrioritySelect('Medium')}
+                  className={`py-3 px-4 rounded-xl font-semibold transition-all border-2 ${
+                    formData.priority === 'Medium'
+                      ? 'bg-yellow-500 text-white border-yellow-500'
+                      : 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:border-yellow-400'
+                  }`}
+                >
+                  Medium
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePrioritySelect('Low')}
+                  className={`py-3 px-4 rounded-xl font-semibold transition-all border-2 ${
+                    formData.priority === 'Low'
+                      ? 'bg-green-500 text-white border-green-500'
+                      : 'bg-green-50 text-green-600 border-green-200 hover:border-green-400'
+                  }`}
+                >
+                  Low
+                </button>
               </div>
+            </div>
 
-              {/* Priority Selection */}
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
-                  <Tag className="w-5 h-5 text-blue-500" />
-                  Priority Level
-                </label>
-                <div className="grid grid-cols-3 gap-4">
-                  {priorityOptions.map((option) => (
-                    <button
-                      key={option.label}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, priority: option.label })}
-                      className={`
-                        px-5 py-4 rounded-xl font-semibold transition-all border-2
-                        ${formData.priority === option.label 
-                          ? `${option.color} text-white border-transparent shadow-lg ring-4 ${option.ring}` 
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-                        }
-                      `}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${formData.priority === option.label ? 'bg-white' : option.color}`} />
-                        {option.label}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold text-lg px-8 py-5 rounded-xl shadow-lg hover:shadow-xl transition-all"
-              >
-                Create Task
-              </button>
-            </form>
-          </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg"
+            >
+              Create Task
+            </button>
+          </form>
         </div>
 
-        {/* Right Side - Preview Card */}
+        {/* Right - Preview */}
         <div className="col-span-5">
-          <div className="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-3xl shadow-lg p-8 text-white sticky top-8">
-            <h3 className="text-2xl font-bold mb-6">Task Preview</h3>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
-              <p className="text-blue-100 text-sm mb-2">Subject</p>
-              <p className="text-xl font-semibold">
-                {formData.subject || 'Enter subject name'}
-              </p>
+          <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl shadow-lg p-8 text-white sticky top-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Calendar className="w-5 h-5" />
+              <h3 className="text-xl font-bold">Task Preview</h3>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
-              <p className="text-blue-100 text-sm mb-2">Task</p>
-              <p className="text-xl font-semibold">
-                {formData.task || 'Enter task description'}
-              </p>
-            </div>
+            <div className="space-y-5">
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <p className="text-sm text-white/80 mb-1">Subject</p>
+                <p className="text-lg font-semibold">
+                  {formData.subject || 'Enter subject name'}
+                </p>
+              </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
-              <p className="text-blue-100 text-sm mb-2">Due Date</p>
-              <p className="text-xl font-semibold">
-                {formData.dueDate 
-                  ? new Date(formData.dueDate).toLocaleDateString('en-GB', { 
-                      day: '2-digit', 
-                      month: 'short', 
-                      year: 'numeric' 
-                    })
-                  : 'Select a date'
-                }
-              </p>
-            </div>
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <p className="text-sm text-white/80 mb-1">Task</p>
+                <p className="text-lg font-semibold">
+                  {formData.task || 'Enter task description'}
+                </p>
+              </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-              <p className="text-blue-100 text-sm mb-2">Priority</p>
-              <div className="flex items-center gap-3">
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <p className="text-sm text-white/80 mb-1">Due Date</p>
+                <p className="text-lg font-semibold">
+                  {formData.dueDate 
+                    ? new Date(formData.dueDate).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })
+                    : 'Select a date'}
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <p className="text-sm text-white/80 mb-2">Priority</p>
                 {formData.priority ? (
-                  <>
-                    <div className={`w-4 h-4 rounded-full ${
-                      formData.priority === 'High' ? 'bg-red-400' :
-                      formData.priority === 'Medium' ? 'bg-yellow-400' :
-                      'bg-green-400'
-                    }`} />
-                    <p className="text-xl font-semibold">{formData.priority}</p>
-                  </>
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                    formData.priority === 'High' ? 'bg-red-500' :
+                    formData.priority === 'Medium' ? 'bg-yellow-500' :
+                    'bg-green-500'
+                  }`}>
+                    <Flag className="w-4 h-4" />
+                    {formData.priority}
+                  </div>
                 ) : (
-                  <p className="text-xl font-semibold">Choose priority</p>
+                  <p className="text-lg font-semibold">Select priority level</p>
                 )}
               </div>
             </div>

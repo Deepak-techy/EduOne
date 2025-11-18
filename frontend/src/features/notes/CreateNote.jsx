@@ -3208,6 +3208,7 @@ const CreateNote = () => {
   };
 
 
+  // response from the ai
   const handleAskAI = async () => {
     if (!selectedText.trim()) {
       toast.error('Please select some text first');
@@ -3232,9 +3233,8 @@ const CreateNote = () => {
         const formattedAnswer = convertMarkdownToHTML(answer);
         
         const aiAnswerHTML = `
-          <p><br></p>
-          <p><strong>🤖 AI Answer:</strong> ${formattedAnswer}</p>
-          <p><br></p>
+        <br><strong>🤖 AI Answer:</strong> ${formattedAnswer}
+        <br>
         `;
         
         editor.commands.insertContent(aiAnswerHTML);

@@ -628,7 +628,7 @@ const ResumeHistory = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
   const [isBackHovered, setIsBackHovered] = useState(false);
-
+  
   useEffect(() => {
     fetchResumes();
   }, []);
@@ -665,20 +665,23 @@ const ResumeHistory = () => {
   };
 
   const confirmDelete = async () => {
-    if (!confirmId) return;
-    setDeletingId(confirmId);
-    setConfirmId(null);
+  if (!confirmId) return;
+  
+  setDeletingId(confirmId);
+  // DON'T clear confirmId here - keep modal open during deletion!
+  
+  try {
+    await resumeService.deleteResume(confirmId);
+    setResumes(resumes.filter(resume => resume._id !== confirmId));
+    toast.success('Resume deleted successfully!');
+  } catch (error) {
+    toast.error(error.message || 'Failed to delete resume');
+  } finally {
+    setDeletingId(null);
+    setConfirmId(null); // Clear modal AFTER deletion completes
+  }
+};
 
-    try {
-      await resumeService.deleteResume(confirmId);
-      setResumes(resumes.filter(resume => resume._id !== confirmId));
-      toast.success('Resume deleted successfully!');
-    } catch (error) {
-      toast.error(error.message || 'Failed to delete resume');
-    } finally {
-      setDeletingId(null);
-    }
-  };
 
   const cancelDelete = () => {
     setConfirmId(null);
@@ -693,13 +696,18 @@ const ResumeHistory = () => {
   };
 
   const deletingItem = resumes.find(r => r._id === confirmId);
-  const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
+  const mainGradient = 'linear-gradient(315deg, #0099FF 0%, #00D4FF 0%, #60A5FA 70%, #2563EB 150%)';
+
 
   return (
     <div style={{ 
-      minHeight: '100vh', background: '#e8f0fe',
+      minHeight: '100vh', 
+      background: '#e8f0fe',
       fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", 
-      color: '#475569'
+      color: '#475569',
+      width: '100%',  // Changed from minWidth to width
+      maxWidth: '100vw',  // Prevent horizontal overflow
+      overflowX: 'hidden'  // Hide horizontal scroll
     }}>
       {(isLoading || isLoadingReport) && (
         <LoadingScreen message={isLoadingReport ? "Loading Analysis..." : "Loading History..."} />
@@ -712,88 +720,102 @@ const ResumeHistory = () => {
         fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
         filter: (isLoading || isLoadingReport) ? 'blur(3px)' : 'none',
         pointerEvents: (isLoading || isLoadingReport) ? 'none' : 'auto',
-        transition: 'filter 0.3s ease'
+        transition: 'filter 0.3s ease',
+        maxWidth: '100%',  // Added
+        margin: '0 auto'  // Center the content
       }}>
         <ToastContainer position="top-right" autoClose={2500} />
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
-          <button
-            onClick={() => navigate('/resume-analyzer')}
-            onMouseEnter={() => setIsBackHovered(true)}
-            onMouseLeave={() => setIsBackHovered(false)}
-            style={{
-              display: 'flex',
-              alignItems: 'left',
-              gap: '0px',
-              background: 'none',
-              border: 'none',
-              borderRadius: '2px',
-              padding: '50px 4px',
-              fontSize: '0.9rem',
-              fontWeight: 700,
-              color: isBackHovered ? '#0891b2' : '#06b6d4',
-              cursor: 'pointer',
-              marginBottom: '2px',
-              transition: 'color 0.2s',
-            }}
-          >
-            <ArrowLeft size={30} color={isBackHovered ? '#0891b2' : '#06b6d4'} />
-          </button>
-
-          <div style={{
-            background: mainGradient,
-            borderRadius: '24px',
-            padding: '14px',
-            color: 'white',
-            boxShadow: '0 8px 24px rgba(6,182,212,0.25)',
-            marginBottom: '20px',
-            position: 'relative',
-            overflow: 'hidden',
-            minWidth: '1350px'
-          }}>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <h1 style={{
-                color: 'white',
-                fontFamily: "'Poppins', 'Segoe UI', Arial, sans-serif",
-                fontWeight: 700,
-                fontSize: '2.8rem',
+        
+        {/* Container with max-width for proper layout */}
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 5px' }}>
+          
+          <div style={{ display: 'flex', gap: '5px', marginBottom: '12px', alignItems: 'flex-start' }}>
+            <button
+              onClick={() => navigate('/resume-analyzer')}
+              onMouseEnter={() => setIsBackHovered(true)}
+              onMouseLeave={() => setIsBackHovered(false)}
+              style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                margin: '0 0 10px 0'
-              }}>
-                <Sparkles size={35} />
-                Resume History 📊
-              </h1>
-              <p style={{ fontSize: '0.95rem', opacity: 0.95, margin: 0, fontWeight: 250 }}>
-                Track your progress • View past analyses • Improve over time
-              </p>
+                background: 'none',
+                border: 'none',
+                borderRadius: '2px',
+                padding: '50px 6px',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                color: isBackHovered ? '#0891b2' : '#06b6d4',
+                cursor: 'pointer',
+                transition: 'color 0.2s',
+                flexShrink: 0  // Prevent button from shrinking
+              }}
+            >
+              <ArrowLeft size={30} color={isBackHovered ? '#0891b2' : '#06b6d4'} />
+            </button>
+
+            <div style={{
+              background: mainGradient,
+              borderRadius: '24px',
+              padding: '24px 30px',  // Reduced padding
+              color: 'white',
+              boxShadow: '0 8px 24px rgba(6,182,212,0.25)',
+              marginBottom: '20px',
+              position: 'relative',
+              overflow: 'hidden',
+              width: '100%',  // Changed from minWidth to width
+              flex: 1  // Take remaining space
+            }}>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <h1 style={{
+                  color: 'white',
+                  fontFamily: "'Poppins', 'Segoe UI', Arial, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',  // Responsive font size
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  margin: '0 0 10px 0',
+                  flexWrap: 'wrap'  // Allow wrapping on small screens
+                }}>
+                  <Sparkles size={35} />
+                  Resume History 📊
+                </h1>
+                <p style={{ 
+                  fontSize: 'clamp(0.85rem, 2vw, 0.95rem)',  // Responsive font size
+                  opacity: 0.95, 
+                  margin: 0, 
+                  fontWeight: 400 
+                }}>
+                  Track your progress • View past analyses • Improve over time
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {error && (
-          <div style={{
-            padding: '16px 20px',
-            background: '#fee2e2',
-            border: '2px solid #ef4444',
-            borderRadius: '12px',
-            color: '#991b1b',
-            fontWeight: 600,
-            marginBottom: '24px',
-          }}>
-            ⚠️ {error}
-          </div>
-        )}
+          {error && (
+            <div style={{
+              padding: '16px 20px',
+              background: '#fee2e2',
+              border: '2px solid #ef4444',
+              borderRadius: '12px',
+              color: '#991b1b',
+              fontWeight: 600,
+              marginBottom: '24px',
+            }}>
+              ⚠️ {error}
+            </div>
+          )}
 
-        {!Array.isArray(resumes) || resumes.length === 0 ? (
-          <div style={{
-            background: 'white',
-            borderRadius: '24px',
-            padding: '80px 40px',
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(6,182,212,0.12)',
-            border: '2px solid #67e8f9',
-          }}>
+          {/* Empty state or Resume cards */}
+          {!Array.isArray(resumes) || resumes.length === 0 ? (
+            <div style={{
+              background: 'white',
+              borderRadius: '24px',
+              padding: '80px 40px',
+              textAlign: 'center',
+              boxShadow: '0 8px 32px rgba(6,182,212,0.12)',
+              border: '2px solid #67e8f9',
+              marginLeft: '50px'
+            }}>
             <div style={{
               width: '120px',
               height: '120px',
@@ -840,6 +862,9 @@ const ResumeHistory = () => {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
             gap: '24px',
+            paddingLeft: '50px' ,
+            paddingRight: '15px',
+            width: '100%'
           }}>
             {resumes.map(resume => {
               const score = resume.score
@@ -1108,35 +1133,64 @@ const ResumeHistory = () => {
               <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
                 <button
                   onClick={confirmDelete}
+                  disabled={deletingId === confirmId}
                   style={{
                     flex: 1,
                     padding: '14px 24px',
-                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                    background: deletingId === confirmId 
+                      ? '#94a3b8' 
+                      : 'linear-gradient(135deg, #ef4444, #dc2626)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '12px',
                     fontSize: '1rem',
                     fontWeight: 700,
-                    cursor: 'pointer',
+                    cursor: deletingId === confirmId ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
                     transition: 'all 0.3s',
-                    boxShadow: '0 4px 16px rgba(239,68,68,0.3)'
+                    boxShadow: deletingId === confirmId 
+                      ? 'none' 
+                      : '0 4px 16px rgba(239,68,68,0.3)',
+                    opacity: deletingId === confirmId ? 0.7 : 1
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(239,68,68,0.4)';
+                    if (deletingId !== confirmId) {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(239,68,68,0.4)';
+                    }
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(239,68,68,0.3)';
+                    if (deletingId !== confirmId) {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(239,68,68,0.3)';
+                    }
                   }}
                 >
-                  <Trash2 size={18} />
-                  Delete
+                  {deletingId === confirmId ? (
+                    <>
+                      <div
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          border: '3px solid rgba(255,255,255,0.3)',
+                          borderTop: '3px solid white',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }}
+                      />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={18} />
+                      Delete
+                    </>
+                  )}
                 </button>
+
 
                 <button
                   onClick={cancelDelete}
@@ -1171,23 +1225,29 @@ const ResumeHistory = () => {
       </div>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+         @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
       `}</style>
     </div>
+  </div>
   );
 };
 

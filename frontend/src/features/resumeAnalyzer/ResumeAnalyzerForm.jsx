@@ -130,7 +130,7 @@ const ResumeAnalyzerForm = () => {
 };
 
 
-const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
+  const mainGradient = 'linear-gradient(255deg, #0099FF 0%, #00D4FF 0%, #60A5FA 70%, #2563EB 150%)';
 
   return (
     <div style={{ minHeight: '50vh', background: '#e8f0fe', padding: 10, fontFamily: '"Inter", sans-serif', position: 'relative' }}>
@@ -191,7 +191,7 @@ const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
               background: 'none',
               border: 'none',
               borderRadius: '2px',
-              padding: '0px 4px',
+              padding: '35px 4px',
               fontSize: '0.9rem',
               fontWeight: 700,
               color: isBackHovered ? '#0d9488' : '#06b6d4',
@@ -245,7 +245,8 @@ const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
           }}
         >
           {/* Left inputs */}
-          <div style={{ flex: 1, minWidth: 300, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, minWidth: 300, display: 'flex', flexDirection: 'column', 
+                    paddingLeft: '50px',  }}>
             {['candidateName', 'jobRole'].map((field) => (
               <div style={{ marginBottom: 18 }} key={field}>
                 <label
@@ -367,7 +368,7 @@ const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
                   padding: '14px 48px',
                   background: isAnalyzing
                     ? '#38bdf8'
-                    : 'linear-gradient(to right, #38bdf8, #0ea5e9, #0284c7)',
+                    : mainGradient,
                   color: 'white',
                   border: 'none',
                   borderRadius: 50,
@@ -405,7 +406,8 @@ const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
           </div>
 
           {/* Right file upload */}
-          <div style={{ flex: 1, minWidth: 300, display: 'flex' }}>
+          <div style={{ flex: 1, minWidth: 300, display: 'flex',
+                    paddingRight: '25px' ,  }}>
             <div
               onClick={() => fileInputRef.current?.click()} // Fix upload trigger
               style={{
@@ -432,7 +434,7 @@ const mainGradient = 'linear-gradient(90deg, #0099FF, #00D4FF)';
                   margin: '0 auto 20px',
                   background: formData.resume
                     ? 'linear-gradient(135deg, #34d399 10%, #22c55e 90%)'
-                    : '#06b6d4',
+                    : 'linear-gradient(315deg, #0099FF 0%, #00D4FF 5%, #60A5FA 90%, #2563EB 150%)',
                   borderRadius: 20,
                   display: 'flex',
                   alignItems: 'center',

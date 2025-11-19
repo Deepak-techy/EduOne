@@ -1,3 +1,4 @@
+
 // src/features/academicPlanner/CreateTask.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -40,8 +41,15 @@ const CreateTask = () => {
     try {
       await plannerService.createTask(formData);
       toast.success('Task created successfully!');
+      
+      // ✅ FIXED: Navigate to the task's due date in weekly view
+      const taskDate = new Date(formData.dueDate);
+      navigate('/academic-planner/view-tasks', { 
+        state: { selectedDate: taskDate.toISOString() } 
+      });
+      
+      // Reset form
       setFormData({ subject: '', task: '', dueDate: '', priority: '' });
-      navigate('/academic-planner/view-tasks');
     } catch (error) {
       console.error('Error:', error);
       toast.error(error.message || 'Failed to create task');
@@ -49,12 +57,12 @@ const CreateTask = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 p-8">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-8">
+      {/* ✅ FIXED: Header - Matching Icon Style */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-500 p-2.5 rounded-xl">
-            <Calendar className="w-6 h-6 text-white" />
+          <div className="bg-white p-2 rounded-lg shadow-sm">
+            <Calendar className="w-6 h-6 text-red-500" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Academic planner</h1>
         </div>
@@ -85,6 +93,12 @@ const CreateTask = () => {
         </div>
       </div>
 
+      {/* Page Title */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-blue-900">Create New Task</h2>
+        <p className="text-gray-600 text-sm mt-1">Add a new task to your academic planner</p>
+      </div>
+
       {/* Main Content */}
       <div className="grid grid-cols-12 gap-8">
         {/* Left - Form */}
@@ -93,7 +107,7 @@ const CreateTask = () => {
             <div className="bg-blue-100 p-3 rounded-xl">
               <FileText className="w-6 h-6 text-blue-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
+            <h3 className="text-xl font-bold text-gray-900">Task Details</h3>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -110,6 +124,7 @@ const CreateTask = () => {
                 onChange={handleChange}
                 placeholder="e.g., DSA, OS, DBMS"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+                required
               />
             </div>
 
@@ -123,9 +138,10 @@ const CreateTask = () => {
                 name="task"
                 value={formData.task}
                 onChange={handleChange}
-                placeholder="e.g., Complete Assignment 3"
+                placeholder="e.g., Complete Assignment 3, Study Chapter 5, Prepare for test"
                 rows="4"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all resize-none"
+                required
               />
             </div>
 
@@ -140,7 +156,9 @@ const CreateTask = () => {
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
+                min={new Date().toISOString().split('T')[0]}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+                required
               />
             </div>
 
@@ -190,7 +208,7 @@ const CreateTask = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg"
+              className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl"
             >
               Create Task
             </button>
@@ -248,6 +266,13 @@ const CreateTask = () => {
                   <p className="text-lg font-semibold">Select priority level</p>
                 )}
               </div>
+            </div>
+
+            {/* Info Box */}
+            <div className="mt-6 bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+              <p className="text-sm text-white/90">
+                💡 <strong>Tip:</strong> High priority tasks appear at the top of your list!
+              </p>
             </div>
           </div>
         </div>

@@ -1,15 +1,21 @@
 // src/features/academicPlanner/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Target, TrendingUp, Award, CheckCircle, Clock } from 'lucide-react';
+import { Calendar, Target, TrendingUp, Clock, CheckCircle, AlertCircle, Flame } from 'lucide-react';
 import plannerService from '../../services/plannerService';
 
+// =====================================================
+// MAIN DASHBOARD COMPONENT
+// =====================================================
 const Dashboard = () => {
   const navigate = useNavigate();
+  
+  // ========== STATE MANAGEMENT ==========
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0 });
   const [completedTasks, setCompletedTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ========== FETCH DASHBOARD DATA ==========
   useEffect(() => {
     fetchDashboard();
   }, []);
@@ -21,9 +27,8 @@ const Dashboard = () => {
       
       console.log('✅ Dashboard response:', res);
       
-      // ✅ Your backend returns: { data: { today: {...}, week: {...} } }
+      // Extract dashboard data
       const dashboardData = res.data || res;
-      
       const todayTasks = dashboardData.today?.tasks || [];
       const weekTasks = dashboardData.week?.tasks || [];
       
@@ -53,71 +58,85 @@ const Dashboard = () => {
     }
   };
 
+  // Calculate progress percentage
   const progressPercent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
 
+  // ========== LOADING STATE ==========
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          {/* Animated Spinner */}
+          <div className="relative mb-8">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+            <div className="relative flex items-center justify-center w-20 h-20 mx-auto">
+              <Calendar className="w-8 h-8 text-blue-600 animate-pulse" />
+            </div>
+          </div>
+          <p className="text-gray-600 font-semibold">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
+  // ========== MAIN RENDER ==========
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-8">
-      {/* ✅ FIXED: Header - Matching Design with Other Pages */}
+      {/* ========== HEADER ========== */}
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
+        {/* Logo & Title */}
+        <div className="flex items-center gap-3 animate-fade-in">
           <div className="bg-white p-2 rounded-lg shadow-sm">
             <Calendar className="w-6 h-6 text-red-500" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Academic planner</h1>
         </div>
 
-        <div className="flex gap-3">
+        {/* Navigation Buttons */}
+        <div className="flex gap-3 animate-fade-in">
           <button
             onClick={() => navigate('/academic-planner/dashboard')}
-            className="px-6 py-2.5 bg-blue-500 text-white font-semibold rounded-lg shadow-md"
+            className="px-6 py-2.5 bg-blue-500 text-white font-semibold rounded-lg shadow-md cursor-pointer transform transition-all duration-200 hover:scale-105 hover:shadow-lg"
           >
             Dashboard
           </button>
           <button
             onClick={() => navigate('/academic-planner/view-tasks')}
-            className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-400 transition-all"
+            className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-400 cursor-pointer transform transition-all duration-200 hover:scale-105"
           >
             View Tasks
           </button>
           <button
             onClick={() => navigate('/academic-planner/create-task')}
-            className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-400 transition-all"
+            className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-400 cursor-pointer transform transition-all duration-200 hover:scale-105"
           >
             + Create Tasks
           </button>
           <button
             onClick={() => navigate('/academic-planner/priority-tasks')}
-            className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-400 transition-all"
+            className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-blue-400 cursor-pointer transform transition-all duration-200 hover:scale-105"
           >
             Priority Tasks
           </button>
         </div>
       </div>
 
-      {/* ✅ NEW: Subtitle - This Week's Overview */}
-      <div className="mb-6">
+      {/* ========== PAGE TITLE ========== */}
+      <div className="mb-6 animate-fade-in-delay">
         <h2 className="text-2xl font-bold text-blue-900">This Week's Overview</h2>
         <p className="text-gray-600 text-sm mt-1">Track your academic progress and achievements</p>
       </div>
 
-      {/* Main Grid */}
+      {/* ========== MAIN GRID ========== */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Left - Stats */}
+        {/* ========== LEFT SECTION - STATS & TASKS ========== */}
         <div className="col-span-8 space-y-6">
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            {/* Total Tasks Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-slide-up">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-blue-100 p-3 rounded-xl">
                   <Target className="w-6 h-6 text-blue-600" />
@@ -128,7 +147,8 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500">All Tasks</p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            {/* Completed Tasks Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-slide-up-delay-1">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-green-100 p-3 rounded-xl">
                   <CheckCircle className="w-6 h-6 text-green-600" />
@@ -139,7 +159,8 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500">Completed</p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            {/* Pending Tasks Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-slide-up-delay-2">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-orange-100 p-3 rounded-xl">
                   <Clock className="w-6 h-6 text-orange-600" />
@@ -151,21 +172,24 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Completed Tasks */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          {/* ========== COMPLETED TASKS LIST ========== */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-slide-up-delay-3">
             <h3 className="text-lg font-bold text-gray-900 mb-5">Recent Completed Tasks</h3>
             <div className="space-y-3">
               {completedTasks.length === 0 ? (
+                // Empty State
                 <div className="text-center py-8 text-gray-400">
                   <CheckCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
                   <p>No completed tasks yet</p>
                   <p className="text-sm mt-1">Complete your first task to see it here!</p>
                 </div>
               ) : (
-                completedTasks.slice(0, 5).map((task) => (
+                // Completed Tasks List
+                completedTasks.slice(0, 5).map((task, index) => (
                   <div
                     key={task._id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all"
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 cursor-pointer transform transition-all duration-200 hover:scale-102 animate-fade-in"
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="flex items-center gap-3">
                       <div className="bg-green-100 p-2 rounded-lg">
@@ -186,15 +210,16 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right - Progress */}
+        {/* ========== RIGHT SECTION - PROGRESS & INSIGHTS ========== */}
         <div className="col-span-4 space-y-6">
-          {/* Progress Card */}
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 shadow-lg">
+          {/* ========== PROGRESS CARD ========== */}
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:scale-105 animate-slide-up">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-white" />
               <h3 className="text-white font-semibold">Progress</h3>
             </div>
             
+            {/* Circular Progress */}
             <div className="text-center mb-6">
               <div className="relative inline-flex items-center justify-center w-32 h-32">
                 <svg className="w-32 h-32 transform -rotate-90">
@@ -216,7 +241,7 @@ const Dashboard = () => {
                     strokeDasharray={`${2 * Math.PI * 56}`}
                     strokeDashoffset={`${2 * Math.PI * 56 * (1 - progressPercent / 100)}`}
                     strokeLinecap="round"
-                    className="transition-all duration-1000"
+                    className="transition-all duration-1000 ease-out"
                   />
                 </svg>
                 <div className="absolute">
@@ -225,6 +250,7 @@ const Dashboard = () => {
               </div>
             </div>
 
+            {/* Progress Info */}
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
               <p className="text-white/80 text-sm mb-1">Completion Rate</p>
               <p className="text-white text-lg font-semibold">
@@ -233,60 +259,121 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Achievements */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-4">
-              <Award className="w-5 h-5 text-amber-500" />
-              <h3 className="font-semibold text-gray-900">Achievements</h3>
-            </div>
-            
-            <div className="space-y-3">
-              {stats.completed > 0 && (
-                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
-                  <div className="bg-amber-100 p-2 rounded-lg">
-                    <Award className="w-5 h-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">Task Master</p>
-                    <p className="text-xs text-gray-500">{stats.completed} tasks completed</p>
-                  </div>
-                </div>
-              )}
+{/* ========== WEEKLY INSIGHTS CARD (Week Range + Today + Motivation) ========== */}
 
-              {progressPercent >= 50 && (
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">Half Way There!</p>
-                    <p className="text-xs text-gray-500">50%+ completion</p>
-                  </div>
-                </div>
-              )}
+<div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transform transition-all duration-300 hover:scale-105 animate-slide-up-delay-1">
+  <div className="flex items-center gap-2 mb-4">
+    <Calendar className="w-5 h-5 text-blue-500" />
+    <h3 className="font-semibold text-gray-900">Weekly Overview</h3>
+  </div>
 
-              {progressPercent === 100 && stats.total > 0 && (
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <div className="bg-green-100 p-2 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">Perfect Score!</p>
-                    <p className="text-xs text-gray-500">100% completion</p>
-                  </div>
-                </div>
-              )}
+  <div className="space-y-3">
+    {/* Week Range */}
+    {(() => {
+      const today = new Date();
+      const firstDayOfWeek = new Date(today);
+      const dayOfWeek = today.getDay();
+      firstDayOfWeek.setDate(today.getDate() - dayOfWeek);
+      
+      const lastDayOfWeek = new Date(firstDayOfWeek);
+      lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+      
+      const formatDate = (date) => {
+        return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      };
+      
+      return (
+        <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="w-4 h-4 text-blue-600" />
+            <p className="text-xs font-semibold text-blue-900 uppercase tracking-wide">This Week</p>
+          </div>
+          <p className="text-lg font-bold text-blue-900">
+            {formatDate(firstDayOfWeek)} - {formatDate(lastDayOfWeek)}
+          </p>
+          <p className="text-xs text-blue-700 mt-1">
+            {firstDayOfWeek.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </p>
+        </div>
+      );
+    })()}
 
-              {stats.completed === 0 && stats.total > 0 && (
-                <div className="text-center py-4 text-gray-400">
-                  <Award className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">Complete tasks to unlock achievements!</p>
-                </div>
-              )}
+    {/* Motivational Quote */}
+    {(() => {
+      const motivationalQuotes = [
+        { text: "Focus on progress, not perfection!", emoji: "🎯" },
+        { text: "Every task completed is a step forward!", emoji: "✨" },
+        { text: "You're doing amazing! Keep going!", emoji: "💪" },
+        { text: "Small steps lead to big achievements!", emoji: "🌟" },
+        { text: "Believe in yourself and stay focused!", emoji: "🚀" }
+      ];
+      
+      const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+      
+      return (
+        <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-100">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">{randomQuote.emoji}</div>
+            <div>
+              <p className="text-xs font-semibold text-orange-900 uppercase tracking-wide mb-1">Motivation</p>
+              <p className="text-sm font-medium text-orange-900">{randomQuote.text}</p>
             </div>
           </div>
         </div>
-      </div>
+      );
+    })()}
+
+    </div>
+    </div>   
+  </div>
+</div>
+    
+
+      {/* ========== CSS ANIMATIONS ========== */}
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fade-in-delay {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+
+        .animate-fade-in-delay {
+          animation: fade-in-delay 0.6s ease-out 0.2s backwards;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.6s ease-out;
+        }
+
+        .animate-slide-up-delay-1 {
+          animation: slide-up 0.6s ease-out 0.1s backwards;
+        }
+
+        .animate-slide-up-delay-2 {
+          animation: slide-up 0.6s ease-out 0.2s backwards;
+        }
+
+        .animate-slide-up-delay-3 {
+          animation: slide-up 0.6s ease-out 0.3s backwards;
+        }
+
+        .hover\:scale-102:hover {
+          transform: scale(1.02);
+        }
+      `}</style>
     </div>
   );
 };

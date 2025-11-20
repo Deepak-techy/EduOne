@@ -1073,84 +1073,57 @@ const PriorityTasks = () => {
 
 if (loading) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 flex items-center justify-center p-8 overflow-hidden relative">
-      {/* Animated Background Particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-[10%] left-[15%] w-2 h-2 bg-blue-400 rounded-full animate-float-particle-1 opacity-60"></div>
-        <div className="absolute top-[60%] left-[25%] w-3 h-3 bg-cyan-400 rounded-full animate-float-particle-2 opacity-50"></div>
-        <div className="absolute top-[30%] right-[20%] w-2 h-2 bg-purple-400 rounded-full animate-float-particle-3 opacity-60"></div>
-        <div className="absolute bottom-[25%] right-[30%] w-3 h-3 bg-pink-400 rounded-full animate-float-particle-4 opacity-50"></div>
-        <div className="absolute top-[80%] left-[40%] w-2 h-2 bg-blue-500 rounded-full animate-float-particle-5 opacity-60"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 flex flex-col items-center justify-center p-8 relative overflow-hidden">
+
+      {/* Floating gradient blobs */}
+      <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-300/30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-52 h-52 bg-cyan-300/30 rounded-full blur-3xl animate-pulse"></div>
+
+      {/* Loader */}
+      <div className="relative flex flex-col items-center mb-8">
+        <div className="w-20 h-20 relative">
+          {/* Outer ring */}
+          <div className="absolute inset-0 rounded-full border-4 border-blue-400 border-t-transparent animate-spin-slow"></div>
+
+          {/* Inner pulsing blob */}
+          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 animate-pulse"></div>
+        </div>
       </div>
 
-      <div className="text-center relative z-10">
-        {/* Neural Network Animation */}
-        <div className="relative mb-16 h-48 w-48 mx-auto">
-          {/* Outer pulsing rings */}
-          <div className="absolute inset-0 border-4 border-blue-400/30 rounded-full animate-ping-slow"></div>
-          <div className="absolute inset-4 border-4 border-cyan-400/40 rounded-full animate-ping-medium"></div>
-          <div className="absolute inset-8 border-4 border-purple-400/50 rounded-full animate-ping-fast"></div>
-          
-          {/* Empty center - NO ICON */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-cyan-500 to-purple-500 rounded-full blur-xl opacity-60 animate-pulse"></div>
-          </div>
-          
-          {/* 4 Rotating Orbiting Balls */}
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full shadow-lg"></div>
-          </div>
-          
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s', animationDelay: '0.75s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full shadow-lg"></div>
-          </div>
-          
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s', animationDelay: '1.5s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg"></div>
-          </div>
-          
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s', animationDelay: '2.25s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full shadow-lg"></div>
-          </div>
-          
-          {/* Corner connection nodes */}
-          <div className="absolute top-8 left-8 w-4 h-4 bg-blue-500 rounded-full shadow-lg animate-pulse-node"></div>
-          <div className="absolute top-8 right-8 w-4 h-4 bg-cyan-500 rounded-full shadow-lg animate-pulse-node [animation-delay:0.2s]"></div>
-          <div className="absolute bottom-8 left-8 w-4 h-4 bg-purple-500 rounded-full shadow-lg animate-pulse-node [animation-delay:0.4s]"></div>
-          <div className="absolute bottom-8 right-8 w-4 h-4 bg-pink-500 rounded-full shadow-lg animate-pulse-node [animation-delay:0.6s]"></div>
-        </div>
+      {/* Text */}
+      <div className="text-center">
+        <h3 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+          Preparing Your Tasks
+        </h3>
 
-        {/* Animated Gradient Text */}
-        <div className="mb-4">
-          <h3 className="text-4xl font-black mb-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient-x">
-            AI Analyzing Tasks
-          </h3>
-          <p className="text-gray-700 text-lg font-medium animate-fade-in-up">
-            Prioritizing with artificial intelligence
-          </p>
-        </div>
-
-        {/* Continuous Loading Progress Bar */}
-        <div className="w-80 mx-auto mb-8 animate-fade-in-up [animation-delay:0.2s]">
-          <div className="relative h-2.5 overflow-hidden rounded-full bg-white/60 shadow-inner">
-            {/* moving blue chunk */}
-            <div className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 rounded-full animate-loading-chunk"></div>
-          </div>
-        </div>
-
-        {/* Typing Effect Dots */}
-        <div className="flex items-center justify-center gap-2.5 h-6 animate-fade-in-up [animation-delay:0.4s]">
-          <div className="w-3 h-3 bg-blue-500 rounded-full shadow-md animate-type-1"></div>
-          <div className="w-3 h-3 bg-cyan-500 rounded-full shadow-md animate-type-2"></div>
-          <div className="w-3 h-3 bg-purple-500 rounded-full shadow-md animate-type-3"></div>
-        </div>
-
-        {/* Status Text */}
-        <p className="mt-6 text-sm text-gray-500 font-medium animate-pulse">
-          Processing your priorities...
+        <p className="text-gray-600 font-medium mt-2">
+          AI is organizing everything for you…
         </p>
-
       </div>
+
+      {/* Progress bar */}
+      <div className="w-64 h-2 mt-8 bg-white/60 rounded-full overflow-hidden shadow-inner">
+        <div className="h-full w-1/3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 animate-loading-slide rounded-full"></div>
+      </div>
+
+      {/* Inline CSS Animations */}
+      <style>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 2.5s linear infinite;
+        }
+
+        @keyframes loading-slide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(300%); }
+        }
+        .animate-loading-slide {
+          animation: loading-slide 1.8s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
@@ -1324,125 +1297,6 @@ if (loading) {
           />
         </div>
       )}
-
-
-      {/* CSS Animations */}
-     <style>{`
-  @keyframes slide-in {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes scale-in {
-    from { transform: scale(0.9); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
-  }
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fade-in-delay {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes slide-up {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* AI Loading Animations */
-  @keyframes ping-slow {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50%      { transform: scale(1.05); opacity: 0.1; }
-  }
-  @keyframes ping-medium {
-    0%, 100% { transform: scale(1); opacity: 0.4; }
-    50%      { transform: scale(1.08); opacity: 0.15; }
-  }
-  @keyframes ping-fast {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50%      { transform: scale(1.12); opacity: 0.2; }
-  }
-  @keyframes pulse-node {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50%      { transform: scale(1.3); opacity: 0.8; }
-  }
-  @keyframes gradient-x {
-    0%, 100% { background-position: 0% 50%; }
-    50%      { background-position: 100% 50%; }
-  }
-  @keyframes fade-in-up {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* Continuous Loading Bar - moving chunk */
-  @keyframes loading-chunk {
-    0%   { transform: translateX(-120%); }
-    50%  { transform: translateX(20%); }
-    100% { transform: translateX(220%); }
-  }
-  
-  /* Typing Effect - dots 1 -> 2 -> 3 -> repeat */
-  @keyframes type-1 {
-    0%, 75%, 100% { transform: scale(0.3); opacity: 0.2; }
-    25%          { transform: scale(1.2); opacity: 1; }
-  }
-  @keyframes type-2 {
-    0%, 25%, 100% { transform: scale(0.3); opacity: 0.2; }
-    50%          { transform: scale(1.2); opacity: 1; }
-  }
-  @keyframes type-3 {
-    0%, 50%, 100% { transform: scale(0.3); opacity: 0.2; }
-    75%          { transform: scale(1.2); opacity: 1; }
-  }
-  
-  /* Floating background particles */
-  @keyframes float-particle-1 {
-    0%, 100% { transform: translate(0, 0); }
-    50%      { transform: translate(-30px, -50px); }
-  }
-  @keyframes float-particle-2 {
-    0%, 100% { transform: translate(0, 0); }
-    50%      { transform: translate(40px, -60px); }
-  }
-  @keyframes float-particle-3 {
-    0%, 100% { transform: translate(0, 0); }
-    50%      { transform: translate(-50px, 40px); }
-  }
-  @keyframes float-particle-4 {
-    0%, 100% { transform: translate(0, 0); }
-    50%      { transform: translate(35px, 55px); }
-  }
-  @keyframes float-particle-5 {
-    0%, 100% { transform: translate(0, 0); }
-    50%      { transform: translate(-40px, -45px); }
-  }
-  
-  .animate-slide-in        { animation: slide-in 0.3s ease-out; }
-  .animate-scale-in        { animation: scale-in 0.2s ease-out; }
-  .animate-fade-in         { animation: fade-in 0.6s ease-out; }
-  .animate-fade-in-delay   { animation: fade-in-delay 0.6s ease-out 0.2s backwards; }
-  .animate-slide-up        { animation: slide-up 0.6s ease-out backwards; }
-  .animate-ping-slow       { animation: ping-slow 3s ease-out infinite; }
-  .animate-ping-medium     { animation: ping-medium 3s ease-out 0.4s infinite; }
-  .animate-ping-fast       { animation: ping-fast 3s ease-out 0.8s infinite; }
-  .animate-pulse-node      { animation: pulse-node 2s ease-in-out infinite; }
-  .animate-gradient-x      { animation: gradient-x 3s ease infinite; background-size: 200% auto; }
-  .animate-fade-in-up      { animation: fade-in-up 0.8s ease-out backwards; }
-  .animate-loading-chunk   { animation: loading-chunk 1.8s ease-in-out infinite; }
-  .animate-type-1          { animation: type-1 1.5s ease-in-out infinite; }
-  .animate-type-2          { animation: type-2 1.5s ease-in-out infinite; }
-  .animate-type-3          { animation: type-3 1.5s ease-in-out infinite; }
-  .animate-float-particle-1{ animation: float-particle-1 6s ease-in-out infinite; }
-  .animate-float-particle-2{ animation: float-particle-2 7s ease-in-out infinite; }
-  .animate-float-particle-3{ animation: float-particle-3 5s ease-in-out infinite; }
-  .animate-float-particle-4{ animation: float-particle-4 8s ease-in-out infinite; }
-  .animate-float-particle-5{ animation: float-particle-5 6.5s ease-in-out infinite; }
-  .hover\\:scale-102:hover { transform: scale(1.02); }
-`}</style>
-
-
-
 
     </div>
   );

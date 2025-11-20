@@ -26,6 +26,7 @@ import userRouter from "./routes/user.routes.js"
 import subjectRouter from "./routes/subject.routes.js"
 import uploadRouter from "./routes/upload.routes.js"
 import noteRouter from "./routes/note.routes.js"
+import taskRouter from "./routes/task.routes.js"
 
 
 // route declarations
@@ -33,5 +34,6 @@ app.use("/api/users", userRouter)   // users route
 app.use("/api/subjects", subjectRouter)   // subjects route
 app.use("/api/uploads", uploadRouter)   // uploads route
 app.use("/api/notes", noteRouter)   // notes route
+app.use("/api/tasks", taskRouter)   // tasks route
 
 export { app }

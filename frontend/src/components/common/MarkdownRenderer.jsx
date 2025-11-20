@@ -2,9 +2,9 @@
 // src/components/common/MarkdownRenderer.jsx
 import ReactMarkdown from 'react-markdown';
 
-const MarkdownRenderer = ({ content }) => {
+const MarkdownRenderer = ({ content,  textColor = '#475569' }) => { //textColor  ← Added by bhaskar
   return (
-    <div className="prose prose-sm max-w-none dark:prose-invert">
+    <div className="prose prose-sm max-w-none dark:prose-invert" style={{ color: textColor }}>
       <ReactMarkdown
         components={{
           // Code blocks
@@ -26,17 +26,36 @@ const MarkdownRenderer = ({ content }) => {
           },
           // Paragraphs
           p({ node, children, ...props }) {
-            return <p className="text-sm leading-relaxed mb-3 last:mb-0 text-slate-800 dark:text-slate-200" {...props}>{children}</p>;
+            return <p className="text-sm leading-relaxed mb-3 last:mb-0 text-slate-800 dark:text-slate-200" 
+            style={{  //
+                marginBottom: '12px', //
+                lineHeight: '1.6',  // ← Added by bhaskar
+                color: textColor  //
+              }}  // 
+              {...props}>{children}</p>;
           },
           // Lists
           ul({ node, children, ...props }) {
-            return <ul className="list-disc list-inside space-y-1.5 ml-2 my-3 text-slate-800 dark:text-slate-200" {...props}>{children}</ul>;
+            return <ul className="list-disc list-inside space-y-1.5 ml-2 my-3 text-slate-800 dark:text-slate-200" 
+            style={{ //
+              marginLeft: '20px', //
+              marginTop: '8px', //
+              marginBottom: '8px',  //
+              color: textColor,  // ← Added by bhaskar
+              listStyleType: 'disc' //
+            }}//
+            {...props}>{children}</ul>;
           },
           ol({ node, children, ...props }) {
             return <ol className="list-decimal list-inside space-y-1.5 ml-2 my-3 text-slate-800 dark:text-slate-200" {...props}>{children}</ol>;
           },
           li({ node, children, ...props }) {
-            return <li className="text-sm leading-relaxed" {...props}>{children}</li>;
+            return <li className="text-sm leading-relaxed" 
+            style={{ //
+              marginBottom: '6px',  //
+              color: textColor  // ← Added by bhaskar
+            }}  //
+            {...props}>{children}</li>;
           },
           // Headings
           h1({ node, children, ...props }) {
@@ -50,7 +69,7 @@ const MarkdownRenderer = ({ content }) => {
           },
           // Strong/Bold
           strong({ node, children, ...props }) {
-            return <strong className="font-bold text-slate-900 dark:text-white" {...props}>{children}</strong>;
+            return <strong className="font-bold text-slate-900 dark:text-white" style={{ fontWeight: 700, color: textColor }} {...props}>{children}</strong>;
           },
           // Emphasis/Italic
           em({ node, children, ...props }) {

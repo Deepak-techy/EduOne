@@ -1,4 +1,3 @@
-
 // // src/components/layout/Sidebar.jsx
 
 // import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -128,7 +127,6 @@
 //   }
 // };
 
-
 //   const toggleExpand = (label, e) => {
 //     e.stopPropagation();
 //     setExpanded((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -175,7 +173,7 @@
 //           style={{ justifyContent: open ? "flex-end" : "center" }}
 //         >
 //           <Menu
-//             className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600 
+//             className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600
 //               transition-colors duration-200"
 //             onClick={() => setOpen((o) => !o)}
 //             data-sidebar-toggle="true"
@@ -194,7 +192,7 @@
 //                 onClick={() => handleNavClick(item)}
 //                 className={`flex items-center ${
 //                   open ? "" : "justify-center"
-//                 } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] 
+//                 } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px]
 //                   transition-all duration-200 cursor-pointer ${
 //                   isOnFeaturePage
 //                     ? "text-slate-900"
@@ -210,7 +208,7 @@
 //                 <Icon className="w-6 h-6 flex-shrink-0" />
 //                 {/* ✅ FIX 4: Smooth fade-in/out for text */}
 //                 {open && (
-//                   <span 
+//                   <span
 //                     className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200"
 //                     style={{ opacity: open ? 1 : 0 }}
 //                   >
@@ -226,7 +224,7 @@
 
 //         {/* Features Header */}
 //         {open && (
-//           <div 
+//           <div
 //             className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0
 //               transition-opacity duration-200"
 //             style={{ opacity: open ? 1 : 0 }}
@@ -249,7 +247,7 @@
 //                 <div
 //                   className={`flex items-center ${
 //                     open ? "" : "justify-center"
-//                   } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] 
+//                   } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px]
 //                     transition-all duration-200 ${
 //                     isActive
 //                       ? "bg-blue-100 text-blue-800 shadow font-semibold"
@@ -265,7 +263,7 @@
 //                     <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
 //                     {/* ✅ FIX 4: Smooth fade for feature labels */}
 //                     {open && (
-//                       <span 
+//                       <span
 //                         className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200"
 //                         style={{ opacity: open ? 1 : 0 }}
 //                       >
@@ -292,7 +290,7 @@
 //                   feature.subFeatures &&
 //                   feature.subFeatures.length > 0 &&
 //                   open && (
-//                     <div 
+//                     <div
 //                       className="ml-10 mt-1 flex flex-col space-y-1 animate-slideDown"
 //                       style={{
 //                         animation: "slideDown 0.2s ease-out"
@@ -304,7 +302,7 @@
 //                           <Link
 //                             key={sub.path}
 //                             to={sub.path}
-//                             className={`text-[14px] font-normal rounded-lg px-3 py-2 
+//                             className={`text-[14px] font-normal rounded-lg px-3 py-2
 //                               transition-all duration-200 ${
 //                               isSubActive
 //                                 ? "bg-blue-200 text-blue-900 font-semibold"
@@ -342,31 +340,24 @@
 
 // export default Sidebar;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // src/components/layout/Sidebar.jsx
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import {
-  Home, PhoneCall, Info, Briefcase,
-  FileQuestion, StickyNote, Calendar,
-  FileCheck, Users, ShieldCheck,
-  Menu, Plus, Minus
+  Home,
+  PhoneCall,
+  Info,
+  Briefcase,
+  FileQuestion,
+  StickyNote,
+  Calendar,
+  FileCheck,
+  Users,
+  ShieldCheck,
+  Menu,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -384,8 +375,8 @@ const featuresItems = [
     path: "/pdf-qa",
     subFeatures: [
       { label: "Subject Q&A", path: "/pdf-qa/subject" },
-      { label: "Upload PDF", path: "/pdf-qa/upload" }
-    ]
+      { label: "Upload PDF", path: "/pdf-qa/upload" },
+    ],
   },
   {
     icon: StickyNote,
@@ -393,26 +384,36 @@ const featuresItems = [
     path: "/notes-organizer",
     subFeatures: [
       { label: "My Library", path: "/notes-organizer/library" },
-      { label: "Create Note", path: "/notes-organizer/create" }
-    ]
+      { label: "Create Note", path: "/notes-organizer/create" },
+    ],
   },
-
- {
-  icon: Calendar,
-  label: "Academic Planner",
-  path: "/academic-planner/dashboard",  
-  subFeatures: [
-    { label: "View Tasks", path: "/academic-planner/view-tasks" },
-    { label: "Create Tasks", path: "/academic-planner/create-task" },
-    { label: "Priority Tasks", path: "/academic-planner/priority-tasks" }
-  ]
-},
-
-
-  { icon: FileCheck, label: "Resume Analyzer", path: "/resume-analyzer", subFeatures: [] },
-  { icon: Users, label: "Interview AI", path: "/interview-ai", subFeatures: [] },
+  {
+    icon: Calendar,
+    label: "Academic Planner",
+    path: "/academic-planner/dashboard",
+    subFeatures: [
+      { label: "View Tasks", path: "/academic-planner/view-tasks" },
+      { label: "Create Tasks", path: "/academic-planner/create-task" },
+      { label: "Priority Tasks", path: "/academic-planner/priority-tasks" },
+    ],
+  },
+  {
+    icon: FileCheck,
+    label: "Resume Analyzer",
+    path: "/resume-analyzer",
+    subFeatures: [
+      { label: "Analyze Resume", path: "/resume-analyzer/analyzer" },
+      { label: "View Past Reports", path: "/resume-analyzer/history" },
+    ],
+  },
+  {
+    icon: Users,
+    label: "Interview AI",
+    path: "/interview-ai",
+    subFeatures: [],
+  },
   { icon: Users, label: "Community", path: "/community", subFeatures: [] },
-  { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] }
+  { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] },
 ];
 
 const FEATURE_ROOTS = [
@@ -422,10 +423,11 @@ const FEATURE_ROOTS = [
   "/resume-analyzer",
   "/interview-ai",
   "/community",
-  "/admin"
+  "/admin",
 ];
 
-const isFeatureRoot = (pathname) => FEATURE_ROOTS.some(root => pathname === root);
+const isFeatureRoot = (pathname) =>
+  FEATURE_ROOTS.some((root) => pathname === root);
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
@@ -433,7 +435,7 @@ const Sidebar = ({ open, setOpen }) => {
   const { user } = useAuth();
   const [expanded, setExpanded] = useState({});
   const sidebarRef = useRef(null);
-  
+
   // ✅ Track if initial open has happened
   const initialOpenDone = useRef(false);
 
@@ -455,7 +457,7 @@ const Sidebar = ({ open, setOpen }) => {
   // Handle route-based sidebar behavior (runs AFTER initial open)
   useEffect(() => {
     if (!setOpen || !user) return;
-    
+
     // Skip if this is the very first render
     if (!initialOpenDone.current) return;
 
@@ -484,7 +486,8 @@ const Sidebar = ({ open, setOpen }) => {
 
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [open, setOpen]);
 
@@ -537,7 +540,10 @@ const Sidebar = ({ open, setOpen }) => {
       <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
       <div className="flex flex-col h-full">
-        <div className="flex-shrink-0 p-4 flex" style={{ justifyContent: open ? "flex-end" : "center" }}>
+        <div
+          className="flex-shrink-0 p-4 flex"
+          style={{ justifyContent: open ? "flex-end" : "center" }}
+        >
           <Menu
             className="w-6 h-6 text-slate-900 cursor-pointer hover:text-blue-600 transition-colors duration-200"
             onClick={() => setOpen((o) => !o)}
@@ -554,15 +560,26 @@ const Sidebar = ({ open, setOpen }) => {
               <div
                 key={item.id}
                 onClick={() => handleNavClick(item)}
-                className={`flex items-center ${open ? "" : "justify-center"} mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all duration-200 cursor-pointer ${
-                  isOnFeaturePage ? "text-slate-900" : `${isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"}`
+                className={`flex items-center ${
+                  open ? "" : "justify-center"
+                } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all duration-200 cursor-pointer ${
+                  isOnFeaturePage
+                    ? "text-slate-900"
+                    : `${
+                        isActive
+                          ? "bg-blue-100 text-blue-800 shadow font-semibold"
+                          : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+                      }`
                 }`}
                 style={{ height: "44px" }}
                 title={item.label}
               >
                 <Icon className="w-6 h-6 flex-shrink-0" />
                 {open && (
-                  <span className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200" style={{ opacity: open ? 1 : 0 }}>
+                  <span
+                    className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200"
+                    style={{ opacity: open ? 1 : 0 }}
+                  >
                     {item.label}
                   </span>
                 )}
@@ -574,7 +591,10 @@ const Sidebar = ({ open, setOpen }) => {
         <div className="mx-4 my-3 border-b border-slate-400 flex-shrink-0" />
 
         {open && (
-          <div className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0 transition-opacity duration-200" style={{ opacity: open ? 1 : 0 }}>
+          <div
+            className="px-6 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider flex-shrink-0 transition-opacity duration-200"
+            style={{ opacity: open ? 1 : 0 }}
+          >
             Features
           </div>
         )}
@@ -583,51 +603,84 @@ const Sidebar = ({ open, setOpen }) => {
           {featuresItems.map((feature) => {
             const Icon = feature.icon;
             const isExpanded = expanded[feature.label];
-            const isActive = location.pathname === feature.path || location.pathname.startsWith(feature.path + "/");
+            const isActive =
+              location.pathname === feature.path ||
+              location.pathname.startsWith(feature.path + "/");
 
             return (
               <div key={feature.label} className="mb-1">
                 <div
-                  className={`flex items-center ${open ? "" : "justify-center"} cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] transition-all duration-200 ${
-                    isActive ? "bg-blue-100 text-blue-800 shadow font-semibold" : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+                  className={`flex items-center ${
+                    open ? "" : "justify-center"
+                  } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] transition-all duration-200 ${
+                    isActive
+                      ? "bg-blue-100 text-blue-800 shadow font-semibold"
+                      : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
                   }`}
                   style={{ height: "44px" }}
                   title={feature.label}
                 >
-                  <div className="flex items-center flex-grow" onClick={() => handleFeatureClick(feature)}>
-                    <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-blue-700" : "text-slate-800"}`} />
+                  <div
+                    className="flex items-center flex-grow"
+                    onClick={() => handleFeatureClick(feature)}
+                  >
+                    <Icon
+                      className={`w-6 h-6 flex-shrink-0 ${
+                        isActive ? "text-blue-700" : "text-slate-800"
+                      }`}
+                    />
                     {open && (
-                      <span className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200" style={{ opacity: open ? 1 : 0 }}>
+                      <span
+                        className="ml-2 whitespace-nowrap overflow-hidden transition-opacity duration-200"
+                        style={{ opacity: open ? 1 : 0 }}
+                      >
                         {feature.label}
                       </span>
                     )}
                   </div>
 
-                  {open && feature.subFeatures && feature.subFeatures.length > 0 && (
-                    <div onClick={(e) => toggleExpand(feature.label, e)} className="p-1 hover:bg-blue-200 rounded transition-colors duration-200">
-                      {isExpanded ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                    </div>
-                  )}
+                  {open &&
+                    feature.subFeatures &&
+                    feature.subFeatures.length > 0 && (
+                      <div
+                        onClick={(e) => toggleExpand(feature.label, e)}
+                        className="p-1 hover:bg-blue-200 rounded transition-colors duration-200"
+                      >
+                        {isExpanded ? (
+                          <Minus className="w-5 h-5" />
+                        ) : (
+                          <Plus className="w-5 h-5" />
+                        )}
+                      </div>
+                    )}
                 </div>
 
-                {isExpanded && feature.subFeatures && feature.subFeatures.length > 0 && open && (
-                  <div className="ml-10 mt-1 flex flex-col space-y-1" style={{ animation: "slideDown 0.2s ease-out" }}>
-                    {feature.subFeatures.map((sub) => {
-                      const isSubActive = location.pathname === sub.path;
-                      return (
-                        <Link
-                          key={sub.path}
-                          to={sub.path}
-                          className={`text-[14px] font-normal rounded-lg px-3 py-2 transition-all duration-200 ${
-                            isSubActive ? "bg-blue-200 text-blue-900 font-semibold" : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                          }`}
-                        >
-                          {sub.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+                {isExpanded &&
+                  feature.subFeatures &&
+                  feature.subFeatures.length > 0 &&
+                  open && (
+                    <div
+                      className="ml-10 mt-1 flex flex-col space-y-1"
+                      style={{ animation: "slideDown 0.2s ease-out" }}
+                    >
+                      {feature.subFeatures.map((sub) => {
+                        const isSubActive = location.pathname === sub.path;
+                        return (
+                          <Link
+                            key={sub.path}
+                            to={sub.path}
+                            className={`text-[14px] font-normal rounded-lg px-3 py-2 transition-all duration-200 ${
+                              isSubActive
+                                ? "bg-blue-200 text-blue-900 font-semibold"
+                                : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                            }`}
+                          >
+                            {sub.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
               </div>
             );
           })}

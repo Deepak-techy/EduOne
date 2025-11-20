@@ -21,6 +21,7 @@ import HelpSupport from "../pages/help/HelpSupport";
 
 // Feature Routes
 import PdfQARoutes from "./PdfQARoutes";
+import ResumeAnalyzerRoutes from "./ResumeAnalyzerRoutes";
 import NotesRoutes from "./NotesRoutes";
 import PlannerRoutes from "./PlannerRoutes";
 
@@ -51,7 +52,8 @@ const AppRoutes = () => {
       {/* Academic Planner Feature Routes */}
       <Route path="/academic-planner/*" element={<PlannerRoutes />} />
 
-
+      {/* Resume Analyzer Feature Routes */}
+      <Route path="/resume-analyzer/*" element={ <ResumeAnalyzerRoutes />} />
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

@@ -23,6 +23,7 @@
     "axios": "^1.12.2",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.0",
+    "jspdf": "^3.0.3",
     "lucide-react": "^0.545.0",
     "marked": "^17.0.0",
     "pdfjs-dist": "^5.4.296",

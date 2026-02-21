@@ -28,6 +28,7 @@ import uploadRouter from "./routes/upload.routes.js"
 import noteRouter from "./routes/note.routes.js"
 import taskRouter from "./routes/task.routes.js"
 import resumeRouter from "./routes/resume.routes.js"
+import communityRouter from "./routes/community.routes.js"
 
 
 // route declarations
@@ -37,5 +38,6 @@ app.use("/api/uploads", uploadRouter)   // uploads route
 app.use("/api/notes", noteRouter)   // notes route
 app.use("/api/tasks", taskRouter)   // tasks route
 app.use("/api/resumes", resumeRouter)   // resumes route
+app.use("/api/community", communityRouter)   // community route
 
 export { app }

@@ -218,17 +218,14 @@ const Sidebar = ({ open, setOpen }) => {
               <div
                 key={item.id}
                 onClick={() => handleNavClick(item)}
-                className={`flex items-center ${
-                  open ? "" : "justify-center"
-                } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all duration-200 cursor-pointer ${
-                  isOnFeaturePage
+                className={`flex items-center ${open ? "" : "justify-center"
+                  } mb-2 px-3 py-2.5 rounded-xl font-medium text-[15px] transition-all duration-200 cursor-pointer ${isOnFeaturePage
                     ? "text-slate-900"
-                    : `${
-                        isActive
-                          ? "bg-blue-100 text-blue-800 shadow font-semibold"
-                          : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
-                      }`
-                }`}
+                    : `${isActive
+                      ? "bg-blue-100 text-blue-800 shadow font-semibold"
+                      : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
+                    }`
+                  }`}
                 style={{ height: "44px" }}
                 title={item.label}
               >
@@ -268,13 +265,11 @@ const Sidebar = ({ open, setOpen }) => {
             return (
               <div key={feature.label} className="mb-1">
                 <div
-                  className={`flex items-center ${
-                    open ? "" : "justify-center"
-                  } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] transition-all duration-200 ${
-                    isActive
+                  className={`flex items-center ${open ? "" : "justify-center"
+                    } cursor-pointer select-none rounded-xl px-3 py-2.5 font-medium text-[15px] transition-all duration-200 ${isActive
                       ? "bg-blue-100 text-blue-800 shadow font-semibold"
                       : "text-slate-900 hover:bg-blue-50 hover:text-blue-600"
-                  }`}
+                    }`}
                   style={{ height: "44px" }}
                   title={feature.label}
                 >
@@ -283,9 +278,8 @@ const Sidebar = ({ open, setOpen }) => {
                     onClick={() => handleFeatureClick(feature)}
                   >
                     <Icon
-                      className={`w-6 h-6 flex-shrink-0 ${
-                        isActive ? "text-blue-700" : "text-slate-800"
-                      }`}
+                      className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-blue-700" : "text-slate-800"
+                        }`}
                     />
                     {open && (
                       <span
@@ -327,11 +321,10 @@ const Sidebar = ({ open, setOpen }) => {
                           <Link
                             key={sub.path}
                             to={sub.path}
-                            className={`text-[14px] font-normal rounded-lg px-3 py-2 transition-all duration-200 ${
-                              isSubActive
+                            className={`text-[14px] font-normal rounded-lg px-3 py-2 transition-all duration-200 ${isSubActive
                                 ? "bg-blue-200 text-blue-900 font-semibold"
                                 : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                            }`}
+                              }`}
                           >
                             {sub.label}
                           </Link>

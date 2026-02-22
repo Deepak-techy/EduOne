@@ -24,6 +24,7 @@ import PdfQARoutes from "./PdfQARoutes";
 import ResumeAnalyzerRoutes from "./ResumeAnalyzerRoutes";
 import NotesRoutes from "./NotesRoutes";
 import PlannerRoutes from "./PlannerRoutes";
+import AdminDashboardRoutes from "./admindashboardroutes";
 
 const AppRoutes = () => {
   return (
@@ -45,7 +46,7 @@ const AppRoutes = () => {
 
       {/* PDF Q&A Feature Routes */}
       <Route path="/pdf-qa/*" element={<PdfQARoutes />} />
-      
+
       {/* Note Organizer Feature Routes */}
       <Route path="/notes-organizer/*" element={<NotesRoutes />} />
 
@@ -53,7 +54,10 @@ const AppRoutes = () => {
       <Route path="/academic-planner/*" element={<PlannerRoutes />} />
 
       {/* Resume Analyzer Feature Routes */}
-      <Route path="/resume-analyzer/*" element={ <ResumeAnalyzerRoutes />} />
+      <Route path="/resume-analyzer/*" element={<ResumeAnalyzerRoutes />} />
+
+      {/* Admin Dashboard Routes */}
+      <Route path="/admin/*" element={<AdminDashboardRoutes />} />
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

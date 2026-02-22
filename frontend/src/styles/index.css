@@ -7,7 +7,7 @@
   box-sizing: border-box;
 }
 
-.prose > * {
+.prose>* {
   all: revert;
 }
 
@@ -48,13 +48,13 @@ html.dark section#services {
 }
 
 /* Service Cards - Dark */
-html.dark section#services > div > div:last-child > div {
+html.dark section#services>div>div:last-child>div {
   background: linear-gradient(135deg, #2d2e33 0%, #1a1b1e 100%) !important;
   border-color: #3d3e43 !important;
 }
 
 /* Service Card Icon Box - Dark */
-html.dark section#services > div > div:last-child > div > div:first-child > div {
+html.dark section#services>div>div:last-child>div>div:first-child>div {
   background-color: #25262b !important;
   border-color: #3d3e43 !important;
 }
@@ -80,13 +80,13 @@ html.dark section#about {
 }
 
 /* About Stats Cards - Dark */
-html.dark section#about > div > div:nth-child(2) > div {
+html.dark section#about>div>div:nth-child(2)>div {
   background-color: #25262b !important;
   border-color: #3d3e43 !important;
 }
 
 /* About Feature Cards - Dark */
-html.dark section#about > div > div:nth-child(3) > div {
+html.dark section#about>div>div:nth-child(3)>div {
   background-color: #25262b !important;
   border-color: #4a9eff !important;
 }
@@ -98,12 +98,12 @@ html.dark section#about h3 {
 }
 
 html.dark section#about p,
-html.dark section#about > div > div:nth-child(2) > div > div:last-child {
+html.dark section#about>div>div:nth-child(2)>div>div:last-child {
   color: #9ca3af !important;
 }
 
 /* About Numbers - Brighter Blue */
-html.dark section#about > div > div:nth-child(2) > div > div:first-child {
+html.dark section#about>div>div:nth-child(2)>div>div:first-child {
   color: #4a9eff !important;
 }
 
@@ -113,7 +113,7 @@ html.dark section#contact {
 }
 
 /* Contact Form Container - Dark */
-html.dark section#contact > div > div > div:last-child {
+html.dark section#contact>div>div>div:last-child {
   background-color: #25262b !important;
   border-color: #3d3e43 !important;
 }
@@ -154,7 +154,7 @@ html.dark section#contact button[type="submit"]:hover {
 }
 
 /* "Let's connect" Box - Dark */
-html.dark section#contact > div > div > div:first-child > div:last-child {
+html.dark section#contact>div>div>div:first-child>div:last-child {
   background: linear-gradient(135deg, #25262b 0%, #2d2e33 100%) !important;
 }
 
@@ -170,26 +170,27 @@ html.dark section#contact p {
 }
 
 /* "Get in touch" - Blue Text */
-html.dark section#contact h2 > span:last-child {
+html.dark section#contact h2>span:last-child {
   color: #4a9eff !important;
 }
+
 /* ========================================
    FORCE "LET'S CONNECT" BOX DARK MODE
 ======================================== */
 
 /* Target the specific box */
-html.dark section#contact > div > div > div:first-child > div:nth-child(2) > div {
+html.dark section#contact>div>div>div:first-child>div:nth-child(2)>div {
   background: linear-gradient(135deg, #2d2e33 0%, #1a1b1e 100%) !important;
   border: 1px solid #3d3e43 !important;
 }
 
 /* All text inside the box - white */
-html.dark section#contact > div > div > div:first-child > div:nth-child(2) h3 {
+html.dark section#contact>div>div>div:first-child>div:nth-child(2) h3 {
   color: #ffffff !important;
 }
 
 /* All paragraphs inside the box - gray */
-html.dark section#contact > div > div > div:first-child > div:nth-child(2) p {
+html.dark section#contact>div>div>div:first-child>div:nth-child(2) p {
   color: #9ca3af !important;
 }
 
@@ -237,12 +238,17 @@ html.dark .bg-gradient-to-br.from-gray-200 {
 
 /* Animations */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
   animation: fadeInUp 0.8s ease-out forwards;
 }
-
-

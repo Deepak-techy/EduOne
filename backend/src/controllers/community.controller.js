@@ -4,6 +4,7 @@ import { Bookmark } from "../models/bookmark.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { getIO } from "../config/socket.config.js";
 
 
 const createPost = asyncHandler(async (req, res) => {
@@ -27,10 +28,18 @@ const createPost = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Failed to create post");
     }
 
+    // populate author for real-time broadcast
+    const populatedPost = await Post.findById(post._id)
+        .populate("author", "fullName userName avatar")
+        .lean();
+
+    // emit real-time event for new post
+    getIO().emit("community:newPost", populatedPost);
+
     // return response
     return res
         .status(201)
-        .json(new ApiResponse(201, post, "Post created successfully"));
+        .json(new ApiResponse(201, populatedPost, "Post created successfully"));
 })
 
 const getAllPosts = asyncHandler(async (req, res) => {
@@ -128,6 +137,9 @@ const deletePost = asyncHandler(async (req, res) => {
     await Bookmark.deleteMany({ postId });
     await Post.deleteOne({ _id: postId });
 
+    // emit real-time event for deleted post
+    getIO().emit("community:postDeleted", { postId });
+
     // return response
     return res
         .status(200)
@@ -166,14 +178,22 @@ const toggleUpvote = asyncHandler(async (req, res) => {
 
     await post.save();
 
+    const voteData = {
+        postId,
+        upvotes: post.upvotes.length,
+        downvotes: post.downvotes.length,
+    };
+
+    // emit real-time vote update to users viewing this post
+    getIO().to(`post:${postId}`).emit("community:voteUpdated", voteData);
+
     // return response
     return res
         .status(200)
         .json(new ApiResponse(
             200,
             {
-                upvotes: post.upvotes.length,
-                downvotes: post.downvotes.length,
+                ...voteData,
                 hasUpvoted: !hasUpvoted,
                 hasDownvoted: false,
             },
@@ -211,14 +231,22 @@ const toggleDownvote = asyncHandler(async (req, res) => {
 
     await post.save();
 
+    const voteData = {
+        postId,
+        upvotes: post.upvotes.length,
+        downvotes: post.downvotes.length,
+    };
+
+    // emit real-time vote update to users viewing this post
+    getIO().to(`post:${postId}`).emit("community:voteUpdated", voteData);
+
     // return response
     return res
         .status(200)
         .json(new ApiResponse(
             200,
             {
-                upvotes: post.upvotes.length,
-                downvotes: post.downvotes.length,
+                ...voteData,
                 hasUpvoted: false,
                 hasDownvoted: !hasDownvoted,
             },
@@ -267,6 +295,13 @@ const addComment = asyncHandler(async (req, res) => {
     const populatedComment = await Comment.findById(comment._id)
         .populate("userId", "fullName userName avatar")
         .lean();
+
+    // emit real-time event for new comment to users viewing this post
+    getIO().to(`post:${postId}`).emit("community:newComment", {
+        postId,
+        comment: populatedComment,
+        commentsCount: post.commentsCount + 1,
+    });
 
     // return response
     return res
@@ -346,7 +381,18 @@ const deleteComment = asyncHandler(async (req, res) => {
 
     // delete the comment and decrement commentsCount
     await Comment.deleteOne({ _id: commentId });
-    await Post.findByIdAndUpdate(comment.postId, { $inc: { commentsCount: -1 } });
+    const updatedPost = await Post.findByIdAndUpdate(
+        comment.postId,
+        { $inc: { commentsCount: -1 } },
+        { new: true }
+    );
+
+    // emit real-time event for deleted comment
+    getIO().to(`post:${comment.postId}`).emit("community:commentDeleted", {
+        postId: comment.postId,
+        commentId,
+        commentsCount: updatedPost.commentsCount,
+    });
 
     // return response
     return res

@@ -24,6 +24,7 @@ import PdfQARoutes from "./PdfQARoutes";
 import ResumeAnalyzerRoutes from "./ResumeAnalyzerRoutes";
 import NotesRoutes from "./NotesRoutes";
 import PlannerRoutes from "./PlannerRoutes";
+import CommunityRoutes from "./CommunityRoutes";
 
 const AppRoutes = () => {
   return (
@@ -54,6 +55,9 @@ const AppRoutes = () => {
 
       {/* Resume Analyzer Feature Routes */}
       <Route path="/resume-analyzer/*" element={ <ResumeAnalyzerRoutes />} />
+
+      {/* Community Post Feature Routes */}
+      <Route path="/community/*" element={<CommunityRoutes />} />
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

@@ -70,7 +70,15 @@ const featuresItems = [
     path: "/interview-ai",
     subFeatures: [],
   },
-  { icon: Users, label: "Community", path: "/community", subFeatures: [] },
+  { 
+    icon: Users, 
+    label: "Community", 
+    path: "/community", 
+    subFeatures: [
+      { label: "Community Feed", path: "/community/feed" },
+      { label: "My Profile", path: "/community/profile" },
+    ] 
+  },
   { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] },
 ];
 

@@ -1,6 +1,6 @@
 import PostCard from "./PostCard";
 
-const Feed = ({ posts, refreshPosts }) => {
+const Feed = ({ posts, refreshPosts, refreshBookmarks, bookmarks }) => {
   return (
     <div>
       {posts.map((post) => (
@@ -8,6 +8,8 @@ const Feed = ({ posts, refreshPosts }) => {
           key={post._id}
           post={post}
           refreshPosts={refreshPosts}
+          refreshBookmarks={refreshBookmarks}
+          bookmarks={bookmarks}
         />
       ))}
     </div>

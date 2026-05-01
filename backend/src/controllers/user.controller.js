@@ -343,9 +343,9 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     }
 
     // get user details from frontend
-    const { fullName, userName, email, } = req.body
+    const { fullName, userName, email, bio } = req.body
 
-    if (!fullName && !userName && !email) {
+    if (!fullName && !userName && !email && bio === undefined) {
         throw new ApiError(400, "No fields provided to update");
     }
 
@@ -378,7 +378,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         {
             fullName,
             userName,
-            email
+            email,
+            bio
         },
         { new: true }
     ).select("-password -refreshToken -resetPasswordToken -resetPasswordExpire")

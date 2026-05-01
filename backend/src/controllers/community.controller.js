@@ -1,3 +1,4 @@
+import { mongoose } from "mongoose";
 import { Post } from "../models/post.model.js";
 import { Comment } from "../models/comment.model.js";
 import { Bookmark } from "../models/bookmark.model.js";
@@ -51,8 +52,14 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
     if (filter === "student") {
         query.authorRole = "Student";
+    } else if (filter === "teacher") {
+        query.authorRole = "Teacher";
     } else if (filter === "admin") {
         query.authorRole = "Admin";
+    } else if (filter === "my-posts") {
+        query.author = new mongoose.Types.ObjectId(req.user._id);
+    } else if (filter === "liked") {
+        query.upvotes = { $in: [new mongoose.Types.ObjectId(req.user._id)] };
     }
 
     // calculate pagination
@@ -127,8 +134,11 @@ const deletePost = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Post not found");
     }
 
-    // only the author or an admin can delete
-    if (post.author.toString() !== userId.toString() && role !== "Admin") {
+    const isOwner = post.author.toString() === userId.toString();
+    const isAdmin = role === "Admin";
+    const isTeacherDeletingStudent = role === "Teacher" && post.authorRole === "Student";
+
+    if (!isOwner && !isAdmin && !isTeacherDeletingStudent) {
         throw new ApiError(403, "You are not authorized to delete this post");
     }
 
@@ -374,8 +384,12 @@ const deleteComment = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Comment not found");
     }
 
-    // only the comment owner or an admin can delete
-    if (comment.userId.toString() !== userId.toString() && role !== "Admin") {
+    const post = await Post.findById(comment.postId);
+    const isPostOwner = post && post.author.toString() === userId.toString();
+    const isCommentOwner = comment.userId.toString() === userId.toString();
+    const isAdmin = role === "Admin";
+
+    if (!isCommentOwner && !isAdmin && !isPostOwner) {
         throw new ApiError(403, "You are not authorized to delete this comment");
     }
 

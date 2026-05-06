@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config src/server.js",
-    "qdrant": "qdrant",
+    "qdrant": "C:\\qdrant\\qdrant.exe",
     "ollama": "ollama serve",
     "start": "node -r dotenv/config src/server.js",
     "local": "concurrently --kill-others --names \"QDRANT,OLLAMA,SERVER\" --prefix-colors \"cyan,magenta,green\" \"npm run qdrant\" \"npm run ollama\" \"npm run dev\""

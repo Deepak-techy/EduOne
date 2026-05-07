@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config src/server.js",
-    "qdrant": "C:\\qdrant\\qdrant.exe",
+    "qdrant": "qdrant",
     "ollama": "ollama serve",
     "start": "node -r dotenv/config src/server.js",
     "local": "concurrently --kill-others --names \"QDRANT,OLLAMA,SERVER\" --prefix-colors \"cyan,magenta,green\" \"npm run qdrant\" \"npm run ollama\" \"npm run dev\""
@@ -37,6 +37,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.9",
     "pdf-parse": "^1.1.1",
+    "socket.io": "^4.8.3",
     "uuid": "^13.0.0"
   }
 }

@@ -40,6 +40,11 @@ const userSchema = new Schema(
         avatar: {
             type: String,
         },
+        bio: {
+            type: String,
+            trim: true,
+            maxLength: 500,
+        },
         accountStatus: {
             type: String,
             enum: ["Active", "Suspended", "Deleted"],

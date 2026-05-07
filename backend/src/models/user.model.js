@@ -56,6 +56,10 @@ const userSchema = new Schema(
         resetPasswordExpires: {
             type: Date,
         },
+        lastLoginAt: {
+            type: Date,
+            default: null,
+        },
     },
     {
         timestamps: true

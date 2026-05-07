@@ -23,6 +23,11 @@ const initSocket = (httpServer) => {
             socket.leave(`post:${postId}`);
         });
 
+        // join admin dashboard room for real-time admin events
+        socket.on("joinAdminDashboard", () => {
+            socket.join("admin-dashboard");
+        });
+
         socket.on("disconnect", () => {
             console.log(`Socket disconnected: ${socket.id}`);
         });

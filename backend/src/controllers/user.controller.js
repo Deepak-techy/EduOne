@@ -93,6 +93,10 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Invalid password")
     }
 
+    // record last login timestamp
+    user.lastLoginAt = new Date()
+    await user.save({ validateBeforeSave: false })
+
     // generate access and refresh token
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
 

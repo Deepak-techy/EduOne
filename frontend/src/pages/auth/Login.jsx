@@ -48,17 +48,20 @@ const Login = () => {
         : { userName: formData.identifier, password: formData.password };
 
       // ✅ Backend sets httpOnly cookies automatically
-      await authService.login(payload);
+      const loginRes = await authService.login(payload);
 
+      // ✅ Check if logged-in user is Admin → redirect to admin panel
+      const loggedUser = loginRes?.data?.user || loginRes?.user || loginRes?.data;
+      const isAdmin = loggedUser?.role === 'Admin';
 
-      toast.success('Login successful! Welcome back! 🎉', {
+      toast.success(isAdmin ? 'Welcome back, Admin! 🛡️' : 'Login successful! Welcome back! 🎉', {
         position: 'top-right',
         autoClose: 2000,
       });
 
-      // ✅ Reload to trigger AuthContext to fetch user from backend
+      // ✅ Redirect: Admin → admin dashboard, Others → home
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = isAdmin ? '/admin/dashboard' : '/';
       }, 1000);
       
     } catch (error) {

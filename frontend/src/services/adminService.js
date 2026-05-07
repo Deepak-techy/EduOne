@@ -1,177 +1,500 @@
 // src/services/adminService.js
-// ─── Mock data (replace with real axios calls once backend is ready) ──────────
+// Real API service connecting to backend admin endpoints
+import axios from 'axios';
 
-const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
+const API_URL = '/api/admin';
 
-const MOCK = {
-    dashboard: {
-        totalUsers: 1284,
-        dailyActive: 347,
-        notesCreated: 892,
-        tasksCompleted: 621,
-        growth: {
-            totalUsers: '+12%',
-            dailyActive: '+8%',
-            notesCreated: '+24%',
-            tasksCompleted: '+5%',
-        },
-        dailyActiveUsers: [
-            { date: '15 Feb', count: 280 },
-            { date: '16 Feb', count: 310 },
-            { date: '17 Feb', count: 295 },
-            { date: '18 Feb', count: 340 },
-            { date: '19 Feb', count: 320 },
-            { date: '20 Feb', count: 360 },
-            { date: '21 Feb', count: 347 },
-        ],
-        tasksOverview: { completed: 621, pending: 183 },
-        recentActivity: [
-            { id: 1, type: 'note', user: 'Priya Sharma', action: 'Created a new note on Physics', time: '2m ago' },
-            { id: 2, type: 'register', user: 'Rahul Verma', action: 'Registered as a new student', time: '15m ago' },
-            { id: 3, type: 'upload', user: 'Anjali Mehta', action: 'Uploaded Chemistry PDF', time: '1h ago' },
-            { id: 4, type: 'announcement', user: 'Admin', action: 'Posted mid-term exam schedule', time: '3h ago' },
-            { id: 5, type: 'resume', user: 'Karan Singh', action: 'Generated AI resume', time: '5h ago' },
-        ],
-        featureUsage: [
-            { name: 'Notes', usage: 84 },
-            { name: 'Tasks', usage: 67 },
-            { name: 'Resume', usage: 45 },
-            { name: 'Uploads', usage: 38 },
-            { name: 'AI Assistant', usage: 72 },
-        ],
-    },
+const api = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+});
 
-    users: [
-        { _id: 'u1', fullName: 'Priya Sharma', email: 'priya@example.com', role: 'Student', accountStatus: 'Active', createdAt: '2025-09-10T08:00:00Z' },
-        { _id: 'u2', fullName: 'Rahul Verma', email: 'rahul@example.com', role: 'Student', accountStatus: 'Active', createdAt: '2025-10-03T09:00:00Z' },
-        { _id: 'u3', fullName: 'Anjali Mehta', email: 'anjali@example.com', role: 'Teacher', accountStatus: 'Active', createdAt: '2025-08-15T10:00:00Z' },
-        { _id: 'u4', fullName: 'Karan Singh', email: 'karan@example.com', role: 'Student', accountStatus: 'Suspended', createdAt: '2025-11-20T11:00:00Z' },
-        { _id: 'u5', fullName: 'Deepak Gupta', email: 'deepak@example.com', role: 'Teacher', accountStatus: 'Active', createdAt: '2025-07-01T12:00:00Z' },
-        { _id: 'u6', fullName: 'Sneha Patel', email: 'sneha@example.com', role: 'Student', accountStatus: 'Active', createdAt: '2026-01-05T13:00:00Z' },
-    ],
-
-    posts: [
-        { _id: 'p1', author: { fullName: 'Karan Singh', role: 'Student' }, content: 'This exam schedule is completely unfair and needs to be revised immediately.', flagged: true, flagCount: 3, createdAt: '2026-02-18T10:00:00Z' },
-        { _id: 'p2', author: { fullName: 'Priya Sharma', role: 'Student' }, content: 'Can someone share notes for Chapter 5 of Organic Chemistry?', flagged: false, flagCount: 0, createdAt: '2026-02-19T11:00:00Z' },
-        { _id: 'p3', author: { fullName: 'Rahul Verma', role: 'Student' }, content: 'I think the grading policy is biased. Not happy with the teacher feedback.', flagged: true, flagCount: 1, createdAt: '2026-02-20T09:00:00Z' },
-        { _id: 'p4', author: { fullName: 'Anjali Mehta', role: 'Teacher' }, content: 'Assignment 3 deadline has been extended to March 1st. Please check the portal.', flagged: false, flagCount: 0, createdAt: '2026-02-21T14:00:00Z' },
-    ],
-
-    analytics: {
-        featureUsage: [
-            { name: 'Notes', usage: 84 },
-            { name: 'AI Assistant', usage: 72 },
-            { name: 'Tasks', usage: 67 },
-            { name: 'Resume', usage: 45 },
-            { name: 'Uploads', usage: 38 },
-        ],
-        weeklyActivity: [
-            { date: 'Mon', count: 210 },
-            { date: 'Tue', count: 275 },
-            { date: 'Wed', count: 310 },
-            { date: 'Thu', count: 290 },
-            { date: 'Fri', count: 340 },
-            { date: 'Sat', count: 180 },
-            { date: 'Sun', count: 150 },
-        ],
-    },
-
-    announcements: [
-        { _id: 'a1', title: 'Mid-Term Exam Schedule Released', body: 'Mid-term exams will be held from March 10–15. Check the portal for your timetable.', createdAt: '2026-02-20T08:00:00Z' },
-        { _id: 'a2', title: 'Platform Maintenance — Feb 25', body: 'EduOne will be under maintenance on Feb 25 from 2:00 AM to 4:00 AM IST. Plan accordingly.', createdAt: '2026-02-19T10:00:00Z' },
-        { _id: 'a3', title: 'New AI Resume Feature is Live!', body: 'Generate a professional resume in seconds using our new AI-powered tool under the Resume tab.', createdAt: '2026-02-15T09:00:00Z' },
-    ],
+// ─── Auth ──────────────────────────────────────────────────────────────────────
+const auth = {
+  login: async (credentials) => {
+    try {
+      const res = await api.post('/login', credentials);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Admin login failed' };
+    }
+  },
+  getProfile: async () => {
+    try {
+      const res = await api.get('/profile');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch admin profile' };
+    }
+  },
+  changePassword: async (data) => {
+    try {
+      const res = await api.put('/change-password', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to change password' };
+    }
+  },
+  getDashboardOverview: async () => {
+    try {
+      const res = await api.get('/dashboard-overview');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch dashboard' };
+    }
+  },
 };
 
-// ─── Service object ────────────────────────────────────────────────────────────
-// Each method simulates a network delay, then returns mock data.
-// Replace the body of each method with a real axios call when the backend is ready:
-//   import axios from 'axios';
-//   const api = axios.create({ baseURL: '/api/admin', withCredentials: true });
-//   getDashboard: async () => { const r = await api.get('/dashboard'); return r.data; }
+// ─── User Management ───────────────────────────────────────────────────────────
+const users = {
+  getAll: async (params = {}) => {
+    try {
+      const res = await api.get('/users', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch users' };
+    }
+  },
+  getById: async (id) => {
+    try {
+      const res = await api.get(`/users/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch user' };
+    }
+  },
+  create: async (data) => {
+    try {
+      const res = await api.post('/users/create', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to create user' };
+    }
+  },
+  update: async (id, data) => {
+    try {
+      const res = await api.put(`/users/${id}/update`, data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to update user' };
+    }
+  },
+  suspend: async (id) => {
+    try {
+      const res = await api.patch(`/users/${id}/suspend`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to suspend user' };
+    }
+  },
+  activate: async (id) => {
+    try {
+      const res = await api.patch(`/users/${id}/activate`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to activate user' };
+    }
+  },
+  delete: async (id) => {
+    try {
+      const res = await api.delete(`/users/${id}/delete`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete user' };
+    }
+  },
+  changeRole: async (id, role) => {
+    try {
+      const res = await api.patch(`/users/${id}/role`, { role });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to change role' };
+    }
+  },
+  getActivity: async (id) => {
+    try {
+      const res = await api.get(`/users/${id}/activity`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch activity' };
+    }
+  },
+  getLoginHistory: async (id) => {
+    try {
+      const res = await api.get(`/users/${id}/login-history`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch login history' };
+    }
+  },
+  export: async () => {
+    try {
+      const res = await api.get('/users/export');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to export users' };
+    }
+  },
+  getOnline: async () => {
+    try {
+      const res = await api.get('/users/online');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch online users' };
+    }
+  },
+  bulkAction: async (data) => {
+    try {
+      const res = await api.post('/users/bulk-action', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Bulk action failed' };
+    }
+  },
+};
+
+// ─── Community / Content Moderation ────────────────────────────────────────────
+const community = {
+  getPosts: async (params = {}) => {
+    try {
+      const res = await api.get('/posts', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch posts' };
+    }
+  },
+  getFlaggedPosts: async (params = {}) => {
+    try {
+      const res = await api.get('/posts/flagged', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch flagged posts' };
+    }
+  },
+  getPostById: async (id) => {
+    try {
+      const res = await api.get(`/posts/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch post' };
+    }
+  },
+  deletePost: async (id) => {
+    try {
+      const res = await api.delete(`/posts/${id}/delete`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete post' };
+    }
+  },
+  getReports: async (params = {}) => {
+    try {
+      const res = await api.get('/reports', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch reports' };
+    }
+  },
+  getReportById: async (id) => {
+    try {
+      const res = await api.get(`/reports/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch report' };
+    }
+  },
+  resolveReport: async (id) => {
+    try {
+      const res = await api.patch(`/reports/${id}/resolve`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to resolve report' };
+    }
+  },
+  rejectReport: async (id) => {
+    try {
+      const res = await api.patch(`/reports/${id}/reject`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to reject report' };
+    }
+  },
+  deleteComment: async (id) => {
+    try {
+      const res = await api.delete(`/comments/${id}/delete`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete comment' };
+    }
+  },
+  getStats: async () => {
+    try {
+      const res = await api.get('/community/stats');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch community stats' };
+    }
+  },
+};
+
+// ─── Notes Management ──────────────────────────────────────────────────────────
+const notes = {
+  getAll: async (params = {}) => {
+    try {
+      const res = await api.get('/notes', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch notes' };
+    }
+  },
+  getById: async (id) => {
+    try {
+      const res = await api.get(`/notes/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch note' };
+    }
+  },
+  delete: async (id) => {
+    try {
+      const res = await api.delete(`/notes/${id}/delete`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete note' };
+    }
+  },
+  getUsageStats: async () => {
+    try {
+      const res = await api.get('/notes/usage-stats');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch notes stats' };
+    }
+  },
+};
+
+// ─── Tasks Management ──────────────────────────────────────────────────────────
+const tasks = {
+  getAll: async (params = {}) => {
+    try {
+      const res = await api.get('/tasks', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch tasks' };
+    }
+  },
+  getStats: async () => {
+    try {
+      const res = await api.get('/tasks/stats');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch task stats' };
+    }
+  },
+  getAIPerformance: async () => {
+    try {
+      const res = await api.get('/tasks/ai-performance');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch AI stats' };
+    }
+  },
+  delete: async (id) => {
+    try {
+      const res = await api.delete(`/tasks/delete/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete task' };
+    }
+  },
+};
+
+// ─── Resumes Management ────────────────────────────────────────────────────────
+const resumes = {
+  getAll: async (params = {}) => {
+    try {
+      const res = await api.get('/resumes', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch resumes' };
+    }
+  },
+  getById: async (id) => {
+    try {
+      const res = await api.get(`/resumes/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch resume' };
+    }
+  },
+  delete: async (id) => {
+    try {
+      const res = await api.delete(`/resumes/${id}/delete`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete resume' };
+    }
+  },
+  getStats: async () => {
+    try {
+      const res = await api.get('/resumes/stats');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch resume stats' };
+    }
+  },
+};
+
+// ─── Analytics ─────────────────────────────────────────────────────────────────
+const analytics = {
+  getDailyUsers: async (params = {}) => {
+    try {
+      const res = await api.get('/analytics/daily-users', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch daily users' };
+    }
+  },
+  getMonthlyUsers: async (params = {}) => {
+    try {
+      const res = await api.get('/analytics/monthly-users', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch monthly users' };
+    }
+  },
+  getFeatureUsage: async () => {
+    try {
+      const res = await api.get('/analytics/feature-usage');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch feature usage' };
+    }
+  },
+  getUserGrowth: async (params = {}) => {
+    try {
+      const res = await api.get('/analytics/user-growth', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch user growth' };
+    }
+  },
+  getTopFeatures: async () => {
+    try {
+      const res = await api.get('/analytics/top-features');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch top features' };
+    }
+  },
+  getTrafficSource: async () => {
+    try {
+      const res = await api.get('/analytics/traffic-source');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch traffic source' };
+    }
+  },
+  getErrorLogs: async (params = {}) => {
+    try {
+      const res = await api.get('/analytics/error-logs', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch error logs' };
+    }
+  },
+  getSystemHealth: async () => {
+    try {
+      const res = await api.get('/analytics/system-health');
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch system health' };
+    }
+  },
+};
+
+// ─── Announcements & Notifications ─────────────────────────────────────────────
+const announcements = {
+  getAll: async (params = {}) => {
+    try {
+      const res = await api.get('/announcements', { params });
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to fetch announcements' };
+    }
+  },
+  create: async (data) => {
+    try {
+      const res = await api.post('/announcements/create', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to create announcement' };
+    }
+  },
+  update: async (id, data) => {
+    try {
+      const res = await api.put(`/announcements/${id}/update`, data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to update announcement' };
+    }
+  },
+  delete: async (id) => {
+    try {
+      const res = await api.delete(`/announcements/${id}/delete`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to delete announcement' };
+    }
+  },
+  pin: async (id) => {
+    try {
+      const res = await api.patch(`/announcement/pin/${id}`);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to pin announcement' };
+    }
+  },
+};
+
+const notifications = {
+  send: async (data) => {
+    try {
+      const res = await api.post('/notifications/send', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to send notification' };
+    }
+  },
+  broadcastEmail: async (data) => {
+    try {
+      const res = await api.post('/email/broadcast', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to broadcast email' };
+    }
+  },
+  sendPush: async (data) => {
+    try {
+      const res = await api.post('/push-notification/send', data);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data || { message: 'Failed to send push notification' };
+    }
+  },
+};
 
 export const adminService = {
-
-    getDashboard: async () => {
-        await delay();
-        return { data: MOCK.dashboard };
-    },
-
-    // --- User Management ---
-    getUsers: async () => {
-        await delay();
-        return { data: MOCK.users };
-    },
-
-    updateUserRole: async (id, role) => {
-        await delay(300);
-        const user = MOCK.users.find((u) => u._id === id);
-        if (user) user.role = role;
-        return { data: { message: 'Role updated' } };
-    },
-
-    updateUserStatus: async (id, status) => {
-        await delay(300);
-        const user = MOCK.users.find((u) => u._id === id);
-        if (user) user.accountStatus = status;
-        return { data: { message: 'Status updated' } };
-    },
-
-    deleteUser: async (id) => {
-        await delay(300);
-        const idx = MOCK.users.findIndex((u) => u._id === id);
-        if (idx !== -1) MOCK.users.splice(idx, 1);
-        return { data: { message: 'User deleted' } };
-    },
-
-    // --- Content Moderation ---
-    getPosts: async () => {
-        await delay();
-        return { data: MOCK.posts };
-    },
-
-    deletePost: async (id) => {
-        await delay(300);
-        const idx = MOCK.posts.findIndex((p) => p._id === id);
-        if (idx !== -1) MOCK.posts.splice(idx, 1);
-        return { data: { message: 'Post deleted' } };
-    },
-
-    flagPost: async (id, flagged) => {
-        await delay(300);
-        const post = MOCK.posts.find((p) => p._id === id);
-        if (post) {
-            post.flagged = flagged;
-            post.flagCount = flagged ? (post.flagCount || 0) + 1 : Math.max(0, (post.flagCount || 1) - 1);
-        }
-        return { data: { message: 'Post updated' } };
-    },
-
-    // --- Analytics ---
-    getAnalytics: async () => {
-        await delay();
-        return { data: MOCK.analytics };
-    },
-
-    // --- Announcements ---
-    getAnnouncements: async () => {
-        await delay();
-        return { data: [...MOCK.announcements] };
-    },
-
-    createAnnouncement: async (data) => {
-        await delay(300);
-        const newItem = { _id: `a${Date.now()}`, ...data, createdAt: new Date().toISOString() };
-        MOCK.announcements.unshift(newItem);
-        return { data: newItem };
-    },
-
-    deleteAnnouncement: async (id) => {
-        await delay(300);
-        const idx = MOCK.announcements.findIndex((a) => a._id === id);
-        if (idx !== -1) MOCK.announcements.splice(idx, 1);
-        return { data: { message: 'Announcement deleted' } };
-    },
+  auth,
+  users,
+  community,
+  notes,
+  tasks,
+  resumes,
+  analytics,
+  announcements,
+  notifications,
 };
 
 export default adminService;

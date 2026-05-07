@@ -14,6 +14,7 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const isAuthPage = location.pathname.startsWith('/auth');
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   const isFeaturePage = location.pathname.startsWith('/pdf-qa') ||
                         location.pathname.startsWith('/notes-organizer') ||
@@ -27,15 +28,15 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col dark:bg-[#1a1b1e]">
-      {!isAuthPage && <Navbar />}
+      {!isAuthPage && !isAdminPage && <Navbar />}
       <div className="flex flex-1">
         {/* CHANGED: Show sidebar if user logged in and not on auth page */}
-        {user && !isAuthPage && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />}
+        {user && !isAuthPage && !isAdminPage && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />}
 
         <main 
           className="flex-1 transition-all duration-300 ease-in-out"
           style={{
-            marginLeft: user && !isAuthPage ? (sidebarOpen ? '250px' : '70px') : '0' // <-- UPDATED
+            marginLeft: user && !isAuthPage && !isAdminPage ? (sidebarOpen ? '250px' : '70px') : '0' // <-- UPDATED
           }}
         >
           <AppRoutes />

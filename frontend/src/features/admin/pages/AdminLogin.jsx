@@ -1,0 +1,123 @@
+// src/features/admin/pages/AdminLogin.jsx
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../../contexts/AdminAuthContext';
+import { toast } from 'react-toastify';
+import { ShieldCheck, Loader2, Eye, EyeOff } from 'lucide-react';
+
+const AdminLogin = () => {
+  const navigate = useNavigate();
+  const { login, isAdminAuthenticated } = useAdminAuth();
+  const [form, setForm] = useState({ identifier: '', password: '' });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const [showPw, setShowPw] = useState(false);
+
+  if (isAdminAuthenticated) {
+    navigate('/admin/dashboard', { replace: true });
+    return null;
+  }
+
+  const validate = () => {
+    const e = {};
+    if (!form.identifier.trim()) e.identifier = 'Email or username is required';
+    if (!form.password) e.password = 'Password is required';
+    setErrors(e);
+    return !Object.keys(e).length;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setLoading(true);
+    setApiError('');
+    try {
+      const isEmail = form.identifier.includes('@');
+      const payload = isEmail
+        ? { email: form.identifier, password: form.password }
+        : { userName: form.identifier, password: form.password };
+      await login(payload);
+      toast.success('Welcome back, Admin! 🎉');
+      navigate('/admin/dashboard', { replace: true });
+    } catch (err) {
+      const msg = err.message || 'Login failed';
+      setApiError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
+      {/* Animated orbs */}
+      <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-indigo-600/20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-purple-600/15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/5 blur-3xl" />
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 mb-4">
+            <ShieldCheck className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
+          <p className="text-slate-400 text-sm mt-1">EduOne Management Console</p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white/[0.05] backdrop-blur-2xl rounded-3xl border border-white/10 p-8 shadow-2xl">
+          {apiError && (
+            <div className="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">{apiError}</div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1.5">Email or Username</label>
+              <input
+                type="text"
+                value={form.identifier}
+                onChange={e => { setForm(f => ({ ...f, identifier: e.target.value })); setErrors({}); setApiError(''); }}
+                placeholder="admin@eduone.com"
+                className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition ${errors.identifier ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:ring-indigo-500/50'}`}
+              />
+              {errors.identifier && <p className="text-red-400 text-xs mt-1">{errors.identifier}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1.5">Password</label>
+              <div className="relative">
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  value={form.password}
+                  onChange={e => { setForm(f => ({ ...f, password: e.target.value })); setErrors({}); setApiError(''); }}
+                  placeholder="••••••••"
+                  className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition ${errors.password ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:ring-indigo-500/50'}`}
+                />
+                <button type="button" onClick={() => setShowPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-white transition-colors cursor-pointer">
+                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:from-indigo-600 hover:to-purple-700 transition-all disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+            >
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Authenticating…</> : 'Sign In to Admin Panel'}
+            </button>
+          </form>
+
+          <p className="text-center text-xs text-slate-500 mt-5">
+            Only authorized administrators can access this portal.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLogin;

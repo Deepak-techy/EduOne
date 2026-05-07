@@ -1,14 +1,8 @@
 // src/routes/admindashboardroutes.jsx
-import { Routes, Route } from 'react-router-dom';
-import AdminDashboard from '../features/admin/dashboard/pages/AdminDashboard';
+import AdminRoutes from '../features/admin/AdminRoutes';
 
 const AdminDashboardRoutes = () => {
-    return (
-        <Routes>
-            <Route path="/" element={<AdminDashboard />} />
-            <Route path="/*" element={<AdminDashboard />} />
-        </Routes>
-    );
+    return <AdminRoutes />;
 };
 
 export default AdminDashboardRoutes;

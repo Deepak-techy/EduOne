@@ -25,7 +25,7 @@ const ReportsManagement = () => {
   const fetchReports = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const res = await adminService.community.getReports();
+      const res = await adminService.community.getReports({ limit: 1000 });
       const payload = res.data ?? res;
       const list = payload?.reports ?? payload ?? [];
       setReports(Array.isArray(list) ? list : []);

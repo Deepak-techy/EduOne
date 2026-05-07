@@ -25,7 +25,7 @@ const ResumeManagement = () => {
   const fetchData = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [rRes, sRes] = await Promise.allSettled([adminService.resumes.getAll(), adminService.resumes.getStats()]);
+      const [rRes, sRes] = await Promise.allSettled([adminService.resumes.getAll({ limit: 1000 }), adminService.resumes.getStats()]);
       if (rRes.status === 'fulfilled') { const payload = rRes.value.data ?? rRes.value; const l = payload?.resumes ?? payload ?? []; setResumes(Array.isArray(l) ? l : []); }
       if (sRes.status === 'fulfilled') { const s = sRes.value.data ?? sRes.value; setStats(s?.overview ?? s); }
     } catch (err) { setError(err.message); } finally { setLoading(false); }

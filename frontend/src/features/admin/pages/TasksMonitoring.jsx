@@ -26,7 +26,7 @@ const TasksMonitoring = () => {
   const fetchData = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [tRes, sRes] = await Promise.allSettled([adminService.tasks.getAll(), adminService.tasks.getStats()]);
+      const [tRes, sRes] = await Promise.allSettled([adminService.tasks.getAll({ limit: 1000 }), adminService.tasks.getStats()]);
       if (tRes.status === 'fulfilled') { const payload = tRes.value.data ?? tRes.value; const l = payload?.tasks ?? payload ?? []; setTasks(Array.isArray(l) ? l : []); }
       if (sRes.status === 'fulfilled') { const s = sRes.value.data ?? sRes.value; setStats(s?.overview ?? s); }
     } catch (err) { setError(err.message); } finally { setLoading(false); }

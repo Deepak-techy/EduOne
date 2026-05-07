@@ -22,7 +22,7 @@ const AnnouncementsPage = () => {
   const fetchData = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const res = await adminService.announcements.getAll();
+      const res = await adminService.announcements.getAll({ limit: 1000 });
       const payload = res.data ?? res;
       const list = payload?.announcements ?? payload ?? [];
       setItems(Array.isArray(list) ? list : []);

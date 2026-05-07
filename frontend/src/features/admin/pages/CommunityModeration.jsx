@@ -28,8 +28,8 @@ const CommunityModeration = () => {
     setLoading(true); setError(null);
     try {
       const res = tab === 'flagged'
-        ? await adminService.community.getFlaggedPosts()
-        : await adminService.community.getPosts();
+        ? await adminService.community.getFlaggedPosts({ limit: 1000 })
+        : await adminService.community.getPosts({ limit: 1000 });
       const payload = res.data ?? res;
       const list = payload?.posts ?? payload ?? [];
       setPosts(Array.isArray(list) ? list : []);

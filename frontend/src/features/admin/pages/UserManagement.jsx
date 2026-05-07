@@ -32,7 +32,7 @@ const UserManagement = () => {
   const fetchUsers = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const res = await adminService.users.getAll();
+      const res = await adminService.users.getAll({ limit: 1000 });
       const payload = res.data ?? res;
       const list = payload?.users ?? payload ?? [];
       setUsers(Array.isArray(list) ? list : []);

@@ -28,7 +28,7 @@ const NotesManagement = () => {
     setLoading(true); setError(null);
     try {
       const [notesRes, statsRes] = await Promise.allSettled([
-        adminService.notes.getAll(), adminService.notes.getUsageStats()
+        adminService.notes.getAll({ limit: 1000 }), adminService.notes.getUsageStats()
       ]);
       if (notesRes.status === 'fulfilled') { const payload = notesRes.value.data ?? notesRes.value; const l = payload?.notes ?? payload ?? []; setNotes(Array.isArray(l) ? l : []); }
       if (statsRes.status === 'fulfilled') { const s = statsRes.value.data ?? statsRes.value; setStats(s?.overview ?? s); }

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 
 const Filters = ({ filter, setFilter, role, refreshPosts }) => {
-  const tabs = ["all", "student", "teacher"];
+  const tabs = ["all", "student", "announcement"];
 
   const [open, setOpen] = useState(false);
 
@@ -35,7 +35,7 @@ const Filters = ({ filter, setFilter, role, refreshPosts }) => {
           style={{ background: "linear-gradient(255deg, #0099FF 0%, #00D4FF 0%, #60A5FA 70%, #2563EB 150%)" }}
         >
           <Plus size={18} />
-          {role === "teacher" ? "Create Announcement" : "Create Post"}
+          {role === "Admin" ? "Create Announcement" : "Create Post"}
         </button>
       </div>
 

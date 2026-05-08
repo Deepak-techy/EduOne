@@ -13,9 +13,9 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
 
   const isOwner = user?._id === post.author?._id;
   const isAdmin = user?.role === "Admin";
-  // The frontend stores "teacher" in lowercase usually, but let's check carefully.
-  const isTeacherDeletingStudent = user?.role?.toLowerCase() === "teacher" && post.authorRole === "Student";
-  const canDelete = isOwner || isAdmin || isTeacherDeletingStudent;
+  // The frontend stores "admin" in lowercase usually, but let's check carefully.
+  const isAdminDeletingStudent = user?.role?.toLowerCase() === "Admin" && post.authorRole === "Student";
+  const canDelete = isOwner || isAdmin || isAdminDeletingStudent;
 
   const isBookmarked = bookmarks.some((b) => {
     const bPostId = b.postId?._id || b.postId || b._id;

@@ -67,4 +67,8 @@ export const communityService = {
   // ✅ POST /api/community/comments/:commentId/report
   reportComment: (commentId, data) =>
     api.post(`/comments/${commentId}/report`, data),
+
+  // ✅ GET /api/community/announcements
+  getAllAnnouncements: () =>
+    api.get(`/announcements`),
 };

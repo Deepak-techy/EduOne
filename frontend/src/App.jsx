@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import AppRoutes from './routes/AppRoutes';
+import AnnouncementBanner from './features/communityPost/components/AnnouncementBanner';
 
 function AppContent() {
   const { user } = useAuth(); // <-- ADDED: Get user from context
@@ -28,6 +29,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col dark:bg-[#1a1b1e]">
+      {user && !isAuthPage && !isAdminPage && <AnnouncementBanner />}
       {!isAuthPage && !isAdminPage && <Navbar />}
       <div className="flex flex-1">
         {/* CHANGED: Show sidebar if user logged in and not on auth page */}

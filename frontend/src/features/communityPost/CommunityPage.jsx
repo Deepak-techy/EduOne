@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, UserCircle } from "lucide-react";
 import Feed from "./components/Feed";
+import AnnouncementFeed from "./components/AnnouncementFeed";
 import BookmarkSidebar from "./components/BookmarkSidebar";
 import Filters from "./components/Filters";
 import { communityService } from "../../services/communityService";
@@ -12,6 +13,7 @@ const CommunityPage = () => {
   const navigate = useNavigate();
 
   const [posts, setPosts] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [filter, setFilter] = useState("all");
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,16 @@ const CommunityPage = () => {
     } catch (err) {
       console.error("Failed to load posts:", err);
       setPosts([]);
+    }
+  };
+
+  const loadAnnouncements = async () => {
+    try {
+      const res = await communityService.getAllAnnouncements();
+      setAnnouncements(res.data?.data?.announcements || []);
+    } catch (err) {
+      console.error("Failed to load announcements:", err);
+      setAnnouncements([]);
     }
   };
 
@@ -39,7 +51,11 @@ const CommunityPage = () => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await loadPosts();
+      if (filter === "announcement") {
+        await loadAnnouncements();
+      } else {
+        await loadPosts();
+      }
       setLoading(false);
     };
     init();
@@ -65,19 +81,14 @@ const CommunityPage = () => {
       
       {/* Dynamic Background Gradients for Glassmorphism */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Top-right glow */}
         <div 
           className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full opacity-30 dark:opacity-40 blur-[120px]"
           style={{ background: "linear-gradient(255deg, #a855f7 0%, #c084fc 50%, #e879f9 100%)" }}
         ></div>
-        
-        {/* Bottom-left glow */}
         <div 
           className="absolute -bottom-[20%] -left-[10%] w-[60%] h-[60%] rounded-full opacity-[0.25] dark:opacity-30 blur-[120px]"
           style={{ background: "linear-gradient(255deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)" }}
         ></div>
-
-        {/* Soft ambient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-purple-50/30 to-blue-50/40 dark:via-purple-900/10 dark:to-blue-900/10 mix-blend-overlay"></div>
       </div>
 
@@ -125,10 +136,14 @@ const CommunityPage = () => {
               filter={filter}
               setFilter={setFilter}
               role={user?.role}
-              refreshPosts={loadPosts}
+              refreshPosts={filter === "announcement" ? loadAnnouncements : loadPosts}
             />
 
-            <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} />
+            {filter === "announcement" ? (
+              <AnnouncementFeed announcements={announcements} loading={false} />
+            ) : (
+              <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} />
+            )}
           </div>
 
           {/* Bookmark Sidebar */}

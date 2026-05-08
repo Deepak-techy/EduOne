@@ -3,6 +3,7 @@ import { Post } from "../models/post.model.js";
 import { Comment } from "../models/comment.model.js";
 import { Bookmark } from "../models/bookmark.model.js";
 import { Report } from "../models/report.model.js";
+import { Announcement } from "../models/announcement.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -55,7 +56,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
         query.authorRole = "Student";
     } else if (filter === "teacher") {
         query.authorRole = "Teacher";
-    } else if (filter === "admin") {
+    } else if (filter === "admin" || filter === "announcement") {
         query.authorRole = "Admin";
     } else if (filter === "my-posts") {
         query.author = new mongoose.Types.ObjectId(req.user._id);
@@ -619,6 +620,26 @@ const reportComment = asyncHandler(async (req, res) => {
 })
 
 
+const getAnnouncements = asyncHandler(async (req, res) => {
+    const query = { isActive: true };
+
+    // Filter by audience based on user role
+    if (req.user.role === "Student") {
+        query.targetAudience = { $in: ["All", "Students"] };
+    } else if (req.user.role === "Teacher") {
+        query.targetAudience = { $in: ["All", "Teachers"] };
+    }
+
+    const announcements = await Announcement.find(query)
+        .sort({ isPinned: -1, createdAt: -1 })
+        .populate("createdBy", "fullName userName")
+        .lean();
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { announcements }, "Announcements fetched successfully"));
+});
+
 export {
     createPost,
     getAllPosts,
@@ -634,5 +655,6 @@ export {
     getMyBookmarks,
     reportPost,
     reportComment,
+    getAnnouncements,
 }
 

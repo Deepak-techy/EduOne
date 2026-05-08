@@ -1,9 +1,13 @@
 import CreatePostModal from "./CreatePostModal";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Megaphone } from "lucide-react";
 
 const Filters = ({ filter, setFilter, role, refreshPosts }) => {
-  const tabs = ["all", "student", "announcement"];
+  const tabs = [
+    { key: "all", label: "All Posts" },
+    { key: "student", label: "Students" },
+    { key: "announcement", label: "Announcements", icon: Megaphone },
+  ];
 
   const [open, setOpen] = useState(false);
 
@@ -14,15 +18,16 @@ const Filters = ({ filter, setFilter, role, refreshPosts }) => {
       <div className="flex bg-white/40 dark:bg-gray-800/60 backdrop-blur-md p-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
         {tabs.map((tab) => (
           <button
-            key={tab}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 capitalize ${
-              filter === tab 
+            key={tab.key}
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-1.5 ${
+              filter === tab.key 
                 ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" 
                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
             }`}
-            onClick={() => setFilter(tab)}
+            onClick={() => setFilter(tab.key)}
           >
-            {tab}
+            {tab.icon && <tab.icon size={14} />}
+            {tab.label}
           </button>
         ))}
       </div>

@@ -30,7 +30,7 @@ const getAllAnnouncements = asyncHandler(async (req, res) => {
 })
 
 const createAnnouncement = asyncHandler(async (req, res) => {
-    const { title, content, targetAudience, isPinned, expiresAt } = req.body;
+    const { title, content, targetAudience, isPinned, expiresAt, notifyUsers } = req.body;
 
     if (!title || !content) {
         throw new ApiError(400, "Title and content are required");
@@ -45,6 +45,26 @@ const createAnnouncement = asyncHandler(async (req, res) => {
 
     if (!announcement) {
         throw new ApiError(500, "Failed to create announcement");
+    }
+
+    // Automatically create system notifications if requested
+    if (notifyUsers) {
+        const query = { accountStatus: "Active" };
+        if (targetAudience === "Students") query.role = "Student";
+        if (targetAudience === "Teachers") query.role = "Teacher";
+
+        const users = await User.find(query).select("_id").lean();
+        const userIds = users.map(u => u._id);
+
+        if (userIds.length > 0) {
+            await Notification.create({
+                title: `📢 ${title}`,
+                message: content.substring(0, 200) + (content.length > 200 ? "..." : ""),
+                type: "System",
+                targetUsers: userIds,
+                sentBy: req.user._id,
+            });
+        }
     }
 
     const populatedAnnouncement = await Announcement.findById(announcement._id)

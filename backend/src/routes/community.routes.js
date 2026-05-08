@@ -15,6 +15,7 @@ import {
     getMyBookmarks,
     reportPost,
     reportComment,
+    getAnnouncements,
 } from "../controllers/community.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -23,6 +24,9 @@ const router = Router();
 // post routes
 router.route("/posts/create").post(verifyJWT, createPost)    // POST /api/community/posts/create
 router.route("/posts/all").get(verifyJWT, getAllPosts)    // GET /api/community/posts/all
+
+// announcement routes (user side)
+router.route("/announcements").get(verifyJWT, getAnnouncements)    // GET /api/community/announcements
 
 // bookmark routes (static before dynamic)
 router.route("/bookmarks/add").post(verifyJWT, addBookmark)    // POST /api/community/bookmarks/add

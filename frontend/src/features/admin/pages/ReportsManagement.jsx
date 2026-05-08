@@ -48,13 +48,13 @@ const ReportsManagement = () => {
   const handleResolve = async (id) => {
     setActing(id);
     try { await adminService.community.resolveReport(id); setReports(p => p.map(r => (r._id || r.id) === id ? { ...r, status: 'Resolved' } : r)); toast.success('Report resolved'); }
-    catch (e) { toast.error(e.message); } finally { setActing(null); }
+    catch (e) { toast.error(e?.message || e?.data?.message || 'Failed to resolve report'); } finally { setActing(null); }
   };
 
   const handleReject = async (id) => {
     setActing(id);
     try { await adminService.community.rejectReport(id); setReports(p => p.map(r => (r._id || r.id) === id ? { ...r, status: 'Rejected' } : r)); toast.success('Report rejected'); }
-    catch (e) { toast.error(e.message); } finally { setActing(null); }
+    catch (e) { toast.error(e?.message || e?.data?.message || 'Failed to reject report'); } finally { setActing(null); }
   };
 
   if (loading) return <SkeletonTable rows={6} />;

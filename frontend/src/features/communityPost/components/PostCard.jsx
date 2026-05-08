@@ -6,11 +6,12 @@ import { createPortal } from "react-dom";
 import { ThumbsUp, ThumbsDown, Bookmark, MessageSquare, Trash2, Flag } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 
-const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
+const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlreadyReported = false }) => {
   const [showComments, setShowComments] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [isReported, setIsReported] = useState(isAlreadyReported);
   const { user } = useAuth();
 
   const isOwner = user?._id === post.author?._id;
@@ -74,6 +75,7 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
 
   const handleReport = async (data) => {
     await communityService.reportPost(post._id, data);
+    setIsReported(true);
   };
 
   return (
@@ -178,12 +180,20 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
 
         {!isOwner && (
           <button
-            onClick={() => setShowReportModal(true)}
-            className="flex items-center gap-1.5 text-gray-500 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400 transition-colors group text-sm font-medium"
-            title="Report Post"
+            onClick={() => isReported ? null : setShowReportModal(true)}
+            className={`flex items-center gap-1.5 transition-colors group text-sm font-medium ${
+              isReported
+                ? 'text-orange-500 dark:text-orange-400 cursor-default'
+                : 'text-gray-500 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400'
+            }`}
+            title={isReported ? 'Already reported' : 'Report Post'}
           >
-            <div className="p-1.5 rounded-full group-hover:bg-orange-50 dark:group-hover:bg-orange-500/10 transition-colors">
-              <Flag size={18} />
+            <div className={`p-1.5 rounded-full transition-colors ${
+              isReported
+                ? 'bg-orange-50 dark:bg-orange-500/20'
+                : 'group-hover:bg-orange-50 dark:group-hover:bg-orange-500/10'
+            }`}>
+              <Flag size={18} fill={isReported ? 'currentColor' : 'none'} />
             </div>
           </button>
         )}

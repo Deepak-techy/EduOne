@@ -112,7 +112,7 @@ const CommunityModeration = () => {
                     const author = post.author?.fullName || post.authorName || '—';
                     const content = post.content || post.text || post.body || '';
                     const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-                    const flags = post.flagCount ?? (post.flagged ? 1 : 0);
+                    const flags = post.reportCount ?? post.flagCount ?? 0;
 
                     return (
                       <tr key={pid} className="hover:bg-white/[0.02] transition-colors">
@@ -133,10 +133,14 @@ const CommunityModeration = () => {
                         <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{date}</span></td>
                         <td className="px-5 py-4">
                           {flags > 0 ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
-                              <Flag className="w-3 h-3" />{flags}
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                              <Flag className="w-3 h-3" />Flagged ({flags})
                             </span>
-                          ) : <span className="text-xs text-slate-600">—</span>}
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                              Not Flagged
+                            </span>
+                          )}
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">

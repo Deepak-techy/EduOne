@@ -16,6 +16,7 @@ import {
     reportPost,
     reportComment,
     getAnnouncements,
+    getMyReportedPostIds,
 } from "../controllers/community.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -27,6 +28,9 @@ router.route("/posts/all").get(verifyJWT, getAllPosts)    // GET /api/community/
 
 // announcement routes (user side)
 router.route("/announcements").get(verifyJWT, getAnnouncements)    // GET /api/community/announcements
+
+// reports (user side)
+router.route("/reports/my-reported-posts").get(verifyJWT, getMyReportedPostIds)    // GET /api/community/reports/my-reported-posts
 
 // bookmark routes (static before dynamic)
 router.route("/bookmarks/add").post(verifyJWT, addBookmark)    // POST /api/community/bookmarks/add

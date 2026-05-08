@@ -71,4 +71,8 @@ export const communityService = {
   // ✅ GET /api/community/announcements
   getAllAnnouncements: () =>
     api.get(`/announcements`),
+
+  // ✅ GET /api/community/reports/my-reported-posts
+  getMyReportedPostIds: () =>
+    api.get(`/reports/my-reported-posts`),
 };

@@ -32,8 +32,13 @@ const ReportModal = ({ open, onClose, onSubmit, contentType = "Post" }) => {
       setDescription("");
       onClose();
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.message || "Failed to submit report";
-      setError(msg);
+      // Handle duplicate report (409) with a friendly message
+      if (err?.response?.status === 409 || err?.status === 409 || err?.statusCode === 409) {
+        setError("You have already reported this. Please wait for it to be reviewed.");
+      } else {
+        const msg = err?.response?.data?.message || err?.data?.message || err?.message || "Failed to submit report";
+        setError(msg === `Request failed with status code ${err?.response?.status}` ? "Something went wrong. Please try again." : msg);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -69,22 +74,23 @@ const ReportModal = ({ open, onClose, onSubmit, contentType = "Post" }) => {
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "linear-gradient(145deg, #fff8f0, #fff5eb)",
-          padding: "36px 32px",
-          borderRadius: "24px",
+          padding: "24px 20px",
+          borderRadius: "20px",
           boxShadow: "0 8px 48px rgba(251,146,60,0.25)",
-          minWidth: "380px",
-          maxWidth: "480px",
-          width: "90vw",
-          border: "4px solid #fb923c",
+          maxWidth: "400px",
+          width: "calc(100vw - 32px)",
+          border: "3px solid #fb923c",
           animation: "slideUp 0.3s ease-out",
+          maxHeight: "90vh",
+          overflowY: "auto",
         }}
       >
         {/* Header icon */}
         <div
           style={{
-            width: "72px",
-            height: "72px",
-            margin: "0 auto 18px",
+            width: "48px",
+            height: "48px",
+            margin: "0 auto 12px",
             background: "linear-gradient(135deg, #fed7aa, #fdba74)",
             borderRadius: "50%",
             display: "flex",
@@ -93,7 +99,7 @@ const ReportModal = ({ open, onClose, onSubmit, contentType = "Post" }) => {
             boxShadow: "0 4px 16px rgba(251,146,60,0.3)",
           }}
         >
-          <Flag size={32} style={{ color: "#ea580c" }} />
+          <Flag size={22} style={{ color: "#ea580c" }} />
         </div>
 
         {/* Title */}
@@ -101,9 +107,9 @@ const ReportModal = ({ open, onClose, onSubmit, contentType = "Post" }) => {
           style={{
             color: "#0891b2",
             fontWeight: 800,
-            fontSize: "1.4rem",
+            fontSize: "1.1rem",
             textAlign: "center",
-            margin: "0 0 6px 0",
+            margin: "0 0 4px 0",
           }}
         >
           Report {contentType}

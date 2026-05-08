@@ -1,6 +1,6 @@
 import PostCard from "./PostCard";
 
-const Feed = ({ posts, refreshPosts, refreshBookmarks, bookmarks }) => {
+const Feed = ({ posts, refreshPosts, refreshBookmarks, bookmarks, reportedPostIds = [] }) => {
   return (
     <div>
       {posts.map((post) => (
@@ -10,6 +10,7 @@ const Feed = ({ posts, refreshPosts, refreshBookmarks, bookmarks }) => {
           refreshPosts={refreshPosts}
           refreshBookmarks={refreshBookmarks}
           bookmarks={bookmarks}
+          isAlreadyReported={reportedPostIds.includes(post._id)}
         />
       ))}
     </div>

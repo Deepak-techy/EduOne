@@ -16,6 +16,7 @@ const CommunityPage = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [filter, setFilter] = useState("all");
   const [bookmarks, setBookmarks] = useState([]);
+  const [reportedPostIds, setReportedPostIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadPosts = async () => {
@@ -61,8 +62,18 @@ const CommunityPage = () => {
     init();
   }, [filter]);
 
+  const loadReportedPosts = async () => {
+    try {
+      const res = await communityService.getMyReportedPostIds();
+      setReportedPostIds(res.data?.data?.reportedPostIds || []);
+    } catch (err) {
+      console.error("Failed to load reported posts:", err);
+    }
+  };
+
   useEffect(() => {
     loadBookmarks();
+    loadReportedPosts();
   }, []);
 
   if (loading) {
@@ -142,7 +153,7 @@ const CommunityPage = () => {
             {filter === "announcement" ? (
               <AnnouncementFeed announcements={announcements} loading={false} />
             ) : (
-              <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} />
+              <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} reportedPostIds={reportedPostIds} />
             )}
           </div>
 

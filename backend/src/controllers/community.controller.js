@@ -640,6 +640,20 @@ const getAnnouncements = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { announcements }, "Announcements fetched successfully"));
 });
 
+const getMyReportedPostIds = asyncHandler(async (req, res) => {
+    const reports = await Report.find({
+        reporterId: req.user._id,
+        contentType: "Post",
+        status: "Pending",
+    }).select("reportedContentId").lean();
+
+    const postIds = reports.map(r => r.reportedContentId.toString());
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { reportedPostIds: postIds }, "Reported post IDs fetched"));
+});
+
 export {
     createPost,
     getAllPosts,
@@ -656,5 +670,6 @@ export {
     reportPost,
     reportComment,
     getAnnouncements,
+    getMyReportedPostIds,
 }
 

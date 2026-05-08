@@ -38,8 +38,18 @@ const getAllPosts = asyncHandler(async (req, res) => {
         .populate("author", "fullName userName avatar role")
         .lean();
 
+    // Attach pending report count to each post
+    const postsWithFlags = await Promise.all(
+        posts.map(async (post) => {
+            const reportCount = await Report.countDocuments({
+                reportedContentId: post._id, contentType: "Post", status: "Pending"
+            });
+            return { ...post, reportCount };
+        })
+    );
+
     return res.status(200).json(new ApiResponse(200,
-        { count: posts.length, page: pageNum, totalPages, totalPosts, posts },
+        { count: postsWithFlags.length, page: pageNum, totalPages, totalPosts, posts: postsWithFlags },
         "Posts fetched successfully"
     ));
 })
@@ -174,7 +184,7 @@ const getReportById = asyncHandler(async (req, res) => {
 
 const resolveReport = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { adminNotes } = req.body;
+    const adminNotes = req.body?.adminNotes;
     if (!id) throw new ApiError(400, "Report ID is required");
 
     const report = await Report.findById(id);
@@ -192,7 +202,7 @@ const resolveReport = asyncHandler(async (req, res) => {
 
 const rejectReport = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { adminNotes } = req.body;
+    const adminNotes = req.body?.adminNotes;
     if (!id) throw new ApiError(400, "Report ID is required");
 
     const report = await Report.findById(id);

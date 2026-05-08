@@ -1,14 +1,16 @@
 import { communityService } from "../../../services/communityService";
 import CommentSection from "./CommentSection";
+import ReportModal from "./ReportModal";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { ThumbsUp, ThumbsDown, Bookmark, MessageSquare, Trash2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Bookmark, MessageSquare, Trash2, Flag } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 
 const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
   const [showComments, setShowComments] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const { user } = useAuth();
 
   const isOwner = user?._id === post.author?._id;
@@ -68,6 +70,10 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleReport = async (data) => {
+    await communityService.reportPost(post._id, data);
   };
 
   return (
@@ -169,6 +175,18 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
             <Bookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
           </div>
         </button>
+
+        {!isOwner && (
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="flex items-center gap-1.5 text-gray-500 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400 transition-colors group text-sm font-medium"
+            title="Report Post"
+          >
+            <div className="p-1.5 rounded-full group-hover:bg-orange-50 dark:group-hover:bg-orange-500/10 transition-colors">
+              <Flag size={18} />
+            </div>
+          </button>
+        )}
 
       </div>
 
@@ -303,6 +321,14 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [] }) => {
         </div>,
         document.body
       )}
+
+      {/* Report Modal */}
+      <ReportModal
+        open={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        onSubmit={handleReport}
+        contentType="Post"
+      />
     </div>
   );
 };

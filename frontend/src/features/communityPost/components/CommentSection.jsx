@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { communityService } from "../../../services/communityService";
-import { Send, Loader2, Trash2 } from "lucide-react";
+import ReportModal from "./ReportModal";
+import { Send, Loader2, Trash2, Flag } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 
 const CommentSection = ({ postId, postAuthorId }) => {
@@ -11,6 +12,7 @@ const CommentSection = ({ postId, postAuthorId }) => {
   const [submitting, setSubmitting] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [reportCommentId, setReportCommentId] = useState(null);
   const { user } = useAuth();
 
   const loadComments = async () => {
@@ -58,7 +60,12 @@ const CommentSection = ({ postId, postAuthorId }) => {
     }
   };
 
+  const handleReportComment = async (data) => {
+    await communityService.reportComment(reportCommentId, data);
+  };
+
   return (
+    <>
     <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50">
 
       {/* Comment input */}
@@ -124,6 +131,15 @@ const CommentSection = ({ postId, postAuthorId }) => {
                         title="Delete comment"
                       >
                         <Trash2 size={14} />
+                      </button>
+                    )}
+                    {!isCommentOwner && (
+                      <button
+                        onClick={() => setReportCommentId(comment._id)}
+                        className="text-gray-400 hover:text-orange-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-orange-50 dark:hover:bg-orange-500/10"
+                        title="Report comment"
+                      >
+                        <Flag size={14} />
                       </button>
                     )}
                   </div>
@@ -252,6 +268,15 @@ const CommentSection = ({ postId, postAuthorId }) => {
         document.body
       )}
     </div>
+
+      {/* Report Comment Modal */}
+      <ReportModal
+        open={!!reportCommentId}
+        onClose={() => setReportCommentId(null)}
+        onSubmit={handleReportComment}
+        contentType="Comment"
+      />
+    </>
   );
 };
 

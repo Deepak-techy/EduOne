@@ -2,6 +2,7 @@ import { mongoose } from "mongoose";
 import { Post } from "../models/post.model.js";
 import { Comment } from "../models/comment.model.js";
 import { Bookmark } from "../models/bookmark.model.js";
+import { Report } from "../models/report.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -517,6 +518,106 @@ const getMyBookmarks = asyncHandler(async (req, res) => {
         ));
 })
 
+// ==================== REPORTS ====================
+
+const reportPost = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+    const { reason, description } = req.body;
+    const { _id: userId } = req.user;
+
+    if (!postId) {
+        throw new ApiError(400, "Post ID is required");
+    }
+
+    if (!reason) {
+        throw new ApiError(400, "Report reason is required");
+    }
+
+    // check if post exists
+    const post = await Post.findById(postId);
+    if (!post) {
+        throw new ApiError(404, "Post not found");
+    }
+
+    // prevent self-reporting
+    if (post.author.toString() === userId.toString()) {
+        throw new ApiError(400, "You cannot report your own post");
+    }
+
+    // prevent duplicate pending reports
+    const existingReport = await Report.findOne({
+        reporterId: userId,
+        reportedContentId: postId,
+        contentType: "Post",
+        status: "Pending",
+    });
+
+    if (existingReport) {
+        throw new ApiError(409, "You have already reported this post");
+    }
+
+    const report = await Report.create({
+        reporterId: userId,
+        reportedContentId: postId,
+        contentType: "Post",
+        reason,
+        description: description || undefined,
+    });
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, report, "Post reported successfully"));
+})
+
+const reportComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+    const { reason, description } = req.body;
+    const { _id: userId } = req.user;
+
+    if (!commentId) {
+        throw new ApiError(400, "Comment ID is required");
+    }
+
+    if (!reason) {
+        throw new ApiError(400, "Report reason is required");
+    }
+
+    // check if comment exists
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    // prevent self-reporting
+    if (comment.userId.toString() === userId.toString()) {
+        throw new ApiError(400, "You cannot report your own comment");
+    }
+
+    // prevent duplicate pending reports
+    const existingReport = await Report.findOne({
+        reporterId: userId,
+        reportedContentId: commentId,
+        contentType: "Comment",
+        status: "Pending",
+    });
+
+    if (existingReport) {
+        throw new ApiError(409, "You have already reported this comment");
+    }
+
+    const report = await Report.create({
+        reporterId: userId,
+        reportedContentId: commentId,
+        contentType: "Comment",
+        reason,
+        description: description || undefined,
+    });
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, report, "Comment reported successfully"));
+})
+
 
 export {
     createPost,
@@ -531,4 +632,7 @@ export {
     addBookmark,
     removeBookmark,
     getMyBookmarks,
+    reportPost,
+    reportComment,
 }
+

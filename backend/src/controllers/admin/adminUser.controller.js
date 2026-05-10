@@ -133,8 +133,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     if (!id) throw new ApiError(400, "User ID is required");
     if (id === req.user._id.toString()) throw new ApiError(400, "Cannot delete your own account");
 
-    const user = await User.findByIdAndUpdate(id, { accountStatus: "Deleted" }, { new: true })
-        .select("-password -refreshToken");
+    const user = await User.findByIdAndDelete(id);
     if (!user) throw new ApiError(404, "User not found");
 
     return res.status(200).json(new ApiResponse(200, {}, "User deleted successfully"));
@@ -254,9 +253,11 @@ const bulkAction = asyncHandler(async (req, res) => {
             message = `${userIds.length} users activated successfully`;
             break;
         case BULK_ACTION_TYPES.DELETE:
-            updateData = { accountStatus: "Deleted" };
-            message = `${userIds.length} users deleted successfully`;
-            break;
+            await User.deleteMany({ _id: { $in: userIds } });
+            return res.status(200).json(new ApiResponse(200,
+                { deletedCount: userIds.length },
+                `${userIds.length} users deleted successfully`
+            ));
         case BULK_ACTION_TYPES.CHANGE_ROLE:
             if (!newRole || !["Student", "Teacher", "Admin"].includes(newRole)) {
                 throw new ApiError(400, "Valid role is required for role change action");

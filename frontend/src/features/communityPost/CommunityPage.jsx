@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, UserCircle } from "lucide-react";
 import Feed from "./components/Feed";
 import AnnouncementFeed from "./components/AnnouncementFeed";
+import AnnouncementCard from "./components/AnnouncementCard";
+import PostCard from "./components/PostCard";
 import BookmarkSidebar from "./components/BookmarkSidebar";
 import Filters from "./components/Filters";
 import { communityService } from "../../services/communityService";
@@ -78,6 +80,16 @@ const CommunityPage = () => {
     loadBookmarks();
     loadReportedPosts();
   }, []);
+
+  // Merge posts + announcements by createdAt for the "all" tab
+  const mergedTimeline = useMemo(() => {
+    if (filter !== 'all') return [];
+    const tagged = [
+      ...posts.map(p => ({ ...p, _type: 'post' })),
+      ...announcements.map(a => ({ ...a, _type: 'announcement' })),
+    ];
+    return tagged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [posts, announcements, filter]);
 
   if (loading) {
     return (
@@ -156,26 +168,22 @@ const CommunityPage = () => {
             {filter === "announcement" ? (
               <AnnouncementFeed announcements={announcements} loading={false} />
             ) : filter === "all" ? (
-              <>
-                {announcements.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
-                      Announcements
-                    </h3>
-                    <AnnouncementFeed announcements={announcements} loading={false} />
-                  </div>
+              <div>
+                {mergedTimeline.map((item) =>
+                  item._type === 'announcement' ? (
+                    <AnnouncementCard key={`ann-${item._id}`} announcement={item} />
+                  ) : (
+                    <PostCard
+                      key={`post-${item._id}`}
+                      post={item}
+                      refreshPosts={loadPosts}
+                      refreshBookmarks={loadBookmarks}
+                      bookmarks={bookmarks}
+                      isAlreadyReported={reportedPostIds.includes(item._id)}
+                    />
+                  )
                 )}
-                <div>
-                  {announcements.length > 0 && posts.length > 0 && (
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                      Posts
-                    </h3>
-                  )}
-                  <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} reportedPostIds={reportedPostIds} />
-                </div>
-              </>
+              </div>
             ) : (
               <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} reportedPostIds={reportedPostIds} />
             )}

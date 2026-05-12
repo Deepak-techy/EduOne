@@ -106,9 +106,9 @@ const UserManagement = () => {
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3">
-      <AlertCircle className="w-8 h-8 text-red-400" />
-      <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchUsers} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <AlertCircle className="w-8 h-8 text-red-500" />
+      <p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchUsers} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold hover:bg-blue-100 cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -125,30 +125,30 @@ const UserManagement = () => {
         onFilterChange={(k, v) => { setFilters(p => ({ ...p, [k]: v })); setPage(1); }}
         onClearFilters={() => { setFilters({ role: 'all', status: 'all' }); setPage(1); }}
       >
-        <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">
+        <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors cursor-pointer">
           <Download className="w-4 h-4" />Export
         </button>
-        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all cursor-pointer">
+        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-gray-900 text-sm font-bold shadow-lg shadow-blue-500/15 hover:shadow-blue-500/20 transition-all cursor-pointer">
           <UserPlus className="w-4 h-4" />Create User
         </button>
       </SearchFilterBar>
 
-      <div className="text-xs text-slate-500">{filtered.length} users found</div>
+      <div className="text-xs text-gray-400">{filtered.length} users found</div>
 
       {/* Table */}
-      <div className="bg-[#1e2030] rounded-2xl border border-white/5 overflow-hidden">
+      <div className="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-white/5 bg-white/[0.02]">
+              <tr className="border-b border-gray-100 bg-gray-50">
                 {['User', 'Email', 'Role', 'Status', 'Joined', 'Actions'].map(h => (
-                  <th key={h} className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                  <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {paged.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-12 text-sm text-slate-500">No users match your search.</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-sm text-gray-400">No users match your search.</td></tr>
               ) : paged.map(user => {
                 const uid = user._id || user.id;
                 const name = user.fullName || user.userName || '—';
@@ -157,28 +157,28 @@ const UserManagement = () => {
                 const isActing = actionLoading === uid;
 
                 return (
-                  <tr key={uid} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={uid} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center text-gray-900 text-xs font-bold flex-shrink-0">
                           {name[0]?.toUpperCase()}
                         </div>
-                        <span className="text-sm font-semibold text-white whitespace-nowrap">{name}</span>
+                        <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">{name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-4"><span className="text-sm text-slate-400">{user.email || '—'}</span></td>
+                    <td className="px-5 py-4"><span className="text-sm text-gray-500">{user.email || '—'}</span></td>
                     <td className="px-5 py-4">
                       <div className="relative">
                         <button onClick={() => setRoleDropdown(roleDropdown === uid ? null : uid)} disabled={isActing}
                           className="cursor-pointer flex items-center gap-1">
                           <RoleBadge role={role} />
-                          <ChevronDown className="w-3 h-3 text-slate-500" />
+                          <ChevronDown className="w-3 h-3 text-gray-400" />
                         </button>
                         {roleDropdown === uid && (
-                          <div className="absolute top-full mt-1 left-0 z-20 bg-[#252740] border border-white/10 rounded-xl shadow-xl overflow-hidden min-w-[120px]">
+                          <div className="absolute top-full mt-1 left-0 z-20 bg-white shadow-lg border border-gray-200 rounded-xl shadow-xl overflow-hidden min-w-[120px]">
                             {ROLES.map(r => (
                               <button key={r} onClick={() => handleRoleChange(uid, r)}
-                                className={`w-full text-left px-4 py-2 text-sm capitalize hover:bg-white/5 transition-colors cursor-pointer ${r === role ? 'text-blue-400 font-bold' : 'text-slate-300'}`}>{r}</button>
+                                className={`w-full text-left px-4 py-2 text-sm capitalize hover:bg-gray-50 transition-colors cursor-pointer ${r === role ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>{r}</button>
                             ))}
                           </div>
                         )}
@@ -186,7 +186,7 @@ const UserManagement = () => {
                     </td>
                     <td className="px-5 py-4"><StatusBadge status={status} /></td>
                     <td className="px-5 py-4">
-                      <span className="text-sm text-slate-500 whitespace-nowrap">
+                      <span className="text-sm text-gray-400 whitespace-nowrap">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
                       </span>
                     </td>
@@ -194,17 +194,17 @@ const UserManagement = () => {
                       <div className="flex items-center gap-2">
                         {status.toLowerCase() === 'suspended' ? (
                           <button onClick={() => setConfirmAction({ type: 'activate', id: uid, name })} disabled={isActing}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-colors cursor-pointer disabled:opacity-50">
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-500/20 transition-colors cursor-pointer disabled:opacity-50">
                             <UserCheck className="w-3.5 h-3.5" />Activate
                           </button>
                         ) : (
                           <button onClick={() => setConfirmAction({ type: 'suspend', id: uid, name })} disabled={isActing}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition-colors cursor-pointer disabled:opacity-50">
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 text-xs font-bold hover:bg-amber-500/20 transition-colors cursor-pointer disabled:opacity-50">
                             <UserX className="w-3.5 h-3.5" />Suspend
                           </button>
                         )}
                         <button onClick={() => setConfirmAction({ type: 'delete', id: uid, name })} disabled={isActing}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors cursor-pointer disabled:opacity-50">
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 transition-colors cursor-pointer disabled:opacity-50">
                           <Trash2 className="w-3.5 h-3.5" />Delete
                         </button>
                       </div>
@@ -238,63 +238,63 @@ const UserManagement = () => {
       <AdminModal open={showCreateModal} onClose={() => { setShowCreateModal(false); setShowPassword(false); }} title="Create New User" icon={UserPlus}>
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Full Name</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
             <input type="text" value={createForm.fullName} onChange={e => setCreateForm(f => ({ ...f, fullName: e.target.value }))}
               placeholder="John Doe"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+              className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Username</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
             <input type="text" value={createForm.userName} onChange={e => setCreateForm(f => ({ ...f, userName: e.target.value }))}
               placeholder="johndoe"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+              className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Email</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
             <input type="email" value={createForm.email} onChange={e => setCreateForm(f => ({ ...f, email: e.target.value }))}
               placeholder="john@example.com"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+              className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Password</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
             <div className="relative">
               <input type={showPassword ? 'text' : 'password'} value={createForm.password} onChange={e => setCreateForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="Min 6 characters"
-                className="w-full px-4 py-2.5 pr-11 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+                className="w-full px-4 py-2.5 pr-11 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
               <button type="button" onClick={() => setShowPassword(p => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 cursor-pointer">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Role</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Role</label>
             <div className="grid grid-cols-3 gap-2">
               {ROLES.map(r => (
                 <button type="button" key={r} onClick={() => setCreateForm(f => ({ ...f, role: r }))}
                   className={`px-3 py-2.5 rounded-xl text-sm font-semibold text-center transition-all cursor-pointer border ${
                     createForm.role === r
                       ? r === 'Admin'
-                        ? 'bg-gradient-to-r from-blue-500/20 to-cyan-600/20 border-blue-500/40 text-blue-400 ring-1 ring-blue-500/30'
+                        ? 'bg-gradient-to-r from-blue-500/20 to-cyan-600/20 border-blue-500/40 text-blue-600 ring-1 ring-blue-500/30'
                         : r === 'Teacher'
-                        ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-400 ring-1 ring-cyan-500/30'
-                        : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400 ring-1 ring-emerald-500/30'
-                      : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                        ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-600 ring-1 ring-cyan-500/30'
+                        : 'bg-emerald-50 border-emerald-500/30 text-emerald-600 ring-1 ring-emerald-500/30'
+                      : 'bg-gray-50 border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300'
                   }`}>{r}</button>
               ))}
             </div>
             {createForm.role === 'Admin' && (
-              <p className="mt-2 text-xs text-amber-400/80 flex items-center gap-1.5">
+              <p className="mt-2 text-xs text-amber-600/80 flex items-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                 This user will have full admin privileges
               </p>
             )}
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/5">
+          <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
             <button type="button" onClick={() => { setShowCreateModal(false); setShowPassword(false); }}
-              className="px-5 py-2.5 rounded-xl border border-white/10 text-sm font-semibold text-slate-300 hover:bg-white/5 cursor-pointer transition-colors">Cancel</button>
+              className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">Cancel</button>
             <button type="submit" disabled={creating}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-gray-900 text-sm font-bold shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
               {creating && <Loader2 className="w-4 h-4 animate-spin" />}
               <UserPlus className="w-4 h-4" />{creating ? 'Creating…' : 'Create User'}
             </button>

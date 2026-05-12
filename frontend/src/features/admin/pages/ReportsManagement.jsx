@@ -60,8 +60,8 @@ const ReportsManagement = () => {
   if (loading) return <SkeletonTable rows={6} />;
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3">
-      <AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchReports} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <AlertCircle className="w-8 h-8 text-red-500" /><p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchReports} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -76,12 +76,12 @@ const ReportsManagement = () => {
         <EmptyState icon={Flag} title="No reports" description="No reports to display." action={fetchReports} actionLabel="Refresh" />
       ) : (
         <>
-          <div className="bg-[#1e2030] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead><tr className="border-b border-white/5 bg-white/[0.02]">
+                <thead><tr className="border-b border-gray-100 bg-gray-50">
                   {['Reporter', 'Reason', 'Status', 'Date', 'Actions'].map(h => (
-                    <th key={h} className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody className="divide-y divide-white/5">
@@ -91,22 +91,22 @@ const ReportsManagement = () => {
                     const status = report.status || 'Pending';
                     const isPending = status.toLowerCase() === 'pending';
                     return (
-                      <tr key={rid} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="px-5 py-4"><span className="text-sm font-semibold text-white">{reporter}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-300">{report.reason || '—'}</span></td>
+                      <tr key={rid} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4"><span className="text-sm font-semibold text-gray-900">{reporter}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-700">{report.reason || '—'}</span></td>
                         <td className="px-5 py-4"><StatusBadge status={status} /></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{report.createdAt ? new Date(report.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-400 whitespace-nowrap">{report.createdAt ? new Date(report.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <button onClick={() => setViewReport(report)} className="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white cursor-pointer"><Eye className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => setViewReport(report)} className="p-1.5 rounded-lg bg-gray-50 text-gray-500 hover:text-gray-900 cursor-pointer"><Eye className="w-3.5 h-3.5" /></button>
                             {isPending && (
                               <>
                                 <button onClick={() => handleResolve(rid)} disabled={acting === rid}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 cursor-pointer disabled:opacity-50">
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-500/20 cursor-pointer disabled:opacity-50">
                                   <CheckCircle className="w-3.5 h-3.5" />Resolve
                                 </button>
                                 <button onClick={() => handleReject(rid)} disabled={acting === rid}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 cursor-pointer disabled:opacity-50">
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 cursor-pointer disabled:opacity-50">
                                   <XCircle className="w-3.5 h-3.5" />Reject
                                 </button>
                               </>
@@ -128,12 +128,12 @@ const ReportsManagement = () => {
         {viewReport && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div><p className="text-xs text-slate-500 mb-1">Reporter</p><p className="text-sm text-white font-semibold">{viewReport.reporterId?.fullName || '—'}</p></div>
-              <div><p className="text-xs text-slate-500 mb-1">Status</p><StatusBadge status={viewReport.status || 'Pending'} /></div>
-              <div><p className="text-xs text-slate-500 mb-1">Reason</p><p className="text-sm text-slate-300">{viewReport.reason || '—'}</p></div>
-              <div><p className="text-xs text-slate-500 mb-1">Date</p><p className="text-sm text-slate-300">{viewReport.createdAt ? new Date(viewReport.createdAt).toLocaleString() : '—'}</p></div>
+              <div><p className="text-xs text-gray-400 mb-1">Reporter</p><p className="text-sm text-gray-900 font-semibold">{viewReport.reporterId?.fullName || '—'}</p></div>
+              <div><p className="text-xs text-gray-400 mb-1">Status</p><StatusBadge status={viewReport.status || 'Pending'} /></div>
+              <div><p className="text-xs text-gray-400 mb-1">Reason</p><p className="text-sm text-gray-700">{viewReport.reason || '—'}</p></div>
+              <div><p className="text-xs text-gray-400 mb-1">Date</p><p className="text-sm text-gray-700">{viewReport.createdAt ? new Date(viewReport.createdAt).toLocaleString() : '—'}</p></div>
             </div>
-            {viewReport.description && <div><p className="text-xs text-slate-500 mb-1">Description</p><p className="text-sm text-slate-300 leading-relaxed">{viewReport.description}</p></div>}
+            {viewReport.description && <div><p className="text-xs text-gray-400 mb-1">Description</p><p className="text-sm text-gray-700 leading-relaxed">{viewReport.description}</p></div>}
           </div>
         )}
       </AdminModal>

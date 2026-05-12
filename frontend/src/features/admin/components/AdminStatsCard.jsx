@@ -26,29 +26,29 @@ const AdminStatsCard = ({
   return (
     <div className="group relative transform transition-all duration-300 hover:-translate-y-1">
       {/* Glow effect */}
-      <div className={`absolute -inset-0.5 bg-gradient-to-r ${gradient} rounded-2xl opacity-0 group-hover:opacity-15 blur-lg transition-opacity duration-500`} />
+      <div className={`absolute -inset-0.5 bg-gradient-to-r ${gradient} rounded-2xl opacity-0 group-hover:opacity-10 blur-lg transition-opacity duration-500`} />
 
-      <div className="relative bg-[#1e2030] rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-all duration-300">
+      <div className="relative bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-200 transition-all duration-300 shadow-sm hover:shadow-md">
         <div className="flex items-start justify-between mb-3">
-          <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110`}>
+          <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110`}>
             <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
           </div>
           {growth && (
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold ${
               isPositive
-                ? 'bg-emerald-500/10 text-emerald-400'
-                : 'bg-red-500/10 text-red-400'
+                ? 'bg-emerald-50 text-emerald-600'
+                : 'bg-red-50 text-red-600'
             }`}>
               {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               {typeof growth === 'string' ? growth : `${growth > 0 ? '+' : ''}${growth}%`}
             </div>
           )}
         </div>
-        <h3 className="text-2xl font-bold text-white mb-0.5 tracking-tight">
+        <h3 className="text-2xl font-bold text-gray-900 mb-0.5 tracking-tight">
           {typeof value === 'number' ? value.toLocaleString() : value}
         </h3>
-        <p className="text-xs text-slate-400 font-medium">{title}</p>
-        {subtitle && <p className="text-[11px] text-slate-500 mt-0.5">{subtitle}</p>}
+        <p className="text-xs text-gray-400 font-medium">{title}</p>
+        {subtitle && <p className="text-[11px] text-gray-400 mt-0.5">{subtitle}</p>}
       </div>
     </div>
   );

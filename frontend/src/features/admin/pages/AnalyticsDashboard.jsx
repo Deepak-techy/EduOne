@@ -17,8 +17,8 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
 
   if (!data.length) return (
     <div className="flex flex-col items-center justify-center py-12 gap-2">
-      <Activity className="w-8 h-8 text-slate-600" />
-      <p className="text-sm text-slate-500">No activity data available</p>
+      <Activity className="w-8 h-8 text-gray-300" />
+      <p className="text-sm text-gray-400">No activity data available</p>
     </div>
   );
 
@@ -53,20 +53,17 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
   const linePath = getPath();
   const areaPath = `${linePath} L${PX + cW},${PY + cH} L${PX},${PY + cH} Z`;
 
-  // Y-axis labels (5 ticks)
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map(f => ({
     val: Math.round(min + f * range),
     y: PY + cH * (1 - f),
   }));
 
-  // X-axis labels - show up to 7 evenly spaced dates
   const maxLabels = Math.min(7, data.length);
   const xLabels = [];
   for (let i = 0; i < maxLabels; i++) {
     const idx = Math.round(i * (data.length - 1) / (maxLabels - 1 || 1));
     const d = data[idx];
     const dateStr = d.label ?? d.date ?? d.month ?? '';
-    // Format date: "2025-05-10" -> "May 10"
     let formatted = dateStr;
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const dt = new Date(dateStr + 'T00:00:00');
@@ -97,13 +94,13 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
       <div className="flex items-center gap-4 mb-4 px-1">
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-          <span className="text-xs text-slate-400">Avg: <span className="text-white font-semibold">{avg}</span></span>
+          <span className="text-xs text-gray-400">Avg: <span className="text-gray-700 font-semibold">{avg}</span></span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-slate-400">Peak: <span className="text-white font-semibold">{max}</span></span>
+          <span className="text-xs text-gray-400">Peak: <span className="text-gray-700 font-semibold">{max}</span></span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-slate-400">Total: <span className="text-white font-semibold">{total.toLocaleString()}</span></span>
+          <span className="text-xs text-gray-400">Total: <span className="text-gray-700 font-semibold">{total.toLocaleString()}</span></span>
         </div>
       </div>
 
@@ -117,8 +114,8 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
         >
           <defs>
             <linearGradient id={`area-${label}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.25" />
-              <stop offset="70%" stopColor={color} stopOpacity="0.05" />
+              <stop offset="0%" stopColor={color} stopOpacity="0.15" />
+              <stop offset="70%" stopColor={color} stopOpacity="0.03" />
               <stop offset="100%" stopColor={color} stopOpacity="0" />
             </linearGradient>
             <filter id={`glow-${label}`}>
@@ -130,16 +127,16 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
           {/* Horizontal grid lines */}
           {yTicks.map((t, i) => (
             <g key={i}>
-              <line x1={PX} y1={t.y} x2={PX + cW} y2={t.y} stroke="#1e293b" strokeWidth="1" strokeDasharray="3,6" />
-              <text x={PX - 8} y={t.y + 3} textAnchor="end" fontSize="9" fill="#475569" fontFamily="system-ui">{t.val}</text>
+              <line x1={PX} y1={t.y} x2={PX + cW} y2={t.y} stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3,6" />
+              <text x={PX - 8} y={t.y + 3} textAnchor="end" fontSize="9" fill="#94a3b8" fontFamily="system-ui">{t.val}</text>
             </g>
           ))}
 
           {/* X-axis labels */}
           {xLabels.map((l, i) => (
             <g key={i}>
-              <line x1={l.x} y1={PY + cH} x2={l.x} y2={PY + cH + 6} stroke="#334155" strokeWidth="1" />
-              <text x={l.x} y={H - 8} textAnchor="middle" fontSize="9" fill="#64748b" fontFamily="system-ui">{l.label}</text>
+              <line x1={l.x} y1={PY + cH} x2={l.x} y2={PY + cH + 6} stroke="#cbd5e1" strokeWidth="1" />
+              <text x={l.x} y={H - 8} textAnchor="middle" fontSize="9" fill="#94a3b8" fontFamily="system-ui">{l.label}</text>
             </g>
           ))}
 
@@ -173,7 +170,7 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
             stroke={color}
             strokeWidth="6"
             strokeLinecap="round"
-            opacity="0.15"
+            opacity="0.1"
             filter={`url(#glow-${label})`}
           />
 
@@ -184,7 +181,7 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
               cx={p.x}
               cy={p.y}
               r={hoveredIdx === i ? 6 : (data.length <= 14 ? 3 : 0)}
-              fill={hoveredIdx === i ? '#1e2030' : color}
+              fill={hoveredIdx === i ? 'white' : color}
               stroke={color}
               strokeWidth={hoveredIdx === i ? 3 : 1.5}
               className="transition-all duration-200"
@@ -195,24 +192,24 @@ const LineChart = ({ data = [], color = '#6366f1', label = '' }) => {
           {/* Hover crosshair + tooltip */}
           {hoveredIdx !== null && pts[hoveredIdx] && (
             <g>
-              <line x1={pts[hoveredIdx].x} y1={PY} x2={pts[hoveredIdx].x} y2={PY + cH} stroke={color} strokeWidth="1" strokeDasharray="4,4" opacity="0.4" />
+              <line x1={pts[hoveredIdx].x} y1={PY} x2={pts[hoveredIdx].x} y2={PY + cH} stroke={color} strokeWidth="1" strokeDasharray="4,4" opacity="0.3" />
               <rect
                 x={Math.min(pts[hoveredIdx].x - 40, W - PX - 40)}
                 y={pts[hoveredIdx].y - 36}
                 width="80"
                 height="28"
                 rx="8"
-                fill="#0f172a"
-                stroke={color}
+                fill="white"
+                stroke="#e2e8f0"
                 strokeWidth="1"
-                opacity="0.95"
+                style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.08))' }}
               />
               <text
                 x={Math.min(pts[hoveredIdx].x, W - PX)}
                 y={pts[hoveredIdx].y - 18}
                 textAnchor="middle"
                 fontSize="11"
-                fill="white"
+                fill="#1e293b"
                 fontWeight="bold"
                 fontFamily="system-ui"
               >
@@ -231,7 +228,7 @@ const BarChartH = ({ data = [], colors = ['#6366f1', '#06b6d4', '#10b981', '#f59
   const [animated, setAnimated] = useState(false);
   useEffect(() => { const t = setTimeout(() => setAnimated(true), 200); return () => clearTimeout(t); }, []);
 
-  if (!data.length) return <p className="text-sm text-slate-500 py-8 text-center">No data</p>;
+  if (!data.length) return <p className="text-sm text-gray-400 py-8 text-center">No data</p>;
   const max = Math.max(...data.map(d => d.usage ?? d.count ?? d.value ?? 0), 1);
   return (
     <div className="space-y-3">
@@ -241,12 +238,12 @@ const BarChartH = ({ data = [], colors = ['#6366f1', '#06b6d4', '#10b981', '#f59
         return (
           <div key={d.name || d.feature || i} className="group">
             <div className="flex justify-between mb-1.5">
-              <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">{d.name ?? d.feature ?? `Item ${i + 1}`}</span>
-              <span className="text-sm font-bold text-white">{val.toLocaleString()}</span>
+              <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">{d.name ?? d.feature ?? `Item ${i + 1}`}</span>
+              <span className="text-sm font-bold text-gray-900">{val.toLocaleString()}</span>
             </div>
-            <div className="h-2.5 bg-white/5 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-1000 ease-out group-hover:brightness-125"
+                className="h-full rounded-full transition-all duration-1000 ease-out group-hover:brightness-110"
                 style={{
                   width: animated ? `${pct}%` : '0%',
                   backgroundColor: colors[i % colors.length],
@@ -283,22 +280,22 @@ const StatusBadge = ({ status }) => {
   const isHealthy = status === 'Healthy' || status === 'Connected';
   return (
     <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-      isHealthy ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
+      isHealthy ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
     }`}>
-      <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+      <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
       {status}
     </div>
   );
 };
 
 // ─── System Health Card ──────────────────────────────────────────────────────
-const HealthMetric = ({ icon: Icon, label, value, color = 'text-slate-300' }) => (
-  <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all duration-300 group">
+const HealthMetric = ({ icon: Icon, label, value, color = 'text-gray-600' }) => (
+  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all duration-300 group">
     <div className="flex items-center gap-2 mb-2">
       <Icon className={`w-4 h-4 ${color}`} />
-      <p className="text-xs text-slate-500 font-medium">{label}</p>
+      <p className="text-xs text-gray-400 font-medium">{label}</p>
     </div>
-    <p className="text-sm font-bold text-white group-hover:text-white/90 transition-colors">{value || '—'}</p>
+    <p className="text-sm font-bold text-gray-900 group-hover:text-gray-700 transition-colors">{value || '—'}</p>
   </div>
 );
 
@@ -332,8 +329,8 @@ const AnalyticsDashboard = () => {
   if (loading) return <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">{[1, 2, 3, 4].map(i => <SkeletonChart key={i} />)}</div>;
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3">
-      <AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchAll} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchAll} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -345,97 +342,92 @@ const AnalyticsDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div><h2 className="text-xl font-bold text-white">Analytics</h2><p className="text-sm text-slate-400">Platform usage insights</p></div>
-        <button onClick={fetchAll} className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white cursor-pointer group"><RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" /></button>
+        <div><h2 className="text-xl font-bold text-gray-900">Analytics</h2><p className="text-sm text-gray-400">Platform usage insights</p></div>
+        <button onClick={fetchAll} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 cursor-pointer group"><RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" /></button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Daily Active Users - Enhanced */}
-        <div className="bg-[#1e2030] rounded-2xl p-6 border border-white/5 hover:border-white/10 transition-all duration-300 lg:col-span-2">
+        {/* Daily Active Users */}
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 transition-all duration-300 lg:col-span-2 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center">
-                <Activity className="w-5 h-5 text-blue-400" />
+              <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Activity className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Daily Active Users</h3>
-                <p className="text-xs text-slate-500">Last 30 days activity</p>
+                <h3 className="text-lg font-bold text-gray-900">Daily Active Users</h3>
+                <p className="text-xs text-gray-400">Last 30 days activity</p>
               </div>
             </div>
             {dailyList.length > 0 && (
               <div className="text-right">
-                <p className="text-2xl font-bold text-white">{dailyList[dailyList.length - 1]?.activeUsers ?? dailyList[dailyList.length - 1]?.count ?? 0}</p>
-                <p className="text-xs text-slate-500">Today</p>
+                <p className="text-2xl font-bold text-gray-900">{dailyList[dailyList.length - 1]?.activeUsers ?? dailyList[dailyList.length - 1]?.count ?? 0}</p>
+                <p className="text-xs text-gray-400">Today</p>
               </div>
             )}
           </div>
-          <LineChart data={dailyList} color="#6366f1" label="dau" />
+          <LineChart data={dailyList} color="#3b82f6" label="dau" />
         </div>
 
         {/* Feature Usage */}
-        <div className="bg-[#1e2030] rounded-2xl p-6 border border-white/5 hover:border-white/10 transition-all duration-300">
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 transition-all duration-300 shadow-sm">
           <div className="flex items-center gap-2 mb-5">
-            <div className="w-9 h-9 rounded-lg bg-cyan-500/15 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-cyan-400" />
+            <div className="w-9 h-9 rounded-lg bg-cyan-50 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-cyan-600" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Feature Usage</h3>
-              <p className="text-xs text-slate-500">Content created per feature</p>
+              <h3 className="text-lg font-bold text-gray-900">Feature Usage</h3>
+              <p className="text-xs text-gray-400">Content created per feature</p>
             </div>
           </div>
           <BarChartH data={featureList} />
         </div>
 
         {/* Top Features */}
-        <div className="bg-[#1e2030] rounded-2xl p-6 border border-white/5 hover:border-white/10 transition-all duration-300">
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 transition-all duration-300 shadow-sm">
           <div className="flex items-center gap-2 mb-5">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-emerald-400" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Top Features</h3>
-              <p className="text-xs text-slate-500">Most popular by usage</p>
+              <h3 className="text-lg font-bold text-gray-900">Top Features</h3>
+              <p className="text-xs text-gray-400">Most popular by usage</p>
             </div>
           </div>
           <BarChartH data={topList} colors={['#10b981', '#06b6d4', '#6366f1', '#f59e0b', '#ef4444']} />
         </div>
 
-        {/* System Health - Enhanced */}
+        {/* System Health */}
         {health && (
-          <div className="bg-[#1e2030] rounded-2xl p-6 border border-white/5 hover:border-white/10 transition-all duration-300 lg:col-span-2">
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 transition-all duration-300 lg:col-span-2 shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
-                  <Server className="w-5 h-5 text-amber-400" />
+                <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+                  <Server className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">System Health</h3>
-                  <p className="text-xs text-slate-500">Infrastructure monitoring</p>
+                  <h3 className="text-lg font-bold text-gray-900">System Health</h3>
+                  <p className="text-xs text-gray-400">Infrastructure monitoring</p>
                 </div>
               </div>
               <StatusBadge status={health.status} />
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {/* Timestamp - formatted */}
-              <HealthMetric icon={Clock} label="Last Checked" value={formatTimestamp(health.timestamp)} color="text-blue-400" />
-
-              {/* Database */}
+              <HealthMetric icon={Clock} label="Last Checked" value={formatTimestamp(health.timestamp)} color="text-blue-500" />
               {health.database && (
                 <>
-                  <HealthMetric icon={Database} label="Database Status" value={health.database.status} color="text-emerald-400" />
-                  <HealthMetric icon={Database} label="Database Name" value={health.database.name} color="text-cyan-400" />
-                  <HealthMetric icon={Globe} label="Database Host" value={health.database.host} color="text-slate-400" />
+                  <HealthMetric icon={Database} label="Database Status" value={health.database.status} color="text-emerald-500" />
+                  <HealthMetric icon={Database} label="Database Name" value={health.database.name} color="text-cyan-500" />
+                  <HealthMetric icon={Globe} label="Database Host" value={health.database.host} color="text-gray-500" />
                 </>
               )}
-
-              {/* Server */}
               {health.server && (
                 <>
-                  <HealthMetric icon={Clock} label="Uptime" value={health.server.uptimeFormatted || `${health.server.uptime}s`} color="text-green-400" />
-                  <HealthMetric icon={HardDrive} label="Memory (Heap)" value={health.server.memory?.heapUsed || '—'} color="text-amber-400" />
-                  <HealthMetric icon={HardDrive} label="Heap Total" value={health.server.memory?.heapTotal || '—'} color="text-orange-400" />
-                  <HealthMetric icon={Cpu} label="Node Version" value={health.server.nodeVersion || '—'} color="text-purple-400" />
+                  <HealthMetric icon={Clock} label="Uptime" value={health.server.uptimeFormatted || `${health.server.uptime}s`} color="text-green-500" />
+                  <HealthMetric icon={HardDrive} label="Memory (Heap)" value={health.server.memory?.heapUsed || '—'} color="text-amber-500" />
+                  <HealthMetric icon={HardDrive} label="Heap Total" value={health.server.memory?.heapTotal || '—'} color="text-orange-500" />
+                  <HealthMetric icon={Cpu} label="Node Version" value={health.server.nodeVersion || '—'} color="text-purple-500" />
                 </>
               )}
             </div>

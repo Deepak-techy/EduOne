@@ -67,9 +67,9 @@ const CommunityModeration = () => {
   if (loading) return <SkeletonTable rows={6} />;
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3">
-      <AlertCircle className="w-8 h-8 text-red-400" />
-      <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchPosts} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <AlertCircle className="w-8 h-8 text-red-500" />
+      <p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchPosts} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -82,7 +82,7 @@ const CommunityModeration = () => {
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                tab === t.id ? 'bg-blue-500/15 text-blue-400' : 'bg-white/5 text-slate-400 hover:text-white'
+                tab === t.id ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-500 hover:text-gray-900'
               }`}>
               <Icon className="w-4 h-4" />{t.label}
             </button>
@@ -96,13 +96,13 @@ const CommunityModeration = () => {
         <EmptyState icon={MessageSquare} title="No posts found" description="No community posts to display." action={fetchPosts} actionLabel="Refresh" />
       ) : (
         <>
-          <div className="bg-[#1e2030] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02]">
+                  <tr className="border-b border-gray-100 bg-gray-50">
                     {['Author', 'Content', 'Date', 'Flags', 'Actions'].map(h => (
-                      <th key={h} className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                      <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -115,40 +115,40 @@ const CommunityModeration = () => {
                     const flags = post.reportCount ?? post.flagCount ?? 0;
 
                     return (
-                      <tr key={pid} className="hover:bg-white/[0.02] transition-colors">
+                      <tr key={pid} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-gray-900 text-xs font-bold flex-shrink-0">
                               {author[0]?.toUpperCase()}
                             </div>
                             <div>
-                              <span className="text-sm font-semibold text-white">{author}</span>
-                              <p className="text-[11px] text-slate-500 capitalize">{post.author?.role || ''}</p>
+                              <span className="text-sm font-semibold text-gray-900">{author}</span>
+                              <p className="text-[11px] text-gray-400 capitalize">{post.author?.role || ''}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-5 py-4 max-w-xs">
-                          <p className="text-sm text-slate-300 truncate">{content || '(empty)'}</p>
+                          <p className="text-sm text-gray-700 truncate">{content || '(empty)'}</p>
                         </td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{date}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-400 whitespace-nowrap">{date}</span></td>
                         <td className="px-5 py-4">
                           {flags > 0 ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-500 border border-red-200">
                               <Flag className="w-3 h-3" />Flagged ({flags})
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
                               Not Flagged
                             </span>
                           )}
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <button onClick={() => setViewPost(post)} className="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+                            <button onClick={() => setViewPost(post)} className="p-1.5 rounded-lg bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer">
                               <Eye className="w-3.5 h-3.5" />
                             </button>
                             <button onClick={() => setConfirmDel(pid)} disabled={deleting === pid}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors cursor-pointer disabled:opacity-50">
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 transition-colors cursor-pointer disabled:opacity-50">
                               <Trash2 className="w-3.5 h-3.5" />Delete
                             </button>
                           </div>
@@ -171,19 +171,19 @@ const CommunityModeration = () => {
         {viewPost && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-gray-900 text-sm font-bold">
                 {(viewPost.author?.fullName || 'U')[0].toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-bold text-white">{viewPost.author?.fullName || '—'}</p>
-                <p className="text-xs text-slate-500">{viewPost.author?.role || ''} • {viewPost.createdAt ? new Date(viewPost.createdAt).toLocaleString() : ''}</p>
+                <p className="text-sm font-bold text-gray-900">{viewPost.author?.fullName || '—'}</p>
+                <p className="text-xs text-gray-400">{viewPost.author?.role || ''} • {viewPost.createdAt ? new Date(viewPost.createdAt).toLocaleString() : ''}</p>
               </div>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{viewPost.content || viewPost.text || viewPost.body || '(empty)'}</p>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{viewPost.content || viewPost.text || viewPost.body || '(empty)'}</p>
             {(viewPost.flagCount > 0 || viewPost.flagged) && (
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                <Flag className="w-4 h-4 text-red-400" />
-                <span className="text-sm text-red-400 font-semibold">{viewPost.flagCount || 1} flag(s)</span>
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200">
+                <Flag className="w-4 h-4 text-red-500" />
+                <span className="text-sm text-red-500 font-semibold">{viewPost.flagCount || 1} flag(s)</span>
               </div>
             )}
           </div>

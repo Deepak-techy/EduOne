@@ -53,8 +53,8 @@ const TasksMonitoring = () => {
 
   if (loading) return <div className="space-y-5"><div className="grid grid-cols-1 sm:grid-cols-3 gap-4">{[1,2,3].map(i => <SkeletonCard key={i} />)}</div><SkeletonTable rows={6} /></div>;
   if (error) return (
-    <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
+    <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-500" /><p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
   );
 
   return (
@@ -76,12 +76,12 @@ const TasksMonitoring = () => {
         <EmptyState icon={CalendarCheck} title="No tasks" description="No tasks to display." action={fetchData} actionLabel="Refresh" />
       ) : (
         <>
-          <div className="bg-[#1e2030] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead><tr className="border-b border-white/5 bg-white/[0.02]">
+                <thead><tr className="border-b border-gray-100 bg-gray-50">
                   {['Task', 'Owner', 'Priority', 'Status', 'Due Date', 'Actions'].map(h => (
-                    <th key={h} className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody className="divide-y divide-white/5">
@@ -90,21 +90,21 @@ const TasksMonitoring = () => {
                     const owner = task.userId?.fullName || task.owner?.fullName || '—';
                     const completed = task.isCompleted || task.status === 'completed';
                     const priority = task.priority || 'Medium';
-                    const prioColor = priority.toLowerCase() === 'high' ? 'text-red-400 bg-red-500/10' : priority.toLowerCase() === 'low' ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10';
+                    const prioColor = priority.toLowerCase() === 'high' ? 'text-red-500 bg-red-50' : priority.toLowerCase() === 'low' ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50';
                     return (
-                      <tr key={tid} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="px-5 py-4"><span className="text-sm font-semibold text-white">{task.subject || task.task || 'Untitled'}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-400">{owner}</span></td>
+                      <tr key={tid} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4"><span className="text-sm font-semibold text-gray-900">{task.subject || task.task || 'Untitled'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-500">{owner}</span></td>
                         <td className="px-5 py-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${prioColor}`}>{priority}</span></td>
                         <td className="px-5 py-4">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${completed ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${completed ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
                             {completed ? <><CheckCircle2 className="w-3 h-3" />Done</> : <><Clock className="w-3 h-3" />Pending</>}
                           </span>
                         </td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '—'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-400 whitespace-nowrap">{task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '—'}</span></td>
                         <td className="px-5 py-4">
                           <button onClick={() => setConfirmDel(tid)} disabled={deleting === tid}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 cursor-pointer disabled:opacity-50">
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 cursor-pointer disabled:opacity-50">
                             <Trash2 className="w-3.5 h-3.5" />Delete
                           </button>
                         </td>

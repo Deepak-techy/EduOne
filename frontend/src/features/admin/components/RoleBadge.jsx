@@ -1,11 +1,11 @@
 // src/features/admin/components/RoleBadge.jsx
 
 const ROLE_STYLES = {
-  admin:   'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  teacher: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  student: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  moderator: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  default: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+  admin:   'bg-purple-50 text-purple-600 border-purple-200',
+  teacher: 'bg-blue-50 text-blue-600 border-blue-200',
+  student: 'bg-cyan-50 text-cyan-600 border-cyan-200',
+  moderator: 'bg-amber-50 text-amber-600 border-amber-200',
+  default: 'bg-gray-50 text-gray-500 border-gray-200',
 };
 
 const ROLE_ICONS = {

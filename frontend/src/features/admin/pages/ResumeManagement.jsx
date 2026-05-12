@@ -50,8 +50,8 @@ const ResumeManagement = () => {
 
   if (loading) return <div className="space-y-5"><div className="grid grid-cols-1 sm:grid-cols-3 gap-4">{[1,2,3].map(i => <SkeletonCard key={i} />)}</div><SkeletonTable rows={6} /></div>;
   if (error) return (
-    <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
+    <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-500" /><p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
   );
 
   return (
@@ -70,12 +70,12 @@ const ResumeManagement = () => {
         <EmptyState icon={FileCheck} title="No resumes" description="No resumes to display." action={fetchData} actionLabel="Refresh" />
       ) : (
         <>
-          <div className="bg-[#1e2030] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead><tr className="border-b border-white/5 bg-white/[0.02]">
+                <thead><tr className="border-b border-gray-100 bg-gray-50">
                   {['Owner', 'Job Role', 'Score', 'Created', 'Actions'].map(h => (
-                    <th key={h} className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody className="divide-y divide-white/5">
@@ -83,14 +83,14 @@ const ResumeManagement = () => {
                     const rid = resume._id || resume.id;
                     const owner = resume.userId?.fullName || resume.fullName || '—';
                     return (
-                      <tr key={rid} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="px-5 py-4"><span className="text-sm font-semibold text-white">{owner}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-400">{resume.jobRole || '—'}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm font-bold text-blue-400">{resume.analysisResult?.overallScore ?? '—'}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{resume.createdAt ? new Date(resume.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
+                      <tr key={rid} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4"><span className="text-sm font-semibold text-gray-900">{owner}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-500">{resume.jobRole || '—'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm font-bold text-blue-600">{resume.analysisResult?.overallScore ?? '—'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-400 whitespace-nowrap">{resume.createdAt ? new Date(resume.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
                         <td className="px-5 py-4">
                           <button onClick={() => setConfirmDel(rid)} disabled={deleting === rid}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 cursor-pointer disabled:opacity-50">
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 cursor-pointer disabled:opacity-50">
                             <Trash2 className="w-3.5 h-3.5" />Delete
                           </button>
                         </td>

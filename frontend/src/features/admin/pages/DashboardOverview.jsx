@@ -28,7 +28,7 @@ const AnimatedValue = ({ value, duration = 1200 }) => {
 // Large hero stat card
 const HeroCard = ({ title, value, icon: Icon, gradient, subtitle, delay = 0 }) => (
   <div
-    className="relative overflow-hidden rounded-2xl p-6 border border-white/10 group hover:border-white/20 transition-all duration-500 hover:-translate-y-1 cursor-default"
+    className="relative overflow-hidden rounded-2xl p-6 border border-white/10 group hover:shadow-lg transition-all duration-500 hover:-translate-y-1 cursor-default"
     style={{ background: gradient, animationDelay: `${delay}ms` }}
   >
     {/* Animated background circles */}
@@ -57,14 +57,14 @@ const HeroCard = ({ title, value, icon: Icon, gradient, subtitle, delay = 0 }) =
 // Standard stat card with ring progress
 const StatCard = ({ title, value, icon: Icon, color, subtitle, maxVal, delay = 0 }) => {
   const colors = {
-    blue: { bg: 'bg-blue-500/10', text: 'text-blue-400', ring: '#3b82f6', glow: 'group-hover:shadow-blue-500/10' },
-    green: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', ring: '#10b981', glow: 'group-hover:shadow-emerald-500/10' },
-    orange: { bg: 'bg-orange-500/10', text: 'text-orange-400', ring: '#f97316', glow: 'group-hover:shadow-orange-500/10' },
-    cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', ring: '#06b6d4', glow: 'group-hover:shadow-cyan-500/10' },
-    purple: { bg: 'bg-purple-500/10', text: 'text-purple-400', ring: '#8b5cf6', glow: 'group-hover:shadow-purple-500/10' },
-    teal: { bg: 'bg-teal-500/10', text: 'text-teal-400', ring: '#14b8a6', glow: 'group-hover:shadow-teal-500/10' },
-    amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', ring: '#f59e0b', glow: 'group-hover:shadow-amber-500/10' },
-    pink: { bg: 'bg-pink-500/10', text: 'text-pink-400', ring: '#ec4899', glow: 'group-hover:shadow-pink-500/10' },
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600', ring: '#3b82f6', glow: 'group-hover:shadow-blue-100' },
+    green: { bg: 'bg-emerald-50', text: 'text-emerald-600', ring: '#10b981', glow: 'group-hover:shadow-emerald-100' },
+    orange: { bg: 'bg-orange-50', text: 'text-orange-600', ring: '#f97316', glow: 'group-hover:shadow-orange-100' },
+    cyan: { bg: 'bg-cyan-50', text: 'text-cyan-600', ring: '#06b6d4', glow: 'group-hover:shadow-cyan-100' },
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600', ring: '#8b5cf6', glow: 'group-hover:shadow-purple-100' },
+    teal: { bg: 'bg-teal-50', text: 'text-teal-600', ring: '#14b8a6', glow: 'group-hover:shadow-teal-100' },
+    amber: { bg: 'bg-amber-50', text: 'text-amber-600', ring: '#f59e0b', glow: 'group-hover:shadow-amber-100' },
+    pink: { bg: 'bg-pink-50', text: 'text-pink-600', ring: '#ec4899', glow: 'group-hover:shadow-pink-100' },
   };
   const c = colors[color] || colors.blue;
   const numericVal = typeof value === 'string' ? parseInt(value) || 0 : (typeof value === 'number' ? value : 0);
@@ -72,14 +72,14 @@ const StatCard = ({ title, value, icon: Icon, color, subtitle, maxVal, delay = 0
   const circumference = 2 * Math.PI * 18;
 
   return (
-    <div className={`group relative bg-[#1e2030] rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${c.glow} cursor-default`}>
+    <div className={`group relative bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${c.glow} cursor-default shadow-sm`}>
       <div className="flex items-start justify-between mb-3">
         <div className={`w-11 h-11 rounded-xl ${c.bg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
           <Icon className={`w-5 h-5 ${c.text}`} strokeWidth={2.5} />
         </div>
         {pct !== null && (
           <svg width="44" height="44" className="transform -rotate-90">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#1e293b" strokeWidth="3" />
+            <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="3" />
             <circle
               cx="22" cy="22" r="18" fill="none" stroke={c.ring} strokeWidth="3"
               strokeDasharray={circumference}
@@ -87,22 +87,17 @@ const StatCard = ({ title, value, icon: Icon, color, subtitle, maxVal, delay = 0
               strokeLinecap="round"
               className="transition-all duration-1000"
             />
-            <text x="22" y="22" textAnchor="middle" dominantBaseline="central" fill="#94a3b8" fontSize="9" fontWeight="bold" className="rotate-90 origin-center">
+            <text x="22" y="22" textAnchor="middle" dominantBaseline="central" fill="#64748b" fontSize="9" fontWeight="bold" className="rotate-90 origin-center">
               {Math.round(pct)}%
             </text>
           </svg>
         )}
       </div>
-      <h3 className="text-2xl font-bold text-white mb-0.5 tracking-tight">
+      <h3 className="text-2xl font-bold text-gray-900 mb-0.5 tracking-tight">
         <AnimatedValue value={value} />
       </h3>
-      <p className="text-xs text-slate-400 font-medium">{title}</p>
-      {subtitle && <p className="text-[11px] text-slate-500 mt-0.5">{subtitle}</p>}
-
-      {/* Hover shine effect */}
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: 'linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%)' }}
-      />
+      <p className="text-xs text-gray-400 font-medium">{title}</p>
+      {subtitle && <p className="text-[11px] text-gray-400 mt-0.5">{subtitle}</p>}
     </div>
   );
 };
@@ -113,8 +108,8 @@ const SectionHeader = ({ icon: Icon, title, color }) => (
     <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center`}>
       <Icon className="w-4 h-4 text-white" />
     </div>
-    <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">{title}</h3>
-    <div className="flex-1 h-px bg-gradient-to-r from-white/10 to-transparent ml-2" />
+    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">{title}</h3>
+    <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent ml-2" />
   </div>
 );
 
@@ -148,8 +143,8 @@ const DashboardOverview = () => {
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3">
       <AlertCircle className="w-8 h-8 text-red-400" />
-      <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetch} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 transition-colors cursor-pointer flex items-center gap-2">
+      <p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetch} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold hover:bg-blue-100 transition-colors cursor-pointer flex items-center gap-2">
         <RefreshCw className="w-4 h-4" />Retry
       </button>
     </div>
@@ -165,13 +160,13 @@ const DashboardOverview = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white">Platform Overview</h2>
-          <p className="text-sm text-slate-400">
+          <h2 className="text-xl font-bold text-gray-900">Platform Overview</h2>
+          <p className="text-sm text-gray-400">
             Real-time platform statistics
-            {lastUpdated && <span className="ml-2 text-slate-500">· Updated {lastUpdated.toLocaleTimeString()}</span>}
+            {lastUpdated && <span className="ml-2 text-gray-400">· Updated {lastUpdated.toLocaleTimeString()}</span>}
           </p>
         </div>
-        <button onClick={fetch} className="p-2.5 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all duration-300 cursor-pointer group" title="Refresh">
+        <button onClick={fetch} className="p-2.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-all duration-300 cursor-pointer group" title="Refresh">
           <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
         </button>
       </div>

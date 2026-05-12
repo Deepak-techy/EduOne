@@ -27,62 +27,62 @@ const AdminSettings = () => {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Profile Section */}
-      <div className="bg-[#1e2030] rounded-2xl border border-white/5 p-6">
+      <div className="bg-white shadow-sm rounded-2xl border border-gray-100 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center">
-            <User className="w-5 h-5 text-white" />
+            <User className="w-5 h-5 text-gray-900" />
           </div>
-          <h3 className="text-lg font-bold text-white">Admin Profile</h3>
+          <h3 className="text-lg font-bold text-gray-900">Admin Profile</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
-            <p className="text-xs text-slate-500 mb-1">Full Name</p>
-            <p className="text-sm font-semibold text-white">{admin?.fullName || '—'}</p>
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-xs text-gray-400 mb-1">Full Name</p>
+            <p className="text-sm font-semibold text-gray-900">{admin?.fullName || '—'}</p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
-            <p className="text-xs text-slate-500 mb-1">Username</p>
-            <p className="text-sm font-semibold text-white">{admin?.userName || '—'}</p>
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-xs text-gray-400 mb-1">Username</p>
+            <p className="text-sm font-semibold text-gray-900">{admin?.userName || '—'}</p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
-            <p className="text-xs text-slate-500 mb-1">Email</p>
-            <p className="text-sm font-semibold text-white">{admin?.email || '—'}</p>
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-xs text-gray-400 mb-1">Email</p>
+            <p className="text-sm font-semibold text-gray-900">{admin?.email || '—'}</p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
-            <p className="text-xs text-slate-500 mb-1">Role</p>
-            <p className="text-sm font-bold text-blue-400">{admin?.role || 'Admin'}</p>
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-xs text-gray-400 mb-1">Role</p>
+            <p className="text-sm font-bold text-blue-600">{admin?.role || 'Admin'}</p>
           </div>
         </div>
       </div>
 
       {/* Change Password */}
-      <div className="bg-[#1e2030] rounded-2xl border border-white/5 p-6">
+      <div className="bg-white shadow-sm rounded-2xl border border-gray-100 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-            <Key className="w-5 h-5 text-white" />
+            <Key className="w-5 h-5 text-gray-900" />
           </div>
-          <h3 className="text-lg font-bold text-white">Change Password</h3>
+          <h3 className="text-lg font-bold text-gray-900">Change Password</h3>
         </div>
 
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Current Password</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Current Password</label>
             <input type="password" value={pwForm.oldPassword} onChange={e => setPwForm(f => ({ ...f, oldPassword: e.target.value }))}
-              placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+              placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">New Password</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">New Password</label>
             <input type="password" value={pwForm.newPassword} onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))}
-              placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+              placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Confirm New Password</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm New Password</label>
             <input type="password" value={pwForm.confirmNewPassword} onChange={e => setPwForm(f => ({ ...f, confirmNewPassword: e.target.value }))}
-              placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
+              placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 transition" />
           </div>
           <div className="pt-2">
             <button type="submit" disabled={saving}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-gray-900 text-sm font-bold shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}Update Password
             </button>
           </div>

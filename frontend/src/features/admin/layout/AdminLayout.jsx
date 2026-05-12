@@ -8,14 +8,14 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-white">
+    <div className="min-h-screen bg-[#f5f7fa] text-gray-900">
       {/* Sidebar */}
       <AdminSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/20 z-40"
           onClick={() => setSidebarOpen(false)}
         />
       )}

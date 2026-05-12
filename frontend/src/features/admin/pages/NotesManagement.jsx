@@ -54,8 +54,8 @@ const NotesManagement = () => {
 
   if (loading) return <div className="space-y-5"><div className="grid grid-cols-1 sm:grid-cols-3 gap-4">{[1,2,3].map(i => <SkeletonCard key={i} />)}</div><SkeletonTable rows={6} /></div>;
   if (error) return (
-    <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
+    <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-500" /><p className="text-sm text-gray-500">{error}</p>
+      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
   );
 
   return (
@@ -74,12 +74,12 @@ const NotesManagement = () => {
         <EmptyState icon={StickyNote} title="No notes" description="No notes to display." action={fetchData} actionLabel="Refresh" />
       ) : (
         <>
-          <div className="bg-[#1e2030] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead><tr className="border-b border-white/5 bg-white/[0.02]">
+                <thead><tr className="border-b border-gray-100 bg-gray-50">
                   {['Subject', 'Owner', 'Document', 'Created', 'Actions'].map(h => (
-                    <th key={h} className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody className="divide-y divide-white/5">
@@ -87,16 +87,16 @@ const NotesManagement = () => {
                     const nid = note._id || note.id;
                     const owner = note.owner?.fullName || note.userId?.fullName || '—';
                     return (
-                      <tr key={nid} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="px-5 py-4"><span className="text-sm font-semibold text-white">{note.subject || 'Untitled'}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-400">{owner}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-400">{note.documentMetadata?.fileName || (note.documentUrl ? 'Uploaded' : '—')}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
+                      <tr key={nid} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4"><span className="text-sm font-semibold text-gray-900">{note.subject || 'Untitled'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-500">{owner}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-500">{note.documentMetadata?.fileName || (note.documentUrl ? 'Uploaded' : '—')}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm text-gray-400 whitespace-nowrap">{note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <button onClick={() => setViewNote(note)} className="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white cursor-pointer"><Eye className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => setViewNote(note)} className="p-1.5 rounded-lg bg-gray-50 text-gray-500 hover:text-gray-900 cursor-pointer"><Eye className="w-3.5 h-3.5" /></button>
                             <button onClick={() => setConfirmDel(nid)} disabled={deleting === nid}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 cursor-pointer disabled:opacity-50">
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 cursor-pointer disabled:opacity-50">
                               <Trash2 className="w-3.5 h-3.5" />Delete
                             </button>
                           </div>
@@ -118,10 +118,10 @@ const NotesManagement = () => {
       <AdminModal open={!!viewNote} onClose={() => setViewNote(null)} title="Note Details" icon={StickyNote}>
         {viewNote && (
           <div className="space-y-3">
-            <div><p className="text-xs text-slate-500 mb-1">Subject</p><p className="text-sm text-white font-semibold">{viewNote.subject || 'Untitled'}</p></div>
-            <div><p className="text-xs text-slate-500 mb-1">Owner</p><p className="text-sm text-slate-300">{viewNote.owner?.fullName || viewNote.userId?.fullName || '—'}</p></div>
-            {viewNote.documentMetadata?.fileName && <div><p className="text-xs text-slate-500 mb-1">Document</p><p className="text-sm text-slate-300">{viewNote.documentMetadata.fileName}</p></div>}
-            {viewNote.content && <div><p className="text-xs text-slate-500 mb-1">Content Preview</p><p className="text-sm text-slate-300 leading-relaxed line-clamp-6">{viewNote.content}</p></div>}
+            <div><p className="text-xs text-gray-400 mb-1">Subject</p><p className="text-sm text-gray-900 font-semibold">{viewNote.subject || 'Untitled'}</p></div>
+            <div><p className="text-xs text-gray-400 mb-1">Owner</p><p className="text-sm text-gray-700">{viewNote.owner?.fullName || viewNote.userId?.fullName || '—'}</p></div>
+            {viewNote.documentMetadata?.fileName && <div><p className="text-xs text-gray-400 mb-1">Document</p><p className="text-sm text-gray-700">{viewNote.documentMetadata.fileName}</p></div>}
+            {viewNote.content && <div><p className="text-xs text-gray-400 mb-1">Content Preview</p><p className="text-sm text-gray-700 leading-relaxed line-clamp-6">{viewNote.content}</p></div>}
           </div>
         )}
       </AdminModal>

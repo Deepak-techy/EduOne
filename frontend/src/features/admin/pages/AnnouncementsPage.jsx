@@ -141,7 +141,7 @@ const AnnouncementsPage = () => {
         <AlertCircle className="w-8 h-8 text-red-400" />
       </div>
       <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchData} className="px-5 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-bold cursor-pointer flex items-center gap-2 hover:bg-indigo-500/20 transition">
+      <button onClick={fetchData} className="px-5 py-2.5 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-bold cursor-pointer flex items-center gap-2 hover:bg-blue-500/20 transition">
         <RefreshCw className="w-4 h-4" /> Retry
       </button>
     </div>
@@ -152,7 +152,7 @@ const AnnouncementsPage = () => {
       {/* Stats Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total', value: totalCount, icon: Megaphone, gradient: 'from-indigo-500 to-purple-600', bg: 'bg-indigo-500/10' },
+          { label: 'Total', value: totalCount, icon: Megaphone, gradient: 'from-[#2196F3] to-[#00BCD4]', bg: 'bg-blue-500/10' },
           { label: 'Pinned', value: pinnedCount, icon: Pin, gradient: 'from-amber-500 to-orange-500', bg: 'bg-amber-500/10' },
           { label: 'Active', value: activeCount, icon: Bell, gradient: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-500/10' },
         ].map(stat => (
@@ -174,7 +174,7 @@ const AnnouncementsPage = () => {
           {['all', 'pinned', 'inactive'].map(tab => (
             <button key={tab} onClick={() => setFilterTab(tab)}
               className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                filterTab === tab ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'
+                filterTab === tab ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'
               }`}>
               {tab}
             </button>
@@ -185,10 +185,10 @@ const AnnouncementsPage = () => {
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search announcements..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition" />
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition" />
           </div>
           <button onClick={openCreate}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all cursor-pointer whitespace-nowrap">
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all cursor-pointer whitespace-nowrap">
             <Plus className="w-4 h-4" /> New
           </button>
         </div>
@@ -202,7 +202,7 @@ const AnnouncementsPage = () => {
           </div>
           <h3 className="text-lg font-bold text-white mb-1">No announcements</h3>
           <p className="text-sm text-slate-500 mb-6">Create your first announcement to get started.</p>
-          <button onClick={openCreate} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold cursor-pointer">
+          <button onClick={openCreate} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold cursor-pointer">
             Create Announcement
           </button>
         </div>
@@ -217,7 +217,7 @@ const AnnouncementsPage = () => {
 
             return (
               <div key={aid} className={`group bg-[#1e2030] rounded-2xl border transition-all duration-300 hover:border-white/15 hover:shadow-lg hover:shadow-black/20 ${
-                !isActive ? 'opacity-50 border-white/5' : a.isPinned ? 'border-indigo-500/30 shadow-indigo-500/5' : 'border-white/5'
+                !isActive ? 'opacity-50 border-white/5' : a.isPinned ? 'border-blue-500/30 shadow-blue-500/5' : 'border-white/5'
               }`}>
                 <div className="p-5">
                   <div className="flex items-start gap-4">
@@ -230,7 +230,7 @@ const AnnouncementsPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-sm font-bold text-white truncate">{a.title || 'Untitled'}</h3>
-                        {a.isPinned && <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 uppercase">Pinned</span>}
+                        {a.isPinned && <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/20 uppercase">Pinned</span>}
                         {!isActive && <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/20 uppercase">Inactive</span>}
                       </div>
                       <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed">{a.content || ''}</p>
@@ -250,7 +250,7 @@ const AnnouncementsPage = () => {
                         {isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                       <button onClick={() => handlePin(aid)} title={a.isPinned ? 'Unpin' : 'Pin to top'}
-                        className={`p-2 rounded-lg hover:bg-white/5 cursor-pointer transition flex items-center gap-1 ${a.isPinned ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-500 hover:text-indigo-400'}`}>
+                        className={`p-2 rounded-lg hover:bg-white/5 cursor-pointer transition flex items-center gap-1 ${a.isPinned ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-blue-400'}`}>
                         <Pin className="w-4 h-4" />
                         <span className="text-[10px] font-bold">{a.isPinned ? 'Unpin' : 'Pin'}</span>
                       </button>
@@ -277,18 +277,18 @@ const AnnouncementsPage = () => {
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">Title</label>
             <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Announcement title…"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition" />
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">Message</label>
             <textarea rows={4} value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} placeholder="Write your announcement…"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition resize-none" />
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition resize-none" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">Audience</label>
               <select value={form.targetAudience} onChange={e => setForm(f => ({ ...f, targetAudience: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition">
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition">
                 <option value="All">All Users</option>
                 <option value="Students">Students</option>
                 <option value="Teachers">Teachers</option>
@@ -297,18 +297,18 @@ const AnnouncementsPage = () => {
             <div className="flex flex-col justify-end gap-3">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input type="checkbox" checked={form.isPinned} onChange={e => setForm(f => ({ ...f, isPinned: e.target.checked }))}
-                  className="w-4 h-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                  className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-blue-500 cursor-pointer" />
                 <span className="text-xs font-bold text-slate-300"><Pin className="w-3 h-3 inline mr-1" />Pin to top</span>
               </label>
             </div>
           </div>
 
           {!editItem && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-blue-500/5 border border-blue-500/15">
               <input type="checkbox" id="notifyUsers" checked={form.notifyUsers} onChange={e => setForm(f => ({ ...f, notifyUsers: e.target.checked }))}
-                className="w-4 h-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-blue-500 cursor-pointer" />
               <label htmlFor="notifyUsers" className="cursor-pointer select-none">
-                <span className="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><Send className="w-3 h-3" /> Send notification to all users</span>
+                <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5"><Send className="w-3 h-3" /> Send notification to all users</span>
                 <p className="text-[10px] text-slate-500 mt-0.5">Users will see this in their notification center</p>
               </label>
             </div>
@@ -320,7 +320,7 @@ const AnnouncementsPage = () => {
               Cancel
             </button>
             <button type="submit" disabled={saving}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               {editItem ? 'Update' : 'Publish'}
             </button>

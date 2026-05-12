@@ -108,7 +108,7 @@ const UserManagement = () => {
     <div className="flex flex-col items-center justify-center py-24 gap-3">
       <AlertCircle className="w-8 h-8 text-red-400" />
       <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchUsers} className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold hover:bg-indigo-500/20 cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <button onClick={fetchUsers} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -128,7 +128,7 @@ const UserManagement = () => {
         <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">
           <Download className="w-4 h-4" />Export
         </button>
-        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all cursor-pointer">
+        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all cursor-pointer">
           <UserPlus className="w-4 h-4" />Create User
         </button>
       </SearchFilterBar>
@@ -160,7 +160,7 @@ const UserManagement = () => {
                   <tr key={uid} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                           {name[0]?.toUpperCase()}
                         </div>
                         <span className="text-sm font-semibold text-white whitespace-nowrap">{name}</span>
@@ -178,7 +178,7 @@ const UserManagement = () => {
                           <div className="absolute top-full mt-1 left-0 z-20 bg-[#252740] border border-white/10 rounded-xl shadow-xl overflow-hidden min-w-[120px]">
                             {ROLES.map(r => (
                               <button key={r} onClick={() => handleRoleChange(uid, r)}
-                                className={`w-full text-left px-4 py-2 text-sm capitalize hover:bg-white/5 transition-colors cursor-pointer ${r === role ? 'text-indigo-400 font-bold' : 'text-slate-300'}`}>{r}</button>
+                                className={`w-full text-left px-4 py-2 text-sm capitalize hover:bg-white/5 transition-colors cursor-pointer ${r === role ? 'text-blue-400 font-bold' : 'text-slate-300'}`}>{r}</button>
                             ))}
                           </div>
                         )}
@@ -241,26 +241,26 @@ const UserManagement = () => {
             <label className="block text-sm font-semibold text-slate-300 mb-1.5">Full Name</label>
             <input type="text" value={createForm.fullName} onChange={e => setCreateForm(f => ({ ...f, fullName: e.target.value }))}
               placeholder="John Doe"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition" />
+              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-1.5">Username</label>
             <input type="text" value={createForm.userName} onChange={e => setCreateForm(f => ({ ...f, userName: e.target.value }))}
               placeholder="johndoe"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition" />
+              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-1.5">Email</label>
             <input type="email" value={createForm.email} onChange={e => setCreateForm(f => ({ ...f, email: e.target.value }))}
               placeholder="john@example.com"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition" />
+              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-1.5">Password</label>
             <div className="relative">
               <input type={showPassword ? 'text' : 'password'} value={createForm.password} onChange={e => setCreateForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="Min 6 characters"
-                className="w-full px-4 py-2.5 pr-11 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition" />
+                className="w-full px-4 py-2.5 pr-11 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition" />
               <button type="button" onClick={() => setShowPassword(p => !p)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -275,7 +275,7 @@ const UserManagement = () => {
                   className={`px-3 py-2.5 rounded-xl text-sm font-semibold text-center transition-all cursor-pointer border ${
                     createForm.role === r
                       ? r === 'Admin'
-                        ? 'bg-gradient-to-r from-indigo-500/20 to-purple-600/20 border-indigo-500/40 text-indigo-400 ring-1 ring-indigo-500/30'
+                        ? 'bg-gradient-to-r from-blue-500/20 to-cyan-600/20 border-blue-500/40 text-blue-400 ring-1 ring-blue-500/30'
                         : r === 'Teacher'
                         ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-400 ring-1 ring-cyan-500/30'
                         : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400 ring-1 ring-emerald-500/30'
@@ -294,7 +294,7 @@ const UserManagement = () => {
             <button type="button" onClick={() => { setShowCreateModal(false); setShowPassword(false); }}
               className="px-5 py-2.5 rounded-xl border border-white/10 text-sm font-semibold text-slate-300 hover:bg-white/5 cursor-pointer transition-colors">Cancel</button>
             <button type="submit" disabled={creating}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white text-sm font-bold shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2">
               {creating && <Loader2 className="w-4 h-4 animate-spin" />}
               <UserPlus className="w-4 h-4" />{creating ? 'Creating…' : 'Create User'}
             </button>

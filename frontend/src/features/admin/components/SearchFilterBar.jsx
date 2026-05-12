@@ -25,18 +25,18 @@ const SearchFilterBar = ({
             value={searchValue}
             onChange={(e) => onSearchChange?.(e.target.value)}
             placeholder={placeholder}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
           />
         </div>
         {filters.length > 0 && (
           <button
             onClick={() => setFiltersOpen(o => !o)}
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
-              hasActive ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+              hasActive ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
             }`}
           >
             <Filter className="w-4 h-4" />Filters
-            {hasActive && <span className="w-2 h-2 rounded-full bg-indigo-400" />}
+            {hasActive && <span className="w-2 h-2 rounded-full bg-blue-400" />}
           </button>
         )}
         {children}
@@ -50,7 +50,7 @@ const SearchFilterBar = ({
                 {f.options.map(opt => (
                   <button key={opt.value} onClick={() => onFilterChange?.(f.key, opt.value)}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                      activeFilters[f.key] === opt.value ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 text-slate-400 border border-transparent hover:bg-white/10'
+                      activeFilters[f.key] === opt.value ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-white/5 text-slate-400 border border-transparent hover:bg-white/10'
                     }`}>{opt.label}</button>
                 ))}
               </div>

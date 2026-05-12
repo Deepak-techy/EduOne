@@ -51,7 +51,7 @@ const ResumeManagement = () => {
   if (loading) return <div className="space-y-5"><div className="grid grid-cols-1 sm:grid-cols-3 gap-4">{[1,2,3].map(i => <SkeletonCard key={i} />)}</div><SkeletonTable rows={6} /></div>;
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3"><AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
+      <button onClick={fetchData} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button></div>
   );
 
   return (
@@ -86,7 +86,7 @@ const ResumeManagement = () => {
                       <tr key={rid} className="hover:bg-white/[0.02] transition-colors">
                         <td className="px-5 py-4"><span className="text-sm font-semibold text-white">{owner}</span></td>
                         <td className="px-5 py-4"><span className="text-sm text-slate-400">{resume.jobRole || '—'}</span></td>
-                        <td className="px-5 py-4"><span className="text-sm font-bold text-indigo-400">{resume.analysisResult?.overallScore ?? '—'}</span></td>
+                        <td className="px-5 py-4"><span className="text-sm font-bold text-blue-400">{resume.analysisResult?.overallScore ?? '—'}</span></td>
                         <td className="px-5 py-4"><span className="text-sm text-slate-500 whitespace-nowrap">{resume.createdAt ? new Date(resume.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></td>
                         <td className="px-5 py-4">
                           <button onClick={() => setConfirmDel(rid)} disabled={deleting === rid}

@@ -69,7 +69,7 @@ const CommunityModeration = () => {
     <div className="flex flex-col items-center justify-center py-24 gap-3">
       <AlertCircle className="w-8 h-8 text-red-400" />
       <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchPosts} className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <button onClick={fetchPosts} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -82,7 +82,7 @@ const CommunityModeration = () => {
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                tab === t.id ? 'bg-indigo-500/15 text-indigo-400' : 'bg-white/5 text-slate-400 hover:text-white'
+                tab === t.id ? 'bg-blue-500/15 text-blue-400' : 'bg-white/5 text-slate-400 hover:text-white'
               }`}>
               <Icon className="w-4 h-4" />{t.label}
             </button>

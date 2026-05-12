@@ -33,17 +33,17 @@ const AdminSidebar = ({ open, setOpen }) => {
   return (
     <aside
       className="fixed top-0 left-0 h-screen z-50 flex flex-col transition-all duration-300 ease-in-out"
-      style={{ width: open ? 260 : 72, background: 'linear-gradient(180deg, #13141f 0%, #171829 100%)' }}
+      style={{ width: open ? 260 : 72, background: 'linear-gradient(180deg, #0d1520 0%, #111d2e 100%)' }}
     >
       {/* Logo area */}
       <div className="flex items-center h-16 px-4 border-b border-white/5 flex-shrink-0">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center flex-shrink-0">
           <ShieldCheck className="w-5 h-5 text-white" />
         </div>
         {open && (
           <div className="ml-3 overflow-hidden">
             <h1 className="text-sm font-bold text-white tracking-wide">EduOne</h1>
-            <p className="text-[10px] text-indigo-400 font-semibold">Admin Panel</p>
+            <p className="text-[10px] text-blue-400 font-semibold">Admin Panel</p>
           </div>
         )}
         <button
@@ -77,11 +77,11 @@ const AdminSidebar = ({ open, setOpen }) => {
               title={item.label}
               className={`flex items-center gap-3 px-3 py-2.5 my-0.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-indigo-500/15 text-indigo-400 shadow-sm shadow-indigo-500/10'
+                  ? 'bg-blue-500/15 text-blue-400 shadow-sm shadow-blue-500/10'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               } ${!open ? 'justify-center' : ''}`}
             >
-              <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-indigo-400' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+              <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-blue-400' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
               {open && <span className="truncate">{item.label}</span>}
             </Link>
           );
@@ -92,7 +92,7 @@ const AdminSidebar = ({ open, setOpen }) => {
       <div className="flex-shrink-0 border-t border-white/5 p-3">
         {open ? (
           <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {(admin?.fullName || admin?.userName || 'A')[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">

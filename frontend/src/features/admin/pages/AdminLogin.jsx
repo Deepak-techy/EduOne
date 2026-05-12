@@ -50,16 +50,16 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #122a4a 50%, #0d1f3c 100%)' }}>
       {/* Animated orbs */}
-      <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-indigo-600/20 blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-purple-600/15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/5 blur-3xl" />
+      <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-blue-600/20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-cyan-600/15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-500/5 blur-3xl" />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2196F3] to-[#00BCD4] shadow-lg shadow-blue-500/25 mb-4">
             <ShieldCheck className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
@@ -80,7 +80,7 @@ const AdminLogin = () => {
                 value={form.identifier}
                 onChange={e => { setForm(f => ({ ...f, identifier: e.target.value })); setErrors({}); setApiError(''); }}
                 placeholder="admin@eduone.com"
-                className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition ${errors.identifier ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:ring-indigo-500/50'}`}
+                className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition ${errors.identifier ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:ring-blue-500/50'}`}
               />
               {errors.identifier && <p className="text-red-400 text-xs mt-1">{errors.identifier}</p>}
             </div>
@@ -93,7 +93,7 @@ const AdminLogin = () => {
                   value={form.password}
                   onChange={e => { setForm(f => ({ ...f, password: e.target.value })); setErrors({}); setApiError(''); }}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition ${errors.password ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:ring-indigo-500/50'}`}
+                  className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition ${errors.password ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:ring-blue-500/50'}`}
                 />
                 <button type="button" onClick={() => setShowPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-white transition-colors cursor-pointer">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -105,7 +105,7 @@ const AdminLogin = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:from-indigo-600 hover:to-purple-700 transition-all disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#2196F3] to-[#00BCD4] text-white font-bold text-sm shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:from-[#1E88E5] hover:to-[#00ACC1] transition-all disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
             >
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Authenticating…</> : 'Sign In to Admin Panel'}
             </button>

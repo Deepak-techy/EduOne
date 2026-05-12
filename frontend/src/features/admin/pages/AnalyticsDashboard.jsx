@@ -333,7 +333,7 @@ const AnalyticsDashboard = () => {
   if (error) return (
     <div className="flex flex-col items-center justify-center py-24 gap-3">
       <AlertCircle className="w-8 h-8 text-red-400" /><p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetchAll} className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
+      <button onClick={fetchAll} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold cursor-pointer flex items-center gap-2"><RefreshCw className="w-4 h-4" />Retry</button>
     </div>
   );
 
@@ -354,8 +354,8 @@ const AnalyticsDashboard = () => {
         <div className="bg-[#1e2030] rounded-2xl p-6 border border-white/5 hover:border-white/10 transition-all duration-300 lg:col-span-2">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-indigo-500/15 flex items-center justify-center">
-                <Activity className="w-5 h-5 text-indigo-400" />
+              <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center">
+                <Activity className="w-5 h-5 text-blue-400" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">Daily Active Users</h3>

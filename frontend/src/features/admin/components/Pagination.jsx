@@ -26,7 +26,7 @@ const Pagination = ({ currentPage = 1, totalPages = 1, onPageChange, totalItems 
         {startPage > 1 && <><button onClick={() => onPageChange(1)} className="w-8 h-8 rounded-lg text-xs font-semibold text-slate-400 hover:bg-white/10 cursor-pointer">1</button>{startPage > 2 && <span className="text-slate-600 text-xs px-1">…</span>}</>}
         {pages.map(p => (
           <button key={p} onClick={() => onPageChange(p)}
-            className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors cursor-pointer ${p === currentPage ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:bg-white/10'}`}>{p}</button>
+            className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors cursor-pointer ${p === currentPage ? 'bg-blue-500 text-white' : 'text-slate-400 hover:bg-white/10'}`}>{p}</button>
         ))}
         {endPage < totalPages && <>{endPage < totalPages - 1 && <span className="text-slate-600 text-xs px-1">…</span>}<button onClick={() => onPageChange(totalPages)} className="w-8 h-8 rounded-lg text-xs font-semibold text-slate-400 hover:bg-white/10 cursor-pointer">{totalPages}</button></>}
         <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages}

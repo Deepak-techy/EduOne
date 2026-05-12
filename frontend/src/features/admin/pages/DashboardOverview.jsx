@@ -149,7 +149,7 @@ const DashboardOverview = () => {
     <div className="flex flex-col items-center justify-center py-24 gap-3">
       <AlertCircle className="w-8 h-8 text-red-400" />
       <p className="text-sm text-slate-400">{error}</p>
-      <button onClick={fetch} className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold hover:bg-indigo-500/20 transition-colors cursor-pointer flex items-center gap-2">
+      <button onClick={fetch} className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 transition-colors cursor-pointer flex items-center gap-2">
         <RefreshCw className="w-4 h-4" />Retry
       </button>
     </div>
@@ -182,7 +182,7 @@ const DashboardOverview = () => {
           title="Total Users"
           value={u.total ?? 0}
           icon={Users}
-          gradient="linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%)"
+          gradient="linear-gradient(135deg, #2196F3 0%, #00BCD4 50%, #0097A7 100%)"
           subtitle="All registered accounts"
           delay={0}
         />
@@ -229,7 +229,7 @@ const DashboardOverview = () => {
 
       {/* Features Section */}
       <div>
-        <SectionHeader icon={Zap} title="Features" color="bg-purple-600" />
+        <SectionHeader icon={Zap} title="Features" color="bg-teal-600" />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard title="Total Notes" value={f.totalNotes ?? 0} icon={FileText} color="purple" />
           <StatCard title="Total Tasks" value={f.totalTasks ?? 0} icon={CalendarCheck} color="amber" />

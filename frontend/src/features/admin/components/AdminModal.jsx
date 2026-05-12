@@ -25,7 +25,7 @@ const AdminModal = ({ open, onClose, title, icon: Icon, children, maxWidth = 'ma
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2196F3] to-[#00BCD4] flex items-center justify-center">
                 <Icon className="w-4.5 h-4.5 text-white" />
               </div>
             )}

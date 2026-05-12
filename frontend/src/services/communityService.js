@@ -16,9 +16,16 @@ export const communityService = {
   getPosts: (filter = "all", page = 1, limit = 10) =>
     api.get(`/posts/all`, { params: { filter, page, limit } }),
 
-  // ✅ POST /api/community/posts/create
-  createPost: (data) =>
-    api.post(`/posts/create`, data),
+  // ✅ POST /api/community/posts/create (supports optional image)
+  createPost: (data) => {
+    // If data is already FormData (has image), send as multipart
+    if (data instanceof FormData) {
+      return api.post(`/posts/create`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    }
+    return api.post(`/posts/create`, data);
+  },
 
   // ✅ PATCH /api/community/posts/:postId/upvote
   upvotePost: (postId) =>

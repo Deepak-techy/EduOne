@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from "multer";
+import path from "path";
 
 import {
     createPost,
@@ -20,10 +22,29 @@ import {
 } from "../controllers/community.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
+// Image upload config — temp storage before Cloudinary upload
+const communityUpload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, 'uploads'),
+        filename: (req, file, cb) => {
+            const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+            cb(null, uniqueName);
+        }
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: (req, file, cb) => {
+        const allowed = /jpeg|jpg|png|gif|webp/;
+        const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+        const mime = allowed.test(file.mimetype);
+        if (ext && mime) cb(null, true);
+        else cb(new Error('Only image files (jpg, png, gif, webp) are allowed'));
+    }
+});
+
 const router = Router();
 
 // post routes
-router.route("/posts/create").post(verifyJWT, createPost)    // POST /api/community/posts/create
+router.route("/posts/create").post(verifyJWT, communityUpload.single("image"), createPost)    // POST /api/community/posts/create
 router.route("/posts/all").get(verifyJWT, getAllPosts)    // GET /api/community/posts/all
 
 // announcement routes (user side)

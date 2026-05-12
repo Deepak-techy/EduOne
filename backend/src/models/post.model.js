@@ -24,6 +24,14 @@ const postSchema = new Schema(
             required: true,
             index: true,
         },
+        image: {
+            type: String,
+            default: null,
+        },
+        imagePublicId: {
+            type: String,
+            default: null,
+        },
         upvotes: [
             {
                 type: Schema.Types.ObjectId,

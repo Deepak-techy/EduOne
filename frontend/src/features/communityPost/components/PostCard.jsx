@@ -128,6 +128,19 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlre
         <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-[15px] whitespace-pre-wrap">{post.content}</p>
       </div>
 
+      {/* Post image (optional) */}
+      {post.image && (
+        <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-600/50">
+          <img
+            src={post.image}
+            alt={post.title || "Post image"}
+            className="w-full max-h-[500px] object-contain bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:opacity-95 transition-opacity"
+            onClick={() => window.open(post.image, '_blank')}
+            loading="lazy"
+          />
+        </div>
+      )}
+
       {/* Action buttons */}
       <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50">
 

@@ -21,6 +21,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         // ✅ REMOVED credentials - axios handles it with withCredentials: true
+      },
+      '/uploads': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

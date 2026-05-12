@@ -8,6 +8,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { getIO } from "../config/socket.config.js";
+import { uploadOnCloudinary } from "../services/cloudinaryUpload.service.js";
+import { deleteFromCloudinary } from "../services/cloudinaryDelete.service.js";
 
 
 const createPost = asyncHandler(async (req, res) => {
@@ -19,13 +21,25 @@ const createPost = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Title and content are required");
     }
 
-    // create post
-    const post = await Post.create({
+    // Build post data
+    const postData = {
         title,
         content,
         author: userId,
         authorRole: role,
-    });
+    };
+
+    // If an image was uploaded via multer, upload to Cloudinary
+    if (req.file) {
+        const cloudinaryResult = await uploadOnCloudinary(req.file.path);
+        if (cloudinaryResult) {
+            postData.image = cloudinaryResult.secure_url;
+            postData.imagePublicId = cloudinaryResult.public_id;
+        }
+    }
+
+    // create post
+    const post = await Post.create(postData);
 
     if (!post) {
         throw new ApiError(500, "Failed to create post");
@@ -142,6 +156,11 @@ const deletePost = asyncHandler(async (req, res) => {
 
     if (!isOwner && !isAdmin && !isTeacherDeletingStudent) {
         throw new ApiError(403, "You are not authorized to delete this post");
+    }
+
+    // delete from cloudinary if image exists
+    if (post.imagePublicId) {
+        await deleteFromCloudinary(post.imagePublicId);
     }
 
     // delete the post and its related comments and bookmarks

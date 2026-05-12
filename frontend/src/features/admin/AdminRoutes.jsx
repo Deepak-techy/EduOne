@@ -14,6 +14,7 @@ import ResumeManagement from './pages/ResumeManagement';
 import TasksMonitoring from './pages/TasksMonitoring';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import AdminSettings from './pages/AdminSettings';
+import LiveRooms from './pages/LiveRooms';
 
 const AdminRoutes = () => {
   return (
@@ -40,6 +41,7 @@ const AdminRoutes = () => {
           <Route path="resumes" element={<ResumeManagement />} />
           <Route path="tasks" element={<TasksMonitoring />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
+          <Route path="live-rooms" element={<LiveRooms />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>

@@ -8,6 +8,7 @@ import adminTasksRoutes from "./adminTasks.routes.js";
 import adminResumesRoutes from "./adminResumes.routes.js";
 import adminAnalyticsRoutes from "./adminAnalytics.routes.js";
 import adminAnnouncementRoutes from "./adminAnnouncement.routes.js";
+import adminRoomRoutes from "./adminRoom.routes.js";
 
 const router = Router();
 
@@ -37,5 +38,8 @@ router.use("/analytics", adminAnalyticsRoutes);
 
 // announcements & notifications routes
 router.use("/", adminAnnouncementRoutes);
+
+// room monitoring routes
+router.use("/rooms", adminRoomRoutes);
 
 export default router;

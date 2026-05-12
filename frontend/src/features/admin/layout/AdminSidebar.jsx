@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MessageSquareWarning, Flag, BarChart3,
   StickyNote, FileCheck, CalendarCheck, Megaphone, Settings,
-  ChevronLeft, ChevronRight, ShieldCheck, LogOut
+  ChevronLeft, ChevronRight, ShieldCheck, LogOut, Radio
 } from 'lucide-react';
 import { useAdminAuth } from '../../../contexts/AdminAuthContext';
 
@@ -20,6 +20,7 @@ const MENU = [
   { path: '/admin/tasks', label: 'Tasks', icon: CalendarCheck },
   { section: 'Insights' },
   { path: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { path: '/admin/live-rooms', label: 'Live Rooms', icon: Radio },
   { section: 'Communications' },
   { path: '/admin/announcements', label: 'Announcements', icon: Megaphone },
   { section: 'System' },

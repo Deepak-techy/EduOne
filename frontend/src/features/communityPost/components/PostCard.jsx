@@ -1,6 +1,7 @@
 import { communityService } from "../../../services/communityService";
 import CommentSection from "./CommentSection";
 import ReportModal from "./ReportModal";
+import RoomActions from "./RoomActions";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { ThumbsUp, ThumbsDown, Bookmark, MessageSquare, Trash2, Flag } from "lucide-react";
@@ -205,6 +206,9 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlre
           <CommentSection postId={post._id} postAuthorId={post.author?._id} />
         </div>
       )}
+
+      {/* Collaboration Room Actions */}
+      <RoomActions postId={post._id} />
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && createPortal(

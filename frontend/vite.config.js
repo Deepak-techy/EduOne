@@ -20,7 +20,12 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
-        // ✅ REMOVED credentials - axios handles it with withCredentials: true
+      },
+      '/socket.io': {
+        target: 'http://localhost:8000',
+        ws: true,
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

@@ -31,6 +31,7 @@ import resumeRouter from "./routes/resume.routes.js"
 import communityRouter from "./routes/community.routes.js"
 import adminRouter from "./routes/admin/index.routes.js"
 import notificationRouter from "./routes/notification.routes.js"
+import roomRouter from "./routes/room.routes.js"
 
 
 // route declarations
@@ -43,6 +44,7 @@ app.use("/api/resumes", resumeRouter)   // resumes route
 app.use("/api/community", communityRouter)   // community route
 app.use("/api/notifications", notificationRouter)   // notifications route
 app.use("/api/admin", adminRouter)   // admin routes
+app.use("/api/rooms", roomRouter)   // collaboration room routes
 
 // Global error handler middleware
 app.use((err, req, res, next) => {

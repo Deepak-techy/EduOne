@@ -52,7 +52,10 @@ const CommunityPage = () => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      if (filter === "announcement") {
+      if (filter === "all") {
+        // Load both posts and announcements for "All Posts" tab
+        await Promise.all([loadPosts(), loadAnnouncements()]);
+      } else if (filter === "announcement") {
         await loadAnnouncements();
       } else {
         await loadPosts();
@@ -152,6 +155,27 @@ const CommunityPage = () => {
 
             {filter === "announcement" ? (
               <AnnouncementFeed announcements={announcements} loading={false} />
+            ) : filter === "all" ? (
+              <>
+                {announcements.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                      Announcements
+                    </h3>
+                    <AnnouncementFeed announcements={announcements} loading={false} />
+                  </div>
+                )}
+                <div>
+                  {announcements.length > 0 && posts.length > 0 && (
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      Posts
+                    </h3>
+                  )}
+                  <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} reportedPostIds={reportedPostIds} />
+                </div>
+              </>
             ) : (
               <Feed posts={posts} refreshPosts={loadPosts} refreshBookmarks={loadBookmarks} bookmarks={bookmarks} reportedPostIds={reportedPostIds} />
             )}

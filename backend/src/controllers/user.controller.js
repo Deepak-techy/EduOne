@@ -34,6 +34,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
+    // Prevent public registration of Admin accounts
+    if (role === "Admin") {
+        throw new ApiError(403, "Admin accounts cannot be created through registration")
+    }
+
     // check if user already exists: userName, email
     const existedUser = await User.findOne({
         $or: [{ userName }, { email }]

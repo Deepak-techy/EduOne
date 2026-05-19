@@ -19,6 +19,8 @@ import {
     reportComment,
     getAnnouncements,
     getMyReportedPostIds,
+    markComment,
+    unmarkComment,
 } from "../controllers/community.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -70,6 +72,8 @@ router.route("/posts/:postId/comments/create").post(verifyJWT, addComment)    //
 router.route("/posts/:postId/comments/all").get(verifyJWT, getComments)    // GET /api/community/posts/:postId/comments/all
 router.route("/comments/:commentId/delete").delete(verifyJWT, deleteComment)    // DELETE /api/community/comments/:commentId/delete
 router.route("/comments/:commentId/report").post(verifyJWT, reportComment)    // POST /api/community/comments/:commentId/report
+router.route("/comments/:commentId/mark").patch(verifyJWT, markComment)    // PATCH /api/community/comments/:commentId/mark
+router.route("/comments/:commentId/unmark").delete(verifyJWT, unmarkComment)    // DELETE /api/community/comments/:commentId/unmark
 
 
 export default router;

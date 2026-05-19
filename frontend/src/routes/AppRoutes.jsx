@@ -27,6 +27,9 @@ import PlannerRoutes from "./PlannerRoutes";
 import AdminDashboardRoutes from "./admindashboardroutes";
 import CommunityRoutes from "./CommunityRoutes";
 
+// Protected Route Component
+import ProtectedRoute from "../components/common/ProtectedRoute";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -39,29 +42,65 @@ const AppRoutes = () => {
       <Route path="/auth/forget-password" element={<ForgetPassword />} />
       <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
 
-      {/* ✅ Profile Routes - NEW */}
-      <Route path="/profile" element={<ViewProfile />} />
-      <Route path="/profile/edit" element={<EditProfile />} />
-      <Route path="/notifications" element={<Notifications />} />
+      {/* ✅ Profile Routes — any authenticated user */}
+      <Route path="/profile" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]}>
+          <ViewProfile />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile/edit" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]}>
+          <EditProfile />
+        </ProtectedRoute>
+      } />
+      <Route path="/notifications" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]}>
+          <Notifications />
+        </ProtectedRoute>
+      } />
       <Route path="/help" element={<HelpSupport />} />
 
-      {/* PDF Q&A Feature Routes */}
-      <Route path="/pdf-qa/*" element={<PdfQARoutes />} />
+      {/* PDF Q&A Feature Routes — Student + Teacher */}
+      <Route path="/pdf-qa/*" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher"]}>
+          <PdfQARoutes />
+        </ProtectedRoute>
+      } />
 
-      {/* Note Organizer Feature Routes */}
-      <Route path="/notes-organizer/*" element={<NotesRoutes />} />
+      {/* Note Organizer Feature Routes — Student + Teacher */}
+      <Route path="/notes-organizer/*" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher"]}>
+          <NotesRoutes />
+        </ProtectedRoute>
+      } />
 
-      {/* Academic Planner Feature Routes */}
-      <Route path="/academic-planner/*" element={<PlannerRoutes />} />
+      {/* Academic Planner Feature Routes — Student + Teacher */}
+      <Route path="/academic-planner/*" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher"]}>
+          <PlannerRoutes />
+        </ProtectedRoute>
+      } />
 
-      {/* Resume Analyzer Feature Routes */}
-      <Route path="/resume-analyzer/*" element={<ResumeAnalyzerRoutes />} />
+      {/* Resume Analyzer Feature Routes — Student only */}
+      <Route path="/resume-analyzer/*" element={
+        <ProtectedRoute allowedRoles={["Student"]}>
+          <ResumeAnalyzerRoutes />
+        </ProtectedRoute>
+      } />
 
-      {/* Admin Dashboard Routes */}
-      <Route path="/admin/*" element={<AdminDashboardRoutes />} />
+      {/* Admin Dashboard Routes — Admin only (has its own internal auth) */}
+      <Route path="/admin/*" element={
+        <ProtectedRoute allowedRoles={["Admin"]} redirectTo="/">
+          <AdminDashboardRoutes />
+        </ProtectedRoute>
+      } />
 
-      {/* Community Post Feature Routes */}
-      <Route path="/community/*" element={<CommunityRoutes />} />
+      {/* Community Post Feature Routes — Student + Teacher */}
+      <Route path="/community/*" element={
+        <ProtectedRoute allowedRoles={["Student", "Teacher"]}>
+          <CommunityRoutes />
+        </ProtectedRoute>
+      } />
 
       {/* 404 */}
       <Route path="*" element={<Home />} />

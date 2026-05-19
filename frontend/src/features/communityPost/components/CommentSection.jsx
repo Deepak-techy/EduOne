@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { communityService } from "../../../services/communityService";
 import ReportModal from "./ReportModal";
-import { Send, Loader2, Trash2, Flag } from "lucide-react";
+import { Send, Loader2, Trash2, Flag, CheckCircle2, Lightbulb, ChevronDown } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 
 const CommentSection = ({ postId, postAuthorId }) => {
@@ -13,7 +13,10 @@ const CommentSection = ({ postId, postAuthorId }) => {
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [reportCommentId, setReportCommentId] = useState(null);
+  const [markMenuId, setMarkMenuId] = useState(null);
   const { user } = useAuth();
+
+  const isTeacherOrAdmin = user?.role === "Teacher" || user?.role === "Admin";
 
   const loadComments = async () => {
     try {
@@ -64,6 +67,48 @@ const CommentSection = ({ postId, postAuthorId }) => {
     await communityService.reportComment(reportCommentId, data);
   };
 
+  const handleMark = async (commentId, markAs) => {
+    try {
+      await communityService.markComment(commentId, markAs);
+      setMarkMenuId(null);
+      loadComments();
+    } catch (err) {
+      console.error("Failed to mark comment:", err);
+    }
+  };
+
+  const handleUnmark = async (commentId) => {
+    try {
+      await communityService.unmarkComment(commentId);
+      loadComments();
+    } catch (err) {
+      console.error("Failed to unmark comment:", err);
+    }
+  };
+
+  // Get mark badge styling
+  const getMarkBadge = (markedAs) => {
+    if (markedAs === "correct") {
+      return {
+        bg: "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700/50",
+        text: "text-emerald-700 dark:text-emerald-300",
+        icon: CheckCircle2,
+        label: "✓ Correct Answer",
+        glow: "ring-2 ring-emerald-200/50 dark:ring-emerald-600/30",
+      };
+    }
+    if (markedAs === "helpful") {
+      return {
+        bg: "bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700/50",
+        text: "text-amber-700 dark:text-amber-300",
+        icon: Lightbulb,
+        label: "★ Helpful Answer",
+        glow: "ring-2 ring-amber-200/50 dark:ring-amber-600/30",
+      };
+    }
+    return null;
+  };
+
   return (
     <>
     <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50">
@@ -109,40 +154,117 @@ const CommentSection = ({ postId, postAuthorId }) => {
             const isCommentOwner = user?._id === comment.userId?._id;
             const isPostOwner = user?._id === postAuthorId;
             const isAdmin = user?.role === "Admin";
-            const canDeleteComment = isCommentOwner || isPostOwner || isAdmin;
+            const isTeacher = user?.role === "Teacher";
+            const canDeleteComment = isCommentOwner || isPostOwner || isAdmin || isTeacher;
+            const markBadge = getMarkBadge(comment.markedAs);
 
             return (
-              <div key={comment._id} className="flex gap-3 group">
+              <div key={comment._id} className={`flex gap-3 group ${markBadge ? 'relative' : ''}`}>
                 <div 
                   className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-sm"
                   style={{ background: "linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)" }}
                 >
                   {(comment.userId?.fullName || "U")[0].toUpperCase()}
                 </div>
-                <div className="flex-1 bg-gray-50 dark:bg-gray-800/80 rounded-2xl rounded-tl-none p-3 shadow-sm border border-gray-100 dark:border-gray-700/50 relative">
+                <div className={`flex-1 rounded-2xl rounded-tl-none p-3 shadow-sm border relative ${
+                  markBadge 
+                    ? `${markBadge.bg} ${markBadge.glow}` 
+                    : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/50'
+                }`}>
                   <div className="flex justify-between items-start gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm block mb-1">
-                      {comment.userId?.fullName || "User"}
-                    </span>
-                    {canDeleteComment && (
-                      <button 
-                        onClick={() => setDeleteConfirmId(comment._id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-                        title="Delete comment"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    )}
-                    {!isCommentOwner && (
-                      <button
-                        onClick={() => setReportCommentId(comment._id)}
-                        className="text-gray-400 hover:text-orange-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-orange-50 dark:hover:bg-orange-500/10"
-                        title="Report comment"
-                      >
-                        <Flag size={14} />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                        {comment.userId?.fullName || "User"}
+                      </span>
+                      {/* Commenter role badge */}
+                      {comment.userId?.role && comment.userId.role !== "Student" && (
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider ${
+                          comment.userId.role === "Teacher" 
+                            ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400" 
+                            : "bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400"
+                        }`}>
+                          {comment.userId.role === "Teacher" ? "Educator" : "Admin"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {/* Mark as Correct/Helpful — Teacher/Admin only */}
+                      {isTeacherOrAdmin && !isCommentOwner && (
+                        <div className="relative">
+                          {comment.markedAs ? (
+                            <button
+                              onClick={() => handleUnmark(comment._id)}
+                              className="text-gray-400 hover:text-gray-600 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-[10px] font-medium"
+                              title="Remove mark"
+                            >
+                              ✕
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => setMarkMenuId(markMenuId === comment._id ? null : comment._id)}
+                                className="text-gray-400 hover:text-emerald-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center gap-0.5"
+                                title="Mark answer"
+                              >
+                                <CheckCircle2 size={14} />
+                                <ChevronDown size={10} />
+                              </button>
+                              {/* Mark dropdown menu */}
+                              {markMenuId === comment._id && (
+                                <div className="absolute right-0 top-8 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[160px] animate-in fade-in slide-in-from-top-1 duration-200">
+                                  <button
+                                    onClick={() => handleMark(comment._id, "correct")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors font-medium"
+                                  >
+                                    <CheckCircle2 size={14} />
+                                    Correct Answer
+                                  </button>
+                                  <button
+                                    onClick={() => handleMark(comment._id, "helpful")}
+                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors font-medium"
+                                  >
+                                    <Lightbulb size={14} />
+                                    Helpful Answer
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {canDeleteComment && (
+                        <button 
+                          onClick={() => setDeleteConfirmId(comment._id)}
+                          className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+                          title="Delete comment"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                      {!isCommentOwner && (
+                        <button
+                          onClick={() => setReportCommentId(comment._id)}
+                          className="text-gray-400 hover:text-orange-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-orange-50 dark:hover:bg-orange-500/10"
+                          title="Report comment"
+                        >
+                          <Flag size={14} />
+                        </button>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Mark badge — shown when comment is marked */}
+                  {markBadge && (
+                    <div className={`inline-flex items-center gap-1.5 mt-1 mb-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${markBadge.text}`}>
+                      <markBadge.icon size={13} />
+                      {markBadge.label}
+                      {comment.markedBy && (
+                        <span className="font-normal opacity-70 ml-1">— by {comment.markedBy.fullName}</span>
+                      )}
+                    </div>
+                  )}
+
                   <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{comment.text}</p>
                 </div>
               </div>

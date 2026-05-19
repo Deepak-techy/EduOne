@@ -152,9 +152,10 @@ const deletePost = asyncHandler(async (req, res) => {
 
     const isOwner = post.author.toString() === userId.toString();
     const isAdmin = role === "Admin";
-    const isTeacherDeletingStudent = role === "Teacher" && post.authorRole === "Student";
+    const isTeacher = role === "Teacher";
 
-    if (!isOwner && !isAdmin && !isTeacherDeletingStudent) {
+    // Owner, Admin, or Teacher can delete any post
+    if (!isOwner && !isAdmin && !isTeacher) {
         throw new ApiError(403, "You are not authorized to delete this post");
     }
 
@@ -370,7 +371,8 @@ const getComments = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
-        .populate("userId", "fullName userName avatar")
+        .populate("userId", "fullName userName avatar role")
+        .populate("markedBy", "fullName userName")
         .lean();
 
     // return response
@@ -409,8 +411,10 @@ const deleteComment = asyncHandler(async (req, res) => {
     const isPostOwner = post && post.author.toString() === userId.toString();
     const isCommentOwner = comment.userId.toString() === userId.toString();
     const isAdmin = role === "Admin";
+    const isTeacher = role === "Teacher";
 
-    if (!isCommentOwner && !isAdmin && !isPostOwner) {
+    // Comment owner, post owner, Admin, or Teacher can delete any comment
+    if (!isCommentOwner && !isAdmin && !isPostOwner && !isTeacher) {
         throw new ApiError(403, "You are not authorized to delete this comment");
     }
 
@@ -673,6 +677,93 @@ const getMyReportedPostIds = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { reportedPostIds: postIds }, "Reported post IDs fetched"));
 });
 
+// ==================== MARK ANSWER ====================
+
+const markComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+    const { markAs } = req.body; // "correct" or "helpful"
+    const { _id: userId, role } = req.user;
+
+    if (!commentId) {
+        throw new ApiError(400, "Comment ID is required");
+    }
+
+    if (!markAs || !["correct", "helpful"].includes(markAs)) {
+        throw new ApiError(400, "markAs must be 'correct' or 'helpful'");
+    }
+
+    // Only Teacher or Admin can mark answers
+    if (role !== "Teacher" && role !== "Admin") {
+        throw new ApiError(403, "Only teachers and admins can mark answers");
+    }
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    // Update the mark
+    comment.markedAs = markAs;
+    comment.markedBy = userId;
+    await comment.save();
+
+    // Populate for response
+    const updatedComment = await Comment.findById(commentId)
+        .populate("userId", "fullName userName avatar")
+        .populate("markedBy", "fullName userName")
+        .lean();
+
+    // Emit real-time event
+    getIO().to(`post:${comment.postId}`).emit("community:commentMarked", {
+        postId: comment.postId,
+        commentId,
+        markedAs: markAs,
+    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedComment, `Comment marked as ${markAs}`));
+});
+
+const unmarkComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+    const { _id: userId, role } = req.user;
+
+    if (!commentId) {
+        throw new ApiError(400, "Comment ID is required");
+    }
+
+    // Only Teacher or Admin can unmark
+    if (role !== "Teacher" && role !== "Admin") {
+        throw new ApiError(403, "Only teachers and admins can unmark answers");
+    }
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    if (!comment.markedAs) {
+        throw new ApiError(400, "Comment is not marked");
+    }
+
+    comment.markedAs = null;
+    comment.markedBy = null;
+    await comment.save();
+
+    // Emit real-time event
+    getIO().to(`post:${comment.postId}`).emit("community:commentUnmarked", {
+        postId: comment.postId,
+        commentId,
+    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Comment mark removed"));
+});
+
 export {
     createPost,
     getAllPosts,
@@ -690,5 +781,6 @@ export {
     reportComment,
     getAnnouncements,
     getMyReportedPostIds,
+    markComment,
+    unmarkComment,
 }
-

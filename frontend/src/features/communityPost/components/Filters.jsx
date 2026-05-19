@@ -1,15 +1,23 @@
 import CreatePostModal from "./CreatePostModal";
 import { useState } from "react";
-import { Plus, Megaphone } from "lucide-react";
+import { Plus, Megaphone, GraduationCap } from "lucide-react";
 
 const Filters = ({ filter, setFilter, role, refreshPosts }) => {
   const tabs = [
     { key: "all", label: "All Posts" },
     { key: "student", label: "Students" },
+    { key: "teacher", label: "Educators", icon: GraduationCap },
     { key: "announcement", label: "Announcements", icon: Megaphone },
   ];
 
   const [open, setOpen] = useState(false);
+
+  // Button label based on role
+  const getButtonLabel = () => {
+    if (role === "Admin") return "Create Announcement";
+    if (role === "Teacher") return "Create Post";
+    return "Create Post";
+  };
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -40,7 +48,7 @@ const Filters = ({ filter, setFilter, role, refreshPosts }) => {
           style={{ background: "linear-gradient(255deg, #0099FF 0%, #00D4FF 0%, #60A5FA 70%, #2563EB 150%)" }}
         >
           <Plus size={18} />
-          {role === "Admin" ? "Create Announcement" : "Create Post"}
+          {getButtonLabel()}
         </button>
       </div>
 

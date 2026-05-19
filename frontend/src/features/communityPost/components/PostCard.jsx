@@ -3,8 +3,44 @@ import CommentSection from "./CommentSection";
 import ReportModal from "./ReportModal";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { ThumbsUp, ThumbsDown, Bookmark, MessageSquare, Trash2, Flag } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Bookmark, MessageSquare, Trash2, Flag, ShieldCheck, GraduationCap } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
+
+// Role-based styling configuration
+const getRoleStyles = (authorRole) => {
+  switch (authorRole) {
+    case "Teacher":
+      return {
+        cardBorder: "border-l-4 border-l-emerald-400",
+        cardShadow: "shadow-[0_8px_30px_rgb(16,185,129,0.08)]",
+        badgeBg: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/50",
+        badgeIcon: GraduationCap,
+        badgeText: "Educator",
+        avatarGradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+        headerBg: "bg-emerald-50/60 dark:bg-emerald-900/20",
+      };
+    case "Admin":
+      return {
+        cardBorder: "border-l-4 border-l-violet-400",
+        cardShadow: "shadow-[0_8px_30px_rgb(139,92,246,0.08)]",
+        badgeBg: "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700/50",
+        badgeIcon: ShieldCheck,
+        badgeText: "Admin",
+        avatarGradient: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+        headerBg: "bg-violet-50/60 dark:bg-violet-900/20",
+      };
+    default:
+      return {
+        cardBorder: "",
+        cardShadow: "shadow-[0_8px_30px_rgb(0,0,0,0.08)]",
+        badgeBg: "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300",
+        badgeIcon: null,
+        badgeText: "Student",
+        avatarGradient: "linear-gradient(255deg, #0099FF 0%, #00D4FF 0%, #60A5FA 70%, #2563EB 150%)",
+        headerBg: "bg-white/50 dark:bg-gray-700/50",
+      };
+  }
+};
 
 const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlreadyReported = false }) => {
   const [showComments, setShowComments] = useState(false);
@@ -16,9 +52,9 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlre
 
   const isOwner = user?._id === post.author?._id;
   const isAdmin = user?.role === "Admin";
-  // The frontend stores "admin" in lowercase usually, but let's check carefully.
-  const isAdminDeletingStudent = user?.role?.toLowerCase() === "Admin" && post.authorRole === "Student";
-  const canDelete = isOwner || isAdmin || isAdminDeletingStudent;
+  const isTeacher = user?.role === "Teacher";
+  // Owner, Admin, or Teacher can delete any post
+  const canDelete = isOwner || isAdmin || isTeacher;
 
   const isBookmarked = bookmarks.some((b) => {
     const bPostId = b.postId?._id || b.postId || b._id;
@@ -27,6 +63,9 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlre
 
   const isUpvoted = Array.isArray(post.upvotes) && post.upvotes.some(id => (id._id || id).toString() === user?._id?.toString());
   const isDownvoted = Array.isArray(post.downvotes) && post.downvotes.some(id => (id._id || id).toString() === user?._id?.toString());
+
+  const roleStyles = getRoleStyles(post.authorRole);
+  const BadgeIcon = roleStyles.badgeIcon;
 
   const handleUpvote = async () => {
     try {
@@ -79,28 +118,29 @@ const PostCard = ({ post, refreshPosts, refreshBookmarks, bookmarks = [], isAlre
   };
 
   return (
-    <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-2xl p-5 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 hover:shadow-lg relative">
+    <div className={`bg-white/40 dark:bg-gray-800/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-2xl p-5 mb-6 ${roleStyles.cardShadow} dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 hover:shadow-lg relative ${roleStyles.cardBorder}`}>
 
       {/* Author info & Actions */}
-      <div className="bg-white/50 dark:bg-gray-700/50 rounded-xl p-4 mb-4 border border-gray-100 dark:border-gray-600/50 shadow-sm flex items-start justify-between transition-colors hover:bg-white/80 dark:hover:bg-gray-700/80">
+      <div className={`${roleStyles.headerBg} rounded-xl p-4 mb-4 border border-gray-100 dark:border-gray-600/50 shadow-sm flex items-start justify-between transition-colors`}>
         <div className="flex items-center gap-3">
           {post.author?.avatar ? (
             <img src={post.author.avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm" />
           ) : (
             <div 
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm"
-              style={{ background: "linear-gradient(255deg, #0099FF 0%, #00D4FF 0%, #60A5FA 70%, #2563EB 150%)" }}
+              style={{ background: roleStyles.avatarGradient }}
             >
               {(post.author?.fullName || post.authorName || "U")[0].toUpperCase()}
             </div>
           )}
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-[15px] leading-tight">
                 {post.author?.fullName || post.authorName || "Unknown"}
               </h3>
-              <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-[10px] font-medium uppercase tracking-wider">
-                {post.authorRole}
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${roleStyles.badgeBg}`}>
+                {BadgeIcon && <BadgeIcon size={10} />}
+                {roleStyles.badgeText}
               </span>
             </div>
             {post.author?.userName && (

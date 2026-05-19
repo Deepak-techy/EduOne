@@ -50,18 +50,31 @@ const Login = () => {
       // ✅ Backend sets httpOnly cookies automatically
       const loginRes = await authService.login(payload);
 
-      // ✅ Check if logged-in user is Admin → redirect to admin panel
+      // ✅ Determine user role for redirect
       const loggedUser = loginRes?.data?.user || loginRes?.user || loginRes?.data;
-      const isAdmin = loggedUser?.role === 'Admin';
+      const userRole = loggedUser?.role;
 
-      toast.success(isAdmin ? 'Welcome back, Admin! 🛡️' : 'Login successful! Welcome back! 🎉', {
+      // Role-specific welcome messages
+      const toastMessages = {
+        Admin: 'Welcome back, Admin! 🛡️',
+        Teacher: 'Welcome back, Educator! 📚',
+        Student: 'Login successful! Welcome back! 🎉',
+      };
+
+      toast.success(toastMessages[userRole] || 'Login successful!', {
         position: 'top-right',
         autoClose: 2000,
       });
 
-      // ✅ Redirect: Admin → admin dashboard, Others → home
+      // ✅ Role-based redirect
+      const redirectPaths = {
+        Admin: '/admin/dashboard',
+        Teacher: '/',
+        Student: '/',
+      };
+
       setTimeout(() => {
-        window.location.href = isAdmin ? '/admin/dashboard' : '/';
+        window.location.href = redirectPaths[userRole] || '/';
       }, 1000);
       
     } catch (error) {

@@ -280,12 +280,14 @@
 
 // src/features/pdfQA/SubjectQA.jsx
 import { useState, useEffect, useRef } from 'react';
-import { Send, Loader2, BookOpen, Search, Sparkles } from 'lucide-react';
+import { Send, Loader2, BookOpen, Search, Sparkles, Upload, CheckCircle2 } from 'lucide-react';
 import { pdfQAService } from '../../services/pdfQAService';
 import MarkdownRenderer from '../../components/common/MarkdownRenderer';
+import { useAuth } from '../../contexts/AuthContext';
 
 
 const SubjectQA = () => {
+  const { user } = useAuth();
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
   const [query, setQuery] = useState('');
@@ -293,7 +295,16 @@ const SubjectQA = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchSubject, setSearchSubject] = useState('');
   
+  // Teacher upload state
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadSubject, setUploadSubject] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState('');
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef(null);
+  
   const chatEndRef = useRef(null);
+  const isTeacher = user?.role === 'Teacher';
 
 
   useEffect(() => {
@@ -377,6 +388,27 @@ const SubjectQA = () => {
     sub.name.toLowerCase().includes(searchSubject.toLowerCase())
   );
 
+  // Teacher permanent PDF upload handler
+  const handlePermanentUpload = async () => {
+    if (!uploadFile || !uploadSubject) return;
+    
+    setIsUploading(true);
+    setUploadSuccess('');
+    setUploadError('');
+    
+    try {
+      const response = await pdfQAService.uploadPermanentPDF(uploadFile, uploadSubject);
+      setUploadSuccess(`PDF uploaded to ${uploadSubject} (${response.data?.chunkCount || 0} chunks)`);
+      setUploadFile(null);
+      setUploadSubject('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (err) {
+      setUploadError(err.message || 'Upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/30 to-teal-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-6">
@@ -442,6 +474,72 @@ const SubjectQA = () => {
                 )}
               </div>
             </div>
+
+            {/* Teacher Upload Section */}
+            {isTeacher && (
+              <div className="border-t border-slate-200 dark:border-slate-700 p-4">
+                <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-4 border border-emerald-200/50 dark:border-emerald-700/30">
+                  <h4 className="font-semibold text-emerald-800 dark:text-emerald-300 text-sm flex items-center gap-2 mb-3">
+                    <Upload className="w-4 h-4" />
+                    Upload PDF to Subject
+                  </h4>
+                  
+                  {/* Subject selector for upload */}
+                  <select
+                    value={uploadSubject}
+                    onChange={(e) => setUploadSubject(e.target.value)}
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="">Select subject...</option>
+                    {subjects.map((s) => (
+                      <option key={s.code} value={s.code}>{s.name}</option>
+                    ))}
+                  </select>
+
+                  {/* File input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => setUploadFile(e.target.files[0])}
+                    className="w-full text-sm text-slate-600 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-100 dark:file:bg-emerald-900/40 file:text-emerald-700 dark:file:text-emerald-300 hover:file:bg-emerald-200 dark:hover:file:bg-emerald-800/40 transition-all mb-2"
+                  />
+
+                  <button
+                    onClick={handlePermanentUpload}
+                    disabled={!uploadFile || !uploadSubject || isUploading}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Upload PDF
+                      </>
+                    )}
+                  </button>
+
+                  {/* Success message */}
+                  {uploadSuccess && (
+                    <div className="mt-2 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {uploadSuccess}
+                    </div>
+                  )}
+
+                  {/* Error message */}
+                  {uploadError && (
+                    <div className="mt-2 text-red-500 text-xs font-medium">
+                      {uploadError}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
 

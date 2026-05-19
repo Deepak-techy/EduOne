@@ -18,6 +18,16 @@ const commentSchema = new Schema(
             required: true,
             trim: true,
         },
+        markedAs: {
+            type: String,
+            enum: ["correct", "helpful", null],
+            default: null,
+        },
+        markedBy: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
+        },
     },
     {
         timestamps: true,

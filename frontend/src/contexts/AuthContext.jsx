@@ -97,6 +97,9 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     setUser, // For manual updates after avatar change
     isAuthenticated: !!user,
+    isStudent: user?.role === 'Student',
+    isTeacher: user?.role === 'Teacher',
+    isAdmin: user?.role === 'Admin',
   };
 
   // Show loading spinner while checking auth

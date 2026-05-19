@@ -31,6 +31,7 @@ const featuresItems = [
     icon: FileQuestion,
     label: "PDF Q&A",
     path: "/pdf-qa",
+    roles: ["Student", "Teacher"],
     subFeatures: [
       { label: "Subject Q&A", path: "/pdf-qa/subject" },
       { label: "Upload PDF", path: "/pdf-qa/upload" },
@@ -40,6 +41,7 @@ const featuresItems = [
     icon: StickyNote,
     label: "Notes Organizer",
     path: "/notes-organizer",
+    roles: ["Student", "Teacher"],
     subFeatures: [
       { label: "My Library", path: "/notes-organizer/library" },
       { label: "Create Note", path: "/notes-organizer/create" },
@@ -49,6 +51,7 @@ const featuresItems = [
     icon: Calendar,
     label: "Academic Planner",
     path: "/academic-planner/dashboard",
+    roles: ["Student", "Teacher"],
     subFeatures: [
       { label: "View Tasks", path: "/academic-planner/view-tasks" },
       { label: "Create Tasks", path: "/academic-planner/create-task" },
@@ -59,6 +62,7 @@ const featuresItems = [
     icon: FileCheck,
     label: "Resume Analyzer",
     path: "/resume-analyzer",
+    roles: ["Student"],
     subFeatures: [
       { label: "Analyze Resume", path: "/resume-analyzer/analyzer" },
       { label: "View Past Reports", path: "/resume-analyzer/history" },
@@ -68,18 +72,20 @@ const featuresItems = [
     icon: Users,
     label: "Interview AI",
     path: "/interview-ai",
+    roles: ["Student"],
     subFeatures: [],
   },
   { 
     icon: Users, 
     label: "Community", 
     path: "/community", 
+    roles: ["Student", "Teacher"],
     subFeatures: [
       { label: "Community Feed", path: "/community/feed" },
       { label: "My Profile", path: "/community/profile" },
     ] 
   },
-  { icon: ShieldCheck, label: "Admin Panel", path: "/admin", subFeatures: [] },
+  { icon: ShieldCheck, label: "Admin Panel", path: "/admin", roles: ["Admin"], subFeatures: [] },
 ];
 
 const FEATURE_ROOTS = [
@@ -263,7 +269,9 @@ const Sidebar = ({ open, setOpen }) => {
         )}
 
         <nav className="px-3 pb-4 flex-grow">
-          {featuresItems.map((feature) => {
+          {featuresItems
+            .filter((feature) => !feature.roles || feature.roles.includes(user?.role))
+            .map((feature) => {
             const Icon = feature.icon;
             const isExpanded = expanded[feature.label];
             const isActive =

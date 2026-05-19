@@ -82,4 +82,12 @@ export const communityService = {
   // ✅ GET /api/community/reports/my-reported-posts
   getMyReportedPostIds: () =>
     api.get(`/reports/my-reported-posts`),
+
+  // ✅ PATCH /api/community/comments/:commentId/mark — Teacher/Admin marks answer
+  markComment: (commentId, markAs) =>
+    api.patch(`/comments/${commentId}/mark`, { markAs }),
+
+  // ✅ DELETE /api/community/comments/:commentId/unmark — Teacher/Admin unmarks answer
+  unmarkComment: (commentId) =>
+    api.delete(`/comments/${commentId}/unmark`),
 };

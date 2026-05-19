@@ -70,6 +70,26 @@ export const pdfQAService = {
       throw error.response?.data || { message: 'Failed to get answer' };
     }
   },
+
+  // 5. Upload Permanent PDF (Teacher/Admin only) — uploads to subject collection
+  uploadPermanentPDF: async (file, subject) => {
+    try {
+      const formData = new FormData();
+      formData.append('pdf', file);
+      formData.append('subject', subject);
+
+      const response = await axios.post(`${API_URL}/uploads/permanent`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+      
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to upload PDF to subject' };
+    }
+  },
 };
 
 export default pdfQAService;

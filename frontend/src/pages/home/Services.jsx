@@ -1,6 +1,6 @@
 // src/pages/home/Services.jsx
 
-import { FileText, BookOpen, Users, Mic, Calendar, Shield, Sparkles, ArrowRight } from 'lucide-react';
+import { FileText, BookOpen, Users, Calendar, Shield, Sparkles, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -35,25 +35,18 @@ const Services = () => {
       delay: '200'
     },
     {
-      icon: Users,
-      title: 'Community',
-      description: 'Connect with students worldwide and share knowledge together',
-      color: 'from-orange-500 to-red-500',
-      delay: '300'
-    },
-    {
-      icon: Mic,
-      title: 'Interview AI',
-      description: 'Practice interviews with AI-powered feedback and improve your skills',
-      color: 'from-indigo-500 to-purple-500',
-      delay: '400'
-    },
-    {
       icon: Shield,
       title: 'Resume Builder',
       description: 'Build professional resumes with AI assistance and stand out',
       color: 'from-pink-500 to-rose-500',
-      delay: '500'
+      delay: '300'
+    },
+    {
+      icon: Users,
+      title: 'Community',
+      description: 'Connect with students worldwide and share knowledge together',
+      color: 'from-orange-500 to-red-500',
+      delay: '400'
     }
   ];
 
@@ -61,9 +54,8 @@ const Services = () => {
     'PDF Q&A': '/pdf-qa',
     'Note Organizer': '/notes-organizer',
     'Academic Planner': '/academic-planner',
-    'Community': '/community',
-    'Interview AI': '/interview-ai',
-    'Resume Builder': '/resume-analyzer'
+    'Resume Builder': '/resume-analyzer',
+    'Community': '/community'
   };
 
   return (
@@ -102,7 +94,7 @@ const Services = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="flex flex-wrap justify-center gap-6 md:gap-8">
           {services.map((service, index) => {
             const Icon = service.icon;
             const route = featureRoute[service.title];
@@ -121,7 +113,8 @@ const Services = () => {
                   hover:shadow-2xl hover:-translate-y-2
                   transition-all duration-500
                   ${user ? 'cursor-pointer' : 'cursor-not-allowed'} 
-                  overflow-hidden`}
+                  overflow-hidden
+                  w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]`}
                 style={{ animationDelay: `${service.delay}ms` }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${service.color} 

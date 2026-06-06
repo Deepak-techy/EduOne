@@ -68,13 +68,7 @@ const featuresItems = [
       { label: "View Past Reports", path: "/resume-analyzer/history" },
     ],
   },
-  {
-    icon: Users,
-    label: "Interview AI",
-    path: "/interview-ai",
-    roles: ["Student"],
-    subFeatures: [],
-  },
+
   { 
     icon: Users, 
     label: "Community", 
@@ -93,7 +87,7 @@ const FEATURE_ROOTS = [
   "/notes-organizer",
   "/academic-planner/dashboard",
   "/resume-analyzer",
-  "/interview-ai",
+
   "/community",
   "/admin",
 ];
@@ -101,7 +95,7 @@ const FEATURE_ROOTS = [
 const isFeatureRoot = (pathname) =>
   FEATURE_ROOTS.some((root) => pathname === root);
 
-const Sidebar = ({ open, setOpen }) => {
+const Sidebar = ({ open, setOpen, bannerVisible = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -197,12 +191,14 @@ const Sidebar = ({ open, setOpen }) => {
   return (
     <div
       ref={sidebarRef}
-      className="fixed top-[80px] left-0 h-[calc(100vh-80px)] shadow-lg z-40"
+      className="fixed left-0 shadow-lg z-40"
       style={{
+        top: bannerVisible ? '120px' : '80px',
+        height: bannerVisible ? 'calc(100vh - 120px)' : 'calc(100vh - 80px)',
         width: sidebarWidth,
         background: "linear-gradient(132deg, #e3fafd, #dcf2ff 84%)",
         border: "none",
-        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease, height 0.3s ease",
         overflowY: "auto",
         overflowX: "hidden",
         scrollbarWidth: "none",

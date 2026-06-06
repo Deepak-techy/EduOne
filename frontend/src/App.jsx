@@ -10,9 +10,10 @@ import AppRoutes from './routes/AppRoutes';
 import AnnouncementBanner from './features/communityPost/components/AnnouncementBanner';
 
 function AppContent() {
-  const { user } = useAuth(); // <-- ADDED: Get user from context
+  const { user } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [bannerVisible, setBannerVisible] = useState(false);
 
   const isAuthPage = location.pathname.startsWith('/auth');
   const isAdminPage = location.pathname.startsWith('/admin');
@@ -21,24 +22,24 @@ function AppContent() {
                         location.pathname.startsWith('/notes-organizer') ||
                         location.pathname.startsWith('/academic-planner') ||
                         location.pathname.startsWith('/resume-analyzer') ||
-                        location.pathname.startsWith('/interview-ai') ||
                         location.pathname.startsWith('/community') ||
                         location.pathname.startsWith('/admin');
 
   const isHomePage = location.pathname === '/';
 
+  const showBanner = user && !isAuthPage && !isAdminPage;
+
   return (
     <div className="min-h-screen flex flex-col dark:bg-[#1a1b1e]">
-      {user && !isAuthPage && !isAdminPage && <AnnouncementBanner />}
+      {showBanner && <AnnouncementBanner onVisibilityChange={setBannerVisible} />}
       {!isAuthPage && !isAdminPage && <Navbar />}
       <div className="flex flex-1">
-        {/* CHANGED: Show sidebar if user logged in and not on auth page */}
-        {user && !isAuthPage && !isAdminPage && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />}
+        {user && !isAuthPage && !isAdminPage && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} bannerVisible={bannerVisible} />}
 
         <main 
           className="flex-1 transition-all duration-300 ease-in-out"
           style={{
-            marginLeft: user && !isAuthPage && !isAdminPage ? (sidebarOpen ? '250px' : '70px') : '0' // <-- UPDATED
+            marginLeft: user && !isAuthPage && !isAdminPage ? (sidebarOpen ? '250px' : '70px') : '0'
           }}
         >
           <AppRoutes />

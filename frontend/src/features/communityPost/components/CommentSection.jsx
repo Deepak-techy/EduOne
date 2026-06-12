@@ -1,9 +1,68 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { communityService } from "../../../services/communityService";
 import ReportModal from "./ReportModal";
 import { Send, Loader2, Trash2, Flag, CheckCircle2, Lightbulb, ChevronDown } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
+
+// Portal-based dropdown for mark menu to avoid z-index / stacking context issues
+const MarkMenuPortal = ({ anchorRef, onMarkCorrect, onMarkHelpful, onClose }) => {
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (anchorRef?.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setPos({
+        top: rect.bottom + 4,
+        left: rect.right - 160, // align right edge with button
+      });
+    }
+  }, [anchorRef]);
+
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target) &&
+        anchorRef?.current && !anchorRef.current.contains(e.target)
+      ) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose, anchorRef]);
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      style={{
+        position: "fixed",
+        top: pos.top,
+        left: pos.left,
+        zIndex: 100000,
+      }}
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[160px] animate-in fade-in slide-in-from-top-1 duration-200"
+    >
+      <button
+        onClick={onMarkCorrect}
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors font-medium"
+      >
+        <CheckCircle2 size={14} />
+        Correct Answer
+      </button>
+      <button
+        onClick={onMarkHelpful}
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors font-medium"
+      >
+        <Lightbulb size={14} />
+        Helpful Answer
+      </button>
+    </div>,
+    document.body
+  );
+};
 
 const CommentSection = ({ postId, postAuthorId }) => {
   const [text, setText] = useState("");
@@ -14,6 +73,7 @@ const CommentSection = ({ postId, postAuthorId }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [reportCommentId, setReportCommentId] = useState(null);
   const [markMenuId, setMarkMenuId] = useState(null);
+  const markBtnRefs = useRef({});
   const { user } = useAuth();
 
   const isTeacherOrAdmin = user?.role === "Teacher" || user?.role === "Admin";
@@ -86,6 +146,8 @@ const CommentSection = ({ postId, postAuthorId }) => {
     }
   };
 
+  const closeMarkMenu = useCallback(() => setMarkMenuId(null), []);
+
   // Get mark badge styling
   const getMarkBadge = (markedAs) => {
     if (markedAs === "correct") {
@@ -107,6 +169,14 @@ const CommentSection = ({ postId, postAuthorId }) => {
       };
     }
     return null;
+  };
+
+  // Helper to get or create a ref for a comment's mark button
+  const getMarkBtnRef = (commentId) => {
+    if (!markBtnRefs.current[commentId]) {
+      markBtnRefs.current[commentId] = { current: null };
+    }
+    return markBtnRefs.current[commentId];
   };
 
   return (
@@ -157,6 +227,7 @@ const CommentSection = ({ postId, postAuthorId }) => {
             const isTeacher = user?.role === "Teacher";
             const canDeleteComment = isCommentOwner || isPostOwner || isAdmin || isTeacher;
             const markBadge = getMarkBadge(comment.markedAs);
+            const btnRef = getMarkBtnRef(comment._id);
 
             return (
               <div key={comment._id} className={`flex gap-3 group ${markBadge ? 'relative' : ''}`}>
@@ -202,6 +273,7 @@ const CommentSection = ({ postId, postAuthorId }) => {
                           ) : (
                             <>
                               <button
+                                ref={(el) => { btnRef.current = el; }}
                                 onClick={() => setMarkMenuId(markMenuId === comment._id ? null : comment._id)}
                                 className="text-gray-400 hover:text-emerald-500 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center gap-0.5"
                                 title="Mark answer"
@@ -209,24 +281,14 @@ const CommentSection = ({ postId, postAuthorId }) => {
                                 <CheckCircle2 size={14} />
                                 <ChevronDown size={10} />
                               </button>
-                              {/* Mark dropdown menu */}
+                              {/* Mark dropdown menu — rendered via portal */}
                               {markMenuId === comment._id && (
-                                <div className="absolute right-0 top-8 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[160px] animate-in fade-in slide-in-from-top-1 duration-200">
-                                  <button
-                                    onClick={() => handleMark(comment._id, "correct")}
-                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors font-medium"
-                                  >
-                                    <CheckCircle2 size={14} />
-                                    Correct Answer
-                                  </button>
-                                  <button
-                                    onClick={() => handleMark(comment._id, "helpful")}
-                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors font-medium"
-                                  >
-                                    <Lightbulb size={14} />
-                                    Helpful Answer
-                                  </button>
-                                </div>
+                                <MarkMenuPortal
+                                  anchorRef={btnRef}
+                                  onMarkCorrect={() => handleMark(comment._id, "correct")}
+                                  onMarkHelpful={() => handleMark(comment._id, "helpful")}
+                                  onClose={closeMarkMenu}
+                                />
                               )}
                             </>
                           )}

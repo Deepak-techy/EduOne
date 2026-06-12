@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../../contexts/AdminAuthContext';
 import { toast } from 'react-toastify';
-import { ShieldCheck, Loader2, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -113,6 +113,15 @@ const AdminLogin = () => {
           <p className="text-center text-xs text-gray-400 mt-5">
             Only authorized administrators can access this portal.
           </p>
+
+          <a
+            href="/"
+            onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}
+            className="flex items-center justify-center gap-2 mt-4 text-sm font-medium text-[#2196F3] hover:text-[#1976D2] transition-colors group cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            Back to Home
+          </a>
         </div>
       </div>
     </div>
